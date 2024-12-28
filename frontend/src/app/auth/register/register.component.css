@@ -1,0 +1,127 @@
+.main {
+    width: 450px;
+    margin: 0 auto;
+    padding: 25px;
+    background-color: #DEDEDE;
+    color: black;
+    border-radius: 30px;
+    margin-top: 60px;
+    -webkit-box-shadow: 10px -10px 40px 0px #ffffff41, -5px 5px 20px 0px #00000041; 
+    box-shadow: 10px -10px 40px 0px #ffffff41, -5px 5px 20px 0px #00000041;
+}
+
+h1 {
+    font-size: 40px;
+    font-weight: bold;
+    margin: 0px;
+
+}
+h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0px;
+    margin-bottom: 20px;
+}
+h3 a {
+    color: #1F31FE;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+label {
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+}
+.error {
+    color: red;
+    font-size: 15px;
+    margin-left: 10px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    height: 19px;
+}
+
+.input-section {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 100%;
+    height: 120px;
+}
+
+.input-section input {
+    font-weight: 500;
+    width: calc(100% - 20px);
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 20px;
+}
+
+.input-section input::placeholder {
+    color: #4e4d4d7e;
+}
+
+.input-section input:focus {
+    outline: none;
+    border: 2px solid #CE3FCC;
+}
+
+.terms-section {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    height: 50px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+.checkbox {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border-radius: 10px;
+}
+.checkbox_checked {
+    background-color: rgb(63, 236, 10);
+}
+.checkbox > input[type="checkbox"] {
+    width: 50px;
+    height: 50px;
+    margin: 0px;
+    opacity: 0;
+    cursor: pointer;
+}
+.terms {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    margin-left: 15px;
+    gap: 2px;
+}
+.terms > label {
+    font-size: 20px;
+    font-weight: 600;
+    font-size: 20px;
+    margin: 0px;
+}
+.terms > a {
+    font-size: 12px !important;
+    color: #1F31FE;
+    font-weight: medium;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.submit-register {
+    width: 300px;
+    height: 50px;
+    font-size: 22px;
+    font-weight: 800;
+    border-radius: 10px;
+    border: 0px;
+    margin-top: 30px;
+    -webkit-box-shadow: 5px -5px 20px 0px #ffffff41, -5px 5px 20px 0px #00000041; 
+    box-shadow: 5px -5px 20px 0px #ffffff41, -5px 5px 20px 0px #00000041;
+}

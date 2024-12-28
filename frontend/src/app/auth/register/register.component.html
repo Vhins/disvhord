@@ -1,1 +1,123 @@
-<p>register works!</p>
+<div style="text-align: center;">
+    
+    <form [formGroup]="registerform" (ngSubmit)="createAccount()">
+        <div class="main">
+        
+            <div>
+                <h1> Crea il tuo account </h1>
+                <h3> Hai gia un account? <a routerLink="/login"> Login </a> </h3>
+            </div>
+            
+            <div class="input-section">
+                <label for="user_handle"> Nome &#64;handle </label>
+                <input (click)="handleAlreadyInUse = false" [style]="handleAlreadyInUse ? 'color: red' : 'color: black'" type="text" formControlName="user_handle" placeholder="Supermario">
+                <div>
+                    @if(registerform.controls['user_handle'].errors?.['minlength']) {
+                        <span class="error">
+                            L'handle deve essere di almeno 2 caratteri
+                        </span>
+                    }@else if (registerform.controls['user_handle'].errors?.['maxlength']) {
+                        <span class="error">
+                            L'handle può essere al massimo 32 caratteri
+                        </span>
+                    }@else if (registerform.controls['user_handle'].value == "" && registerform.controls['user_handle'].touched){
+                        <span class="error">
+                            L'handle non può essere vuoto
+                        </span>
+                    }@else if (registerform.controls['user_handle'].errors?.['pattern']) {
+                        <span class="error">
+                            L'handle non può contenere caratteri speciali
+                        </span>
+                    }
+                    @if (this.handleAlreadyInUse) {
+                        <span class="error">
+                            <br> Handle non disponibile
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label for="user_displayName"> displayName </label>
+                <input type="text" formControlName="user_displayName" placeholder="Mario Super">
+                <div>
+                    @if(registerform.controls['user_displayName'].errors?.['minlength']) {
+                        <span class="error">
+                            Il nome deve essere di almeno 2 caratteri
+                        </span>
+                    }@else if (registerform.controls['user_displayName'].errors?.['maxlength']) {
+                        <span class="error">
+                            Il nome può essere al massimo 32 caratteri
+                        </span>
+                    }@else if (registerform.controls['user_displayName'].value == "" && registerform.controls['user_displayName'].touched){
+                        <span class="error">
+                            Il nome non può essere vuoto
+                        </span>
+                    }@else if (registerform.controls['user_displayName'].errors?.['pattern']) {
+                        <span class="error">
+                            Il nome non può iniziare con caratteri speciali
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label for="user_email"> E-mail </label>
+                <input (click)="emailAlreadyInUse = false" type="email" formControlName="user_email" placeholder="mariosuper99@disvhord.com">
+                <div>
+                    @if(registerform.controls['user_email'].value == "" && registerform.controls['user_email'].touched){
+                        <span class="error">
+                            Devi inserire un'email
+                        </span>
+                    }@else if (registerform.controls['user_email'].errors?.['email']) {
+                        <span class="error">
+                            Devi inserire un'email valida
+                        </span>
+                    }@else if (registerform.controls['user_email'].errors?.['pattern']) {
+                        <span class="error">
+                            Devi inserire un'email valida
+                        </span>
+                    }
+                    @if (this.emailAlreadyInUse) {
+                        <span class="error">
+                            <br> E-mail gia in uso
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label for="user_password"> Password </label>
+                <input type="password" formControlName="user_password" placeholder="Pasz_w0rdSuperSSGR3TA">
+                <div>
+                    @if(registerform.controls['user_password'].errors?.['minlength']) {
+                        <span class="error">
+                            La password deve essere di almeno 5 caratteri
+                        </span>
+                    }@else if (registerform.controls['user_password'].errors?.['maxlength']) {
+                        <span class="error">
+                            La password può essere al massimo 64 caratteri
+                        </span>
+                    }@else if(registerform.controls['user_password'].value == "" && registerform.controls['user_password'].touched){
+                        <span class="error">
+                            Devi inserire una password
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="terms-section">
+                <div class="checkbox" [style]="termsAccepted ? 'background-color: green' : 'background-color: white'" (click)="acceptTerms()"> </div>
+                <div class="terms">
+                    <label for="terms"> Accetta i termini e le condizioni </label>
+                    <a> termini e condizioni: <a routerLink="/terms" class="22"> disvhord.vincenzomanzi.com </a> </a>
+                </div>
+            </div>
+
+        </div>
+
+            <button class="submit-register" type="submit" [disabled]="registerform.invalid || termsAccepted === false"> Registrati </button>
+        
+    </form>
+
+</div>

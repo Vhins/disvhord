@@ -1,4 +1,9 @@
 :root {
-    background-color: #222222;
+    /* background-color: #222222; */
+    background-image: linear-gradient(90deg, #CE3FCC 0%, #43C2DE 100%);
     color: white;
+    font-family: "Inter", serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }

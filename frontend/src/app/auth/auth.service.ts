@@ -13,13 +13,48 @@ export class AuthService {
 
     public async isLoggedIn(): Promise<boolean> {
         const isTokenValid: boolean = await this.checkTokenValidity()
-        console.debug('isTokenValid', isTokenValid)
+
         if (!isTokenValid) {
             this.router.navigate(['/login'])
             return false
         } else {
             return true
         }
+    }
+
+    
+    public async tryCreateAccount(accountData: object): Promise<{return: boolean, code: number}> {
+        const apiURL = `http://${this.IP}/userCreateAccount`
+        const request = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(accountData)
+        }
+
+
+        return await fetch(apiURL, request)
+        .then(async response =>{
+            const responseData = await response.json()
+            if(response.ok){
+                localStorage.setItem("privateToken", responseData.token)
+                localStorage.setItem("user_id", responseData.id)
+                return {return: true, code: 0}
+            }else if(response.status === 400){
+                if (responseData.message === 'account non creato, email gia registrata') {
+                    return {return: false, code: 1}
+                }else {
+                    return {return: false, code: 2}
+                }
+            }
+            
+            return {return: false, code: 0}
+        })
+        .catch(error =>{
+            console.debug('Errore client fetch: ', error)
+            return {return: false, code: 0}
+        })
     }
 
     public async checkTokenValidity(): Promise<boolean> {
@@ -41,10 +76,8 @@ export class AuthService {
             .then(async response => {
                 const responseData = await response.json()
                 if(response.ok){
-                    console.debug(responseData.message)
                     return true
                 }else{
-                    console.debug(responseData.message)
                     this.removeDataLocalStorage()
                     return false
                 }
