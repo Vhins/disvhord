@@ -1,4 +1,4 @@
-<div style="text-align: center;">
+<div class="container" style="text-align: center;">
     
     <form [formGroup]="registerform" (ngSubmit)="createAccount()">
         <div class="main">
@@ -28,10 +28,9 @@
                         <span class="error">
                             L'handle non può contenere caratteri speciali
                         </span>
-                    }
-                    @if (this.handleAlreadyInUse) {
+                    }@else if (this.handleAlreadyInUse) {
                         <span class="error">
-                            <br> Handle non disponibile
+                            Handle non disponibile
                         </span>
                     }
                 </div>
@@ -77,10 +76,9 @@
                         <span class="error">
                             Devi inserire un'email valida
                         </span>
-                    }
-                    @if (this.emailAlreadyInUse) {
+                    }@else if (this.emailAlreadyInUse) {
                         <span class="error">
-                            <br> E-mail gia in uso
+                            E-mail gia in uso
                         </span>
                     }
                 </div>
@@ -116,7 +114,7 @@
 
         </div>
 
-            <button class="submit-register" type="submit" [disabled]="registerform.invalid || termsAccepted === false"> Registrati </button>
+            <button class="submit" type="submit" [disabled]="registerform.invalid || termsAccepted === false"> Registrati </button>
         
     </form>
 

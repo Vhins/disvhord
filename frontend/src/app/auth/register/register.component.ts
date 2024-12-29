@@ -9,7 +9,7 @@ import { ReactiveFormsModule } from '@angular/forms';
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrl: '../auth.components.css'
 })
 export class RegisterComponent {
     registerform!: FormGroup
@@ -23,7 +23,7 @@ export class RegisterComponent {
     ngOnInit(){
         this.registerform = new FormGroup({
             user_handle: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(32), Validators.pattern('[a-zA-Z0-9_.-]*$')]),
-            user_displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(32), Validators.pattern('[a-zA-Z0-9_.-]*$')]),
+            user_displayName: new FormControl(null, [Validators.required, Validators.minLength(2), Validators.maxLength(32), Validators.pattern(/^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$/)]),
             user_email: new FormControl(null, [Validators.required, Validators.email, Validators.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)]),
             user_password: new FormControl(null, [Validators.required, Validators.minLength(5), Validators.maxLength(64)])
         })

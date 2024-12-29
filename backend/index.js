@@ -39,7 +39,7 @@ async function handleApi_userCreateAccount(req, res){
     const { user_email, user_password, user_handle, user_displayName } = req.body
     console.debug("createAccountData | ", '| user_email: ', user_email, '| user_password: ', user_password, '| user_handle: ', user_handle, '| user_displayName: ', user_displayName)
 
-    if (!isValidEmail(user_email) || !isValidDisplayNameOrHandle(user_handle) || !isValidDisplayNameOrHandle(user_displayName)) {
+    if (!isValidEmail(user_email) || !isValidHandle(user_handle) || !isValidDisplayName(user_displayName)) {
         console.log('Account non creato, email / handle / displayname non valido')
         res.status(400).json({ message: 'Account non creato, email / handle / displayname non valid' })
         console.log("---------------------------------------------------------")
@@ -166,7 +166,12 @@ function isValidEmail(email) {
     return emailRegex.test(email)
 }
 
-function isValidDisplayNameOrHandle(name) {
+function isValidHandle(name) {
     const nameRegex = /^[a-zA-Z0-9_.-]*$/
+    return nameRegex.test(name)
+}
+
+function isValidDisplayName(name) {
+    const nameRegex = /^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$/
     return nameRegex.test(name)
 }
