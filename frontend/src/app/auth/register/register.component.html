@@ -37,7 +37,7 @@
             </div>
 
             <div class="input-section">
-                <label for="user_displayName"> displayName </label>
+                <label for="user_displayName"> Nome visualizzato </label>
                 <input type="text" formControlName="user_displayName" placeholder="Mario Super">
                 <div>
                     @if(registerform.controls['user_displayName'].errors?.['minlength']) {
@@ -105,10 +105,10 @@
             </div>
 
             <div class="terms-section">
-                <div class="checkbox" [style]="termsAccepted ? 'background-color: green' : 'background-color: white'" (click)="acceptTerms()"> </div>
+                <div class="checkbox" (click)="acceptTerms()"> <img [src]="termsAccepted ? './assets/Check.svg' : null"> </div>
                 <div class="terms">
                     <label for="terms"> Accetta i termini e le condizioni </label>
-                    <a> termini e condizioni: <a routerLink="/terms" class="22"> disvhord.vincenzomanzi.com </a> </a>
+                    <a> termini e condizioni: <a routerLink="/terms" class="22"> disvhord/terms </a> </a>
                 </div>
             </div>
 

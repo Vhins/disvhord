@@ -57,12 +57,43 @@ export class AuthService {
         })
     }
 
+    public async login(email: string, password: string): Promise<boolean>{
+        const apiURL = `http://${this.IP}/userLogin`
+        const request = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify( { "email": email, "password": password } )
+        }
+
+        return fetch(apiURL, request)
+        .then(async response =>{
+
+            const responseData = await response.json()
+
+            if(response.ok){    
+                localStorage.setItem("privateToken", responseData.token)
+                localStorage.setItem("user_id", responseData.id)
+                return true
+            }else{
+                console.debug(responseData.message)
+                return false
+            }
+        })
+        .catch(error => {            
+            console.debug('Errore client fetch: ', error)
+            return false
+        })
+        
+    }
+    
     public async checkTokenValidity(): Promise<boolean> {
         const privateToken: string | null = localStorage.getItem("privateToken")
         const user_id: string | null = localStorage.getItem("user_id")
         
         if(privateToken != null && user_id != null){
-
+            
             const apiURL = new URL(`http://${this.IP}/checkUserTokenValidity`)
             const request: RequestInit = {
                 method: 'POST',
@@ -71,7 +102,7 @@ export class AuthService {
                 },
                 body: JSON.stringify( { "privateToken": privateToken, "user_id": user_id } )
             }
-
+            
             return await fetch(apiURL, request)
             .then(async response => {
                 const responseData = await response.json()
@@ -83,9 +114,14 @@ export class AuthService {
                 }
             })
         }
-
+        
+        
         this.removeDataLocalStorage()
         return false
+    }
+    
+    public logout(): void{
+        this.removeDataLocalStorage()
     }
 
     public removeDataLocalStorage(): void{

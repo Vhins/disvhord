@@ -1,1 +1,65 @@
-<p>login works!</p>
+<div class="container" style="text-align: center;">
+    
+    <form [formGroup]="loginform" (ngSubmit)="login()">
+        <div class="main">
+        
+            <div>
+                <h1> Accedi al tuo account </h1>
+                <h3> Non hai un account? <a routerLink="/register"> Registrati </a> </h3>
+            </div>
+
+            <div class="input-section">
+                <label for="user_email"> E-mail </label>
+                <input (click)="wrongPasswordOrEmail = false" type="email" formControlName="user_email" placeholder="mariosuper99@disvhord.com">
+                <div>
+                    @if(loginform.controls['user_email'].value == "" && loginform.controls['user_email'].touched){
+                        <span class="error">
+                            Devi inserire un'email
+                        </span>
+                    }@else if (loginform.controls['user_email'].errors?.['email']) {
+                        <span class="error">
+                            Devi inserire un'email valida
+                        </span>
+                    }@else if (loginform.controls['user_email'].errors?.['pattern']) {
+                        <span class="error">
+                            Devi inserire un'email valida
+                        </span>
+                    }@else if (wrongPasswordOrEmail) {
+                        <span class="error">
+                            E-mail o Password errati
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label for="user_password"> Password </label>
+                <input (click)="wrongPasswordOrEmail = false" type="password" formControlName="user_password" placeholder="Pasz_w0rdSuperSSGR3TA">
+                <div>
+                    @if(loginform.controls['user_password'].errors?.['minlength']) {
+                        <span class="error">
+                            La password deve essere di almeno 5 caratteri
+                        </span>
+                    }@else if (loginform.controls['user_password'].errors?.['maxlength']) {
+                        <span class="error">
+                            La password può essere al massimo 64 caratteri
+                        </span>
+                    }@else if(loginform.controls['user_password'].value == "" && loginform.controls['user_password'].touched){
+                        <span class="error">
+                            Devi inserire una password
+                        </span>
+                    }@else if (wrongPasswordOrEmail) {
+                        <span class="error">
+                            E-mail o Password errati
+                        </span>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+            <button class="submit" type="submit" [disabled]="loginform.invalid"> Accedi </button>
+        
+    </form>
+
+</div>

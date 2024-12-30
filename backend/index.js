@@ -23,8 +23,9 @@ async function startServer(PORT){
         //* API list
         app.get('/test', (req, res) => { console.debug('API works'); res.send('API works') })
         app.post('/userCreateAccount', (req, res) => { handleApi_userCreateAccount(req, res) })
+        app.post('/userLogin', (req, res) => { handleApi_userLogin(req, res) })
         app.post('/checkUserTokenValidity', (req, res) => { handleApi_checkUserTokenValidity(req, res) })
-
+        app.get('/userInterface', (req, res) => { handleApi_userInterface(req, res) })
 
     }catch(error){
         console.error('Errore avviando il server backend:', error)
@@ -40,25 +41,25 @@ async function handleApi_userCreateAccount(req, res){
     console.debug("createAccountData | ", '| user_email: ', user_email, '| user_password: ', user_password, '| user_handle: ', user_handle, '| user_displayName: ', user_displayName)
 
     if (!isValidEmail(user_email) || !isValidHandle(user_handle) || !isValidDisplayName(user_displayName)) {
-        console.log('Account non creato, email / handle / displayname non valido')
+        console.debug('Account non creato, email / handle / displayname non valido')
         res.status(400).json({ message: 'Account non creato, email / handle / displayname non valid' })
-        console.log("---------------------------------------------------------")
+        console.debug("---------------------------------------------------------")
         return
     }
     
     let isHandleAlredyTakenDB = await db.collection('users_info').findOne({ user_handle: user_handle })
     if (isHandleAlredyTakenDB !== null){
-        console.log('Account non creato, handle gia usato')
+        console.debug('Account non creato, handle gia usato')
         res.status(400).json({ message: 'account non creato, handle gia usato'})
-        console.log("---------------------------------------------------------")
+        console.debug("---------------------------------------------------------")
         return
     }
     
     let isEmailAlredyPresentDB = await db.collection('users_info').findOne({ user_email: user_email })
     if (isEmailAlredyPresentDB !== null){
-        console.log('Account non creato, email gia registrata')
+        console.debug('Account non creato, email gia registrata')
         res.status(400).json({ message: 'account non creato, email gia registrata'})
-        console.log("---------------------------------------------------------")
+        console.debug("---------------------------------------------------------")
         return
     }
 
@@ -95,21 +96,62 @@ async function handleApi_userCreateAccount(req, res){
     const op2 = await db.collection('users_interface').insertOne(user_interface_doc)
 
     if(op.acknowledged == false || op == null && op2.acknowledged == false || op2 == null){
-        console.log('Errore del server, account non creato')
+        console.debug('Errore del server, account non creato')
         res.status(404).json({ message: 'Errore del server, account non creato'})
-        console.log("---------------------------------------------------------")
+        console.debug("---------------------------------------------------------")
         return
     }
 
-    console.log('Account creato correttamente')
+    console.debug('Account creato correttamente')
     res.status(201).json({ message: 'account creato correttamente', token: new_token, id: new_user_id})
     
-    console.log("---------------------------------------------------------")
-    return
+    console.debug("---------------------------------------------------------")
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+async function handleApi_userLogin(req, res){
+
+    const { email, password } = req.body
+    console.debug("loginData | ", '| email: ', email)
+
+    if(password == null || password == null){
+        console.debug('Credenziali errate/utente inesistente')
+        res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
+        console.debug("---------------------------------------------------------")
+        return
+    }
+
+    const userDB = await db.collection('users_info').findOne({ user_email: email })
+    if(userDB == null){
+        console.debug('Dati inviati nulli')
+        res.status(400).json({ message: 'Dati inviati nulli' })
+        console.debug("---------------------------------------------------------")
+        return
+    }
+
+    let comparePassword = await compare(password, userDB.user_password)
+
+    if(comparePassword){
+        const newToken = generaTokenJWT(userDB.user_id)
+
+        await db.collection('users_info').updateOne({ user_id: userDB.user_id }, {$set: {token: newToken}})
+
+        console.debug('Loggato con successo!')
+        res.status(200).json({ message: 'Loggato con successo!', token: newToken, id: userDB.user_id})
+    }else{
+        console.debug('Credenziali errate/utente inesistente')
+        res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
+    }
+
+    console.debug("---------------------------------------------------------")
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 async function handleApi_checkUserTokenValidity(req, res){
@@ -126,12 +168,10 @@ async function handleApi_checkUserTokenValidity(req, res){
     if (user_info.token === privateToken){
         console.debug('Token valido')
         res.status(202).json({ message: 'Token valido' })
-        return
     } else {
         console.debug('Token non valido')
         res.status(401).json({ message: 'Token non valido' })
         console.debug("---------------------------------------------------------")
-        return
     }
 }
 
@@ -174,4 +214,27 @@ function isValidHandle(name) {
 function isValidDisplayName(name) {
     const nameRegex = /^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$/
     return nameRegex.test(name)
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+async function handleApi_userInterface(req, res){
+    const { user_id } = req.body
+    console.debug('user_id', user_id)
+
+    const user_interfaceDB = await db.collection('users_interface').findOne({ user_id: Number(user_id) })
+
+    if(user_interfaceDB.user_displayName !== null){
+        console.debug('user esistente dati_interface ottenuti.')
+        res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_displayName: user_interfaceDB.user_displayName })
+        console.debug("---------------------------------------------------------")
+    }else{
+        console.debug('user non esistente nel database.')
+        res.status(401).json({ message: 'user non esistente nel database' })
+        console.debug("---------------------------------------------------------")
+        return
+    }
+
 }
