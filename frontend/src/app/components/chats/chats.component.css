@@ -1,0 +1,50 @@
+:host {
+    max-height: 89%;
+    border: 2px solid black;
+    overflow: hidden;
+}
+
+.chat-container {
+    height: calc(100% - 96px);
+    overflow-y: scroll;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.chat {
+    height: 44px;
+    background-color: white;
+    border-radius: 5px;
+    
+    padding: 8px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 7px;
+}
+
+.personal-chat {
+    width: calc(100% - 29px);
+    margin-bottom: 36px;
+}
+
+.chat-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.chat-user_logo{
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
+
+.chat-user_name {
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
