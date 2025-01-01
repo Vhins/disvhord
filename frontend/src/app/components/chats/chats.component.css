@@ -1,11 +1,11 @@
 :host {
     max-height: 89%;
-    border: 2px solid black;
+    /* border: 2px solid black; */
     overflow: hidden;
 }
 
 .chat-container {
-    height: calc(100% - 96px);
+    height: calc(100% - 101px);
     overflow-y: scroll;
     padding-right: 10px;
     display: flex;
@@ -15,7 +15,7 @@
 
 .chat {
     height: 44px;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 5px;
     
     padding: 8px;
@@ -23,6 +23,15 @@
     justify-content: start;
     align-items: center;
     gap: 7px;
+    cursor: pointer;
+}
+
+.chat:hover {
+    background-color: white;
+}
+
+.chat:last-child {
+    margin-bottom: 5px;
 }
 
 .personal-chat {
@@ -33,6 +42,14 @@
 .chat-icon {
     width: 40px;
     height: 40px;
+}
+
+.chat-icon:hover {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    padding: 3px;
+    transition: all 0.2s ease-in-out;
+    margin-right: -3px;
 }
 
 .chat-user_logo{
