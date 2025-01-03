@@ -26,7 +26,8 @@
               "src/assets/chat_colorfull.svg",
               "src/assets/microphone.svg",
               "src/assets/headphone.svg",
-              "src/assets/audio_settings.svg"
+              "src/assets/audio_settings.svg",
+              "src/assets/home.svg"
             ],
             "styles": [
               "src/styles.css"

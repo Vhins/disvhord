@@ -1,0 +1,55 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.home-container {
+    margin-bottom: 36px;
+}
+
+.home {
+    background-image: linear-gradient(90deg, #CE3FCC 0%, #43C2DE 100%);
+    margin-left: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-icon {
+    width: 35px;
+    height: 35px;
+}
+
+.server-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    /* width: 60px; */
+    padding-left: 12px;
+    height: calc(100% - 100px);
+    overflow-y: auto; 
+    flex-shrink: 0;
+    direction: rtl;
+}
+
+.server {
+    width: 60px;
+    min-height: 60px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.server-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    opacity: 0.85;
+}
+
+.server-icon:hover {
+    border-radius: 15px;
+    opacity: 1;
+}

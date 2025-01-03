@@ -1,0 +1,9 @@
+<div class="navbar">
+    <button (click)="show('friendList')"> Lista amici </button>
+    <button (click)="show('recentActivities')"> Attivita recenti </button>
+    <button (click)="show('yourPost')"> i tuoi post </button>
+</div>
+
+<app-friend-list [hidden]="!showFriendList"></app-friend-list>
+<app-recent-activities [hidden]="!showRecentActivities"></app-recent-activities>
+<app-your-post [hidden]="!showYourPost"></app-your-post>

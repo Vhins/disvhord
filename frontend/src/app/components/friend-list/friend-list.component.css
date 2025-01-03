@@ -1,10 +1,14 @@
 :host {
-    max-height: 89%;
-    /* border: 2px solid black; */
-    overflow: hidden;
+    width: 1000px;
+    min-width: 200px;
+    height: 100%;
+    margin-top: 30px;
 }
 
 .chat-container {
+    background-color: #df14149d;
+    width: calc(100% - 10px);
+    min-width: 200px;
     height: calc(100% - 101px);
     overflow-y: scroll;
     padding-right: 10px;
@@ -13,38 +17,52 @@
     gap: 15px;
 }
 
-.chat {
+.user_info {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 7px;
+}
+
+.user_info2 {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 30px;
+}
+
+.user_status {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.user {
     height: 44px;
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 5px;
     
     padding: 8px;
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
-    gap: 7px;
     cursor: pointer;
 }
 
-.chat:hover {
+.user:hover {
     background-color: white;
 }
 
-.chat:last-child {
+.user:last-child {
     margin-bottom: 5px;
 }
 
-.personal-chat {
-    width: calc(100% - 29px);
-    margin-bottom: 36px;
-}
 
-.chat-icon {
+.chat_icon {
     width: 40px;
     height: 40px;
 }
 
-.chat-icon:hover {
+.chat_icon:hover {
     background-color: #e0e0e0;
     border-radius: 10px;
     padding: 3px;
@@ -52,13 +70,13 @@
     margin-right: -3px;
 }
 
-.chat-user_logo{
+.user_logo{
     width: 44px;
     height: 44px;
     border-radius: 50%;
 }
 
-.chat-user_name {
+.user_name {
     width: 100%;
     font-size: 1.5rem;
     font-weight: 500;
