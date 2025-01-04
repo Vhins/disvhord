@@ -25,7 +25,9 @@ async function startServer(PORT){
         app.post('/userCreateAccount', (req, res) => { handleApi_userCreateAccount(req, res) })
         app.post('/userLogin', (req, res) => { handleApi_userLogin(req, res) })
         app.post('/checkUserTokenValidity', (req, res) => { handleApi_checkUserTokenValidity(req, res) })
-        app.get('/userInterface', (req, res) => { handleApi_userInterface(req, res) })
+
+        app.post('/basicUserInterfaceData', (req, res) => { handleApi_basicUserInterfaceData(req, res) })
+
 
     }catch(error){
         console.error('Errore avviando il server backend:', error)
@@ -220,15 +222,61 @@ function isValidDisplayName(name) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-async function handleApi_userInterface(req, res){
+async function handleApi_basicUserInterfaceData(req, res){
     const { user_id } = req.body
     console.debug('user_id', user_id)
 
     const user_interfaceDB = await db.collection('users_interface').findOne({ user_id: Number(user_id) })
+    delete user_interfaceDB._id
+    delete user_interfaceDB.blocked
+    delete user_interfaceDB.servers_owned
 
-    if(user_interfaceDB.user_displayName !== null){
+
+    const friends_info = []
+    for (const friend of user_interfaceDB.friends) {
+        const friend_info = await db.collection('users_interface').findOne({ user_id: friend })
+        if (friend_info === null) continue
+
+        friends_info.push({
+            user_id: friend_info.user_id,
+            user_displayName: friend_info.user_displayName,
+            user_logo: friend_info.user_logo
+        })
+    }
+    user_interfaceDB.friends = friends_info
+
+
+    const chats_info = []
+    for (const chat of user_interfaceDB.chats) {
+        const chat_info = await db.collection('users_interface').findOne({ user_id: chat })
+        if (chat_info === null) continue
+
+        chats_info.push({
+            chat_id: chat_info.user_id,
+            user_displayName: chat_info.user_displayName,
+            user_logo: chat_info.user_logo
+        })
+    }
+    user_interfaceDB.chats = chats_info
+
+
+    const servers_info = []
+    for (const server of user_interfaceDB.servers_joined) {
+        const server_info = await db.collection('servers').findOne({ server_id: server })
+        if (server_info === null) continue
+
+        servers_info.push({
+            server_id: server_info.server_id,
+            name: server_info.name,
+            logo: server_info.logo
+        })
+    }
+    user_interfaceDB.servers_joined = servers_info
+
+
+    if(user_interfaceDB !== null){
         console.debug('user esistente dati_interface ottenuti.')
-        res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_displayName: user_interfaceDB.user_displayName })
+        res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
         console.debug("---------------------------------------------------------")
     }else{
         console.debug('user non esistente nel database.')
@@ -236,5 +284,4 @@ async function handleApi_userInterface(req, res){
         console.debug("---------------------------------------------------------")
         return
     }
-
 }

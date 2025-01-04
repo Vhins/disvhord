@@ -1,122 +1,19 @@
 <div class="chat-container">
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 1 </span>
+
+    @for (friend of getFriendsList(); track $index) {
+        <div class="user">
+            <div [id]="friend.user_id" class="user_info">
+                <img class="user_logo" [src]="friend.user_logo">
+                <div class="user_info3">
+                    <span class="user_name"> {{friend.user_displayName}} </span>
+                    <span class="user_mood"> Nah today nuhhu </span>
+                </div>
+            </div>
+            <div class="user_info2">
+                <div class="user_status"> Stava usando visual studio.. </div>
+                <img class="chat_icon" src="./assets/chat_colorfull.svg">
+            </div>
         </div>
-        <div class="user_info2">
-            <div class="user_status"> Stava usando visual studio.. </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 2 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Sta giocando a fortnite </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 3 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Stava usando visual studio.. </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 4 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Sta giocando a fortnite.. </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 5 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Stava usando visual studio.. </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 6 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Sta giocando a fortnite </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 7 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Stava usando visual studio.. </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 8 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Sta giocando a fortnite </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 9 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Stava usando visual studio.. </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 10 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Sta giocando a fortnite </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 11 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Stava usando visual studio.. </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
-    <div class="user">
-        <div class="user_info">
-            <img class="user_logo" src="https://cdn.discordapp.com/avatars/949468725990543401/5a58cc492b781b07b9478c6b2c598ee1.webp?size=100">
-            <span class="user_name"> Prova 12 </span>
-        </div>
-                <div class="user_info2">
-            <div class="user_status"> Sta giocando a fortnite </div>
-            <img class="chat_icon" src="./assets/chat_colorfull.svg">
-        </div>
-    </div>
+    }
+
 </div>

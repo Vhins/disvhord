@@ -20,7 +20,7 @@ export class HomeComponent {
     }
 
     showorhide(): boolean {
-        console.log('aa', this.location.path())
+        // console.debg('this.location.path', this.location.path())
         return this.location.path() === '/app/home/me';
     }
 
