@@ -1,4 +1,7 @@
 import express, { json } from "express"; const app = express(); app.use(json())
+import http from "http"; const server = http.createServer(app);
+import { Server } from "socket.io"; 
+const io = new Server(server, { cors: { origin: "http://localhost:4200", methods: ["GET", "POST"]}});
 import { connectToDatabase } from "./db.js"; let db
 import jwt from 'jsonwebtoken'; const { sign } = jwt;
 import rateLimit from 'express-rate-limit'
@@ -6,11 +9,14 @@ import { compare, hash, genSalt } from 'bcrypt'
 
 startServer(3333)
 
+const users = {}
+
 async function startServer(PORT){
 
     try{
         db = await connectToDatabase()
-        
+
+        io.listen(3332)
         app.listen(PORT, ()=>{ console.debug(`‎ \n Server backend avviato | Port: ${PORT} \n ---------------------------------------------------------`) })
 
         app.use((req, res, next) => {        
@@ -28,6 +34,29 @@ async function startServer(PORT){
 
         app.post('/basicUserInterfaceData', (req, res) => { handleApi_basicUserInterfaceData(req, res) })
 
+
+        //* Socket.io
+        io.on('connection', (socket) => {
+            console.log('utente connesso')
+
+            socket.on('connect', (user_id) => {
+                users[user_id] = socket.id
+                // io.emit('message', message)
+            })
+
+            socket.on('personal_message', (data) => {
+                console.log('message: ' + data.content, 'sender: ' + data.sender, 'receiver: ' + data.receiver)
+                const receiverSocketId = users[receiver]
+                io.to(receiverSocketId).emit('personal_message', data)
+            })
+
+            socket.on('disconnect', () => {
+                for (let userId in users) {
+                    if (users[userId] === socket.id) { delete users[userId]; break }
+                }
+            })
+
+        })
 
     }catch(error){
         console.error('Errore avviando il server backend:', error)
@@ -285,3 +314,6 @@ async function handleApi_basicUserInterfaceData(req, res){
         return
     }
 }
+
+
+
