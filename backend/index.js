@@ -39,15 +39,30 @@ async function startServer(PORT){
         io.on('connection', (socket) => {
             console.log('utente connesso')
 
-            socket.on('connect', (user_id) => {
+            socket.on('connected', (user_id) => {
+                console.log(user_id + ' è connesso')
                 users[user_id] = socket.id
-                // io.emit('message', message)
             })
 
-            socket.on('personal_message', (data) => {
-                console.log('message: ' + data.content, 'sender: ' + data.sender, 'receiver: ' + data.receiver)
-                const receiverSocketId = users[receiver]
-                io.to(receiverSocketId).emit('personal_message', data)
+            socket.on('personal_message', async (data) => {
+                console.log('message: ' + data.content, 'sender: ' + data.sender, users[data.sender], 'receiver: ' + data.receiver, users[data.receiver])
+                if (users[data.receiver] !== null) {
+                    const senderSocketId = users[data.sender]
+                    const receiverSocketId = users[data.receiver]
+                    io.to(senderSocketId).emit('personal_message_received', data)
+                    io.to(receiverSocketId).emit('personal_message_received', data)
+                }
+                
+                const message = {
+                    "message_id": 33,
+                    "content": data.content,
+                    "attachments": null
+                }
+            
+                const op = await db.collection('chats').updateOne(
+                    { chat_id: 4},
+                    { $push: { messages: message }}
+                )
             })
 
             socket.on('disconnect', () => {
@@ -255,7 +270,19 @@ async function handleApi_basicUserInterfaceData(req, res){
     const { user_id } = req.body
     console.debug('user_id', user_id)
 
+    if (user_id === null) {
+        res.status(404).json({ message: 'nessun id fornito' })
+        console.debug("---------------------------------------------------------")
+        return
+    }
+
     const user_interfaceDB = await db.collection('users_interface').findOne({ user_id: Number(user_id) })
+    console.log('user_interfaceDB', user_interfaceDB)
+    if (user_interfaceDB === null) {
+        res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
+        console.debug("---------------------------------------------------------")
+        return
+    }
     delete user_interfaceDB._id
     delete user_interfaceDB.blocked
     delete user_interfaceDB.servers_owned

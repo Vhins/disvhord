@@ -27,7 +27,9 @@
               "src/assets/microphone.svg",
               "src/assets/headphone.svg",
               "src/assets/audio_settings.svg",
-              "src/assets/home.svg"
+              "src/assets/home.svg",
+              "src/assets/attachment.svg",
+              "src/assets/send.svg"
             ],
             "styles": [
               "src/styles.css"

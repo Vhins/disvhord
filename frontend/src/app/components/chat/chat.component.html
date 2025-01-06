@@ -1,1 +1,22 @@
-<p>chat works!</p>
+<div class="messages-container" #scrollContainer>
+    @for (message of messages; track $index) {
+        <div class="message-wrapper">
+            <div class="message">
+                <img class="message-user_logo" src="https://cdn.discordapp.com/avatars/704278954588110888/d348363a850a931bf7bd5e0b9ec894da.webp?size=100">
+                <div class="content"> {{message.content}} </div>
+                <div class="data"> 29/12/2024 10:02 </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="input-container" #input_container>
+    <div class="input-box">
+        <button>
+            <img class="input-icon" src="./assets/attachment.svg">
+        </button>
+        <textarea #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="adjustHeight($event)"></textarea>
+        <button (click)="sendMessage()">
+            <img class="input-icon" src="./assets/send.svg">
+        </button>
+    </div>
+</div>
