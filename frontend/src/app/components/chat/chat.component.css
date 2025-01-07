@@ -13,7 +13,8 @@
     /* height: calc(100% - 102px); */
     overflow-y: scroll;
     display: flex;
-    flex-direction: row;
+    justify-content: end;
+    /* flex-direction: column; */
     gap: 20px;
     flex-wrap: wrap;
 }

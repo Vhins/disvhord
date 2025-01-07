@@ -33,6 +33,7 @@ async function startServer(PORT){
         app.post('/checkUserTokenValidity', (req, res) => { handleApi_checkUserTokenValidity(req, res) })
 
         app.post('/basicUserInterfaceData', (req, res) => { handleApi_basicUserInterfaceData(req, res) })
+        app.post('/ChatInfoMessages', (req, res) => { handleApi_ChatInfoMessages(req, res) })
 
 
         //* Socket.io
@@ -46,23 +47,28 @@ async function startServer(PORT){
 
             socket.on('personal_message', async (data) => {
                 console.log('message: ' + data.content, 'sender: ' + data.sender, users[data.sender], 'receiver: ' + data.receiver, users[data.receiver])
+
                 if (users[data.receiver] !== null) {
+                    const message = {
+                        "message_id": 33,
+                        "content": data.content,
+                        "attachments": null,
+                        "sender": data.sender,
+                        "receiver": data.receiver,
+                        "timestamp": new Date().getTime()
+                    }
+                
+                    const op = await db.collection('chats').updateOne(
+                        { chat_id: 4},
+                        { $push: { messages: message }}
+                    )
+
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
                     io.to(senderSocketId).emit('personal_message_received', data)
                     io.to(receiverSocketId).emit('personal_message_received', data)
                 }
                 
-                const message = {
-                    "message_id": 33,
-                    "content": data.content,
-                    "attachments": null
-                }
-            
-                const op = await db.collection('chats').updateOne(
-                    { chat_id: 4},
-                    { $push: { messages: message }}
-                )
             })
 
             socket.on('disconnect', () => {
@@ -302,18 +308,30 @@ async function handleApi_basicUserInterfaceData(req, res){
     user_interfaceDB.friends = friends_info
 
 
+    console.log("?????",  user_interfaceDB.chats)
     const chats_info = []
     for (const chat of user_interfaceDB.chats) {
-        const chat_info = await db.collection('users_interface').findOne({ user_id: chat })
+        const chat_info = await db.collection('chats').findOne({ chat_id: chat })
         if (chat_info === null) continue
 
+        let user_chat_info 
+        if (chat_info.users_id[0] === Number(user_id)) {
+            user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[1] })
+        } else {
+            user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[0] })
+        }
+
+        console.log('user_chat_info', user_chat_info)
+
         chats_info.push({
-            chat_id: chat_info.user_id,
-            user_displayName: chat_info.user_displayName,
-            user_logo: chat_info.user_logo
+            chat_id: chat_info.chat_id,
+            chat_user_id: user_chat_info.user_id,
+            user_displayName: user_chat_info.user_displayName,
+            user_logo: user_chat_info.user_logo
         })
     }
     user_interfaceDB.chats = chats_info
+    console.log('!!!!!!!!', chats_info)
 
 
     const servers_info = []
@@ -344,3 +362,18 @@ async function handleApi_basicUserInterfaceData(req, res){
 
 
 
+
+async function handleApi_ChatInfoMessages(req, res) {
+    const { chat_id } = req.body
+    console.debug('chat_id', chat_id)
+
+    const chat_info = await db.collection('chats').findOne({ chat_id: chat_id })
+
+    let user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[1] })
+    let user_chat_info2 = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[0] })
+
+    console.debug('chat_info.messages', chat_info.messages)
+    res.status(200).json({ chatInfo: user_chat_info, chatInfo2: user_chat_info2, chatMessages: chat_info.messages })
+    console.debug("---------------------------------------------------------")
+    return
+ }

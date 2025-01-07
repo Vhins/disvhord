@@ -18,7 +18,7 @@ export const routes: Routes = [
     { path: 'app', canActivate: [authGuard], component: DisvhordAppComponent, children: [
         { path: 'home', component: HomeComponent, children: [
             { path: 'me', component: NavbarComponent },
-            { path: 'chat', component: ChatComponent },
+            { path: 'chat/:chat_id', component: ChatComponent },
         ]},
         { path: 'server', component: ChatComponent}
     ]

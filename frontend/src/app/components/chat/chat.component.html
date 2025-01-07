@@ -1,9 +1,11 @@
 <div class="messages-container" #scrollContainer>
     @for (message of messages; track $index) {
         <div class="message-wrapper">
-            <div class="message">
-                <img class="message-user_logo" src="https://cdn.discordapp.com/avatars/704278954588110888/d348363a850a931bf7bd5e0b9ec894da.webp?size=100">
-                <div class="content"> {{message.content}} </div>
+            <div [id]="message.message_id" class="message">
+                <img class="message-user_logo" [src]="users_info[message.sender].img">
+                <!-- <img class="message-user_logo" src="https://cdn.discordapp.com/avatars/704278954588110888/d348363a850a931bf7bd5e0b9ec894da.webp?size=100"> -->
+                <div> {{users_info[message.sender].name}}:{{message.sender}} </div>
+                <div class="content"> {{message.content}}, timestamp: {{message.timestamp}} </div>
                 <div class="data"> 29/12/2024 10:02 </div>
             </div>
         </div>

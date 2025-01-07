@@ -9,7 +9,7 @@ interface user_interface {
     user_logo: string,
     friends: Array<{user_id: number, user_displayName: string, user_logo: string}>,
     pending_friend_requests: Array<number>,
-    chats: Array<{chat_id: number, user_displayName: string, user_logo: string}>,
+    chats: Array<{chat_id: number, chat_user_id: number, user_displayName: string, user_logo: string}>,
     servers_joined: Array<{server_id: number, name: string, logo: string}>,
     posts: Array<number>,
     notifications: Array<number>
@@ -24,6 +24,7 @@ export class InitializeAppApiService {
     constructor(private ruoter: Router, private authService: AuthService) {
         this.IP = "localhost:3333"
         this.get_basicUserInterfaceData()
+        
     }
 
     user_interface!: user_interface
@@ -45,6 +46,7 @@ export class InitializeAppApiService {
             if(response.ok){
                 this.user_interface = responseData.user_interfaceDB
                 console.debug('responseData.user_interfaceDB', this.user_interface)
+                console.debug('this.user_interface.chats', this.user_interface.chats)
 
                 return true
             }else{
