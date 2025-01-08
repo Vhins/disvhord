@@ -34,7 +34,7 @@
 
             <div class="input-section">
                 <label for="user_password"> Password </label>
-                <input (click)="wrongPasswordOrEmail = false" type="password" formControlName="user_password" placeholder="Pasz_w0rdSuperSSGR3TA">
+                <input autocomplete="on" (click)="wrongPasswordOrEmail = false" type="password" formControlName="user_password" placeholder="Pasz_w0rdSuperSSGR3TA">
                 <div>
                     @if(loginform.controls['user_password'].errors?.['minlength']) {
                         <span class="error">

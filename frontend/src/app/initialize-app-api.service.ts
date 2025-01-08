@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 
 interface user_interface {
@@ -19,23 +18,19 @@ interface user_interface {
   providedIn: 'root'
 })
 export class InitializeAppApiService {
-    IP: string
+    IP: string = "localhost:3333"  
 
-    constructor(private ruoter: Router, private authService: AuthService) {
-        this.IP = "localhost:3333"
-        this.get_basicUserInterfaceData()
-        
-    }
+    constructor(private authService: AuthService) {}
 
     user_interface!: user_interface
-
 
     async get_basicUserInterfaceData(): Promise< boolean>{
         const apiURL = `http://${this.IP}/basicUserInterfaceData`
         const request = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem("privateToken")}`
             },
             body: JSON.stringify( {"user_id": localStorage.getItem("user_id")} )
         }
@@ -45,19 +40,14 @@ export class InitializeAppApiService {
             const responseData = await response.json()
             if(response.ok){
                 this.user_interface = responseData.user_interfaceDB
-                console.debug('responseData.user_interfaceDB', this.user_interface)
-                console.debug('this.user_interface.chats', this.user_interface.chats)
-
                 return true
             }else{
-                console.debug(responseData.message)
                 this.authService.removeDataLocalStorage()
-                this.ruoter.navigate(['/login'])
                 return false
             }
         })
         .catch(error =>{
-            console.debug('Errore client fetch: ', error)
+            console.error(error)
             return false
         })
     }

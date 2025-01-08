@@ -52,7 +52,7 @@ export class AuthService {
             return {return: false, code: 0}
         })
         .catch(error =>{
-            console.debug('Errore client fetch: ', error)
+            console.error(error)
             return {return: false, code: 0}
         })
     }
@@ -77,12 +77,11 @@ export class AuthService {
                 localStorage.setItem("user_id", responseData.id)
                 return true
             }else{
-                console.debug(responseData.message)
                 return false
             }
         })
-        .catch(error => {            
-            console.debug('Errore client fetch: ', error)
+        .catch(error => {     
+            console.error(error)
             return false
         })
         
@@ -98,9 +97,10 @@ export class AuthService {
             const request: RequestInit = {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${privateToken}`
                 },
-                body: JSON.stringify( { "privateToken": privateToken, "user_id": user_id } )
+                body: JSON.stringify( { "user_id": user_id } )
             }
             
             return await fetch(apiURL, request)

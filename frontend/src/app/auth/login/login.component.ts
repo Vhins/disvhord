@@ -27,7 +27,7 @@ export class LoginComponent {
 
     async login(){
         if(await this.authService.login(this.loginform.value.user_email, this.loginform.value.user_password)){
-            this.ruoter.navigate(['/app'])
+            this.ruoter.navigate(['/app/home/me'])
         }else{
             this.wrongPasswordOrEmail = true
         }

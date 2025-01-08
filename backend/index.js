@@ -6,6 +6,7 @@ import { connectToDatabase } from "./db.js"; let db
 import jwt from 'jsonwebtoken'; const { sign } = jwt;
 import rateLimit from 'express-rate-limit'
 import { compare, hash, genSalt } from 'bcrypt'
+const secretJWT = "90628be6876cdbed544203e26c89ce931b10e1ca4163d41f7b6f4131b2c77bae0f9998d6fefa65d4570effdc12a36fce2bdf87ad3821714d1326798eff1d85ad"
 
 startServer(3333)
 
@@ -32,17 +33,17 @@ async function startServer(PORT){
         app.post('/userLogin', (req, res) => { handleApi_userLogin(req, res) })
         app.post('/checkUserTokenValidity', (req, res) => { handleApi_checkUserTokenValidity(req, res) })
 
-        app.post('/basicUserInterfaceData', (req, res) => { handleApi_basicUserInterfaceData(req, res) })
-        app.post('/ChatInfoMessages', (req, res) => { handleApi_ChatInfoMessages(req, res) })
+        app.post('/basicUserInterfaceData', verifyJWT, (req, res) => { handleApi_basicUserInterfaceData(req, res) })
+        app.post('/ChatInfoMessages', verifyJWT, (req, res) => { handleApi_ChatInfoMessages(req, res) })
 
 
         //* Socket.io
         io.on('connection', (socket) => {
-            console.log('utente connesso')
 
-            socket.on('connected', (user_id) => {
-                console.log(user_id + ' è connesso')
-                users[user_id] = socket.id
+            socket.on('connected', (token) => {
+                const decoded = jwt.verify(token, secretJWT)
+                console.log('connesso tramite socket.io, user_id:', decoded.user_id)
+                users[decoded.id] = socket.user_id
             })
 
             socket.on('personal_message', async (data) => {
@@ -90,28 +91,21 @@ async function startServer(PORT){
 
 async function handleApi_userCreateAccount(req, res){
     const { user_email, user_password, user_handle, user_displayName } = req.body
-    console.debug("createAccountData | ", '| user_email: ', user_email, '| user_password: ', user_password, '| user_handle: ', user_handle, '| user_displayName: ', user_displayName)
 
     if (!isValidEmail(user_email) || !isValidHandle(user_handle) || !isValidDisplayName(user_displayName)) {
-        console.debug('Account non creato, email / handle / displayname non valido')
         res.status(400).json({ message: 'Account non creato, email / handle / displayname non valid' })
-        console.debug("---------------------------------------------------------")
         return
     }
     
     let isHandleAlredyTakenDB = await db.collection('users_info').findOne({ user_handle: user_handle })
     if (isHandleAlredyTakenDB !== null){
-        console.debug('Account non creato, handle gia usato')
         res.status(400).json({ message: 'account non creato, handle gia usato'})
-        console.debug("---------------------------------------------------------")
         return
     }
     
     let isEmailAlredyPresentDB = await db.collection('users_info').findOne({ user_email: user_email })
     if (isEmailAlredyPresentDB !== null){
-        console.debug('Account non creato, email gia registrata')
         res.status(400).json({ message: 'account non creato, email gia registrata'})
-        console.debug("---------------------------------------------------------")
         return
     }
 
@@ -148,16 +142,12 @@ async function handleApi_userCreateAccount(req, res){
     const op2 = await db.collection('users_interface').insertOne(user_interface_doc)
 
     if(op.acknowledged == false || op == null && op2.acknowledged == false || op2 == null){
-        console.debug('Errore del server, account non creato')
         res.status(404).json({ message: 'Errore del server, account non creato'})
-        console.debug("---------------------------------------------------------")
         return
     }
 
-    console.debug('Account creato correttamente')
     res.status(201).json({ message: 'account creato correttamente', token: new_token, id: new_user_id})
     
-    console.debug("---------------------------------------------------------")
 }
 
 
@@ -167,20 +157,15 @@ async function handleApi_userCreateAccount(req, res){
 async function handleApi_userLogin(req, res){
 
     const { email, password } = req.body
-    console.debug("loginData | ", '| email: ', email)
 
     if(password == null || password == null){
-        console.debug('Credenziali errate/utente inesistente')
         res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
-        console.debug("---------------------------------------------------------")
         return
     }
 
     const userDB = await db.collection('users_info').findOne({ user_email: email })
     if(userDB == null){
-        console.debug('Dati inviati nulli')
         res.status(400).json({ message: 'Dati inviati nulli' })
-        console.debug("---------------------------------------------------------")
         return
     }
 
@@ -191,39 +176,64 @@ async function handleApi_userLogin(req, res){
 
         await db.collection('users_info').updateOne({ user_id: userDB.user_id }, {$set: {token: newToken}})
 
-        console.debug('Loggato con successo!')
         res.status(200).json({ message: 'Loggato con successo!', token: newToken, id: userDB.user_id})
     }else{
-        console.debug('Credenziali errate/utente inesistente')
         res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
     }
 
-    console.debug("---------------------------------------------------------")
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+async function verifyJWT(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+
+    if (!token) {
+        return res.status(401).json({ error: "Token non fornito!" })
+    }
+
+    try {
+        const decoded = jwt.verify(token, secretJWT)
+        req.JWTdata = decoded
+
+        const user_info = await db.collection('users_info').findOne({user_id: Number(decoded.user_id)})
+
+        if (user_info === null){
+            res.status(404).json({ message: 'Utente non trovato' })
+            return
+        }
+    
+        if (user_info.token === token){
+            next()
+        } else {
+            res.status(401).json({ message: 'Token non valido' })
+            return
+        }
+    } catch (error) {
+        return res.status(403).json({ error: "Token non valido!" })
+    }
+}
+
 
 async function handleApi_checkUserTokenValidity(req, res){
-    const { privateToken, user_id } = req.body
+    const { user_id } = req.body
+    const authHeader = req.headers['authorization']
+    const privateToken = authHeader && authHeader.split(' ')[1]
+
     const user_info = await db.collection('users_info').findOne({user_id: Number(user_id)})
 
     if (user_info === null){
-        console.debug('Utente non trovato')
         res.status(404).json({ message: 'Utente non trovato' })
-        console.debug("---------------------------------------------------------")
         return
     }
 
     if (user_info.token === privateToken){
-        console.debug('Token valido')
         res.status(202).json({ message: 'Token valido' })
     } else {
-        console.debug('Token non valido')
         res.status(401).json({ message: 'Token non valido' })
-        console.debug("---------------------------------------------------------")
     }
 }
 
@@ -250,7 +260,7 @@ async function generateID(){
 }
 
 function generaTokenJWT(user_id){
-    return sign({ user_id: user_id, timestamp: new Date().getTime()}, "90628be6876cdbed544203e26c89ce931b10e1ca4163d41f7b6f4131b2c77bae0f9998d6fefa65d4570effdc12a36fce2bdf87ad3821714d1326798eff1d85ad")
+    return sign({ user_id: user_id, timestamp: new Date().getTime()}, secretJWT)
 }
 
 function isValidEmail(email) {
@@ -268,25 +278,20 @@ function isValidDisplayName(name) {
     return nameRegex.test(name)
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function handleApi_basicUserInterfaceData(req, res){
     const { user_id } = req.body
-    console.debug('user_id', user_id)
 
     if (user_id === null) {
         res.status(404).json({ message: 'nessun id fornito' })
-        console.debug("---------------------------------------------------------")
         return
     }
 
     const user_interfaceDB = await db.collection('users_interface').findOne({ user_id: Number(user_id) })
-    console.log('user_interfaceDB', user_interfaceDB)
     if (user_interfaceDB === null) {
         res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
-        console.debug("---------------------------------------------------------")
         return
     }
     delete user_interfaceDB._id
@@ -308,7 +313,6 @@ async function handleApi_basicUserInterfaceData(req, res){
     user_interfaceDB.friends = friends_info
 
 
-    console.log("?????",  user_interfaceDB.chats)
     const chats_info = []
     for (const chat of user_interfaceDB.chats) {
         const chat_info = await db.collection('chats').findOne({ chat_id: chat })
@@ -321,7 +325,6 @@ async function handleApi_basicUserInterfaceData(req, res){
             user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[0] })
         }
 
-        console.log('user_chat_info', user_chat_info)
 
         chats_info.push({
             chat_id: chat_info.chat_id,
@@ -331,7 +334,6 @@ async function handleApi_basicUserInterfaceData(req, res){
         })
     }
     user_interfaceDB.chats = chats_info
-    console.log('!!!!!!!!', chats_info)
 
 
     const servers_info = []
@@ -349,31 +351,36 @@ async function handleApi_basicUserInterfaceData(req, res){
 
 
     if(user_interfaceDB !== null){
-        console.debug('user esistente dati_interface ottenuti.')
         res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
-        console.debug("---------------------------------------------------------")
     }else{
-        console.debug('user non esistente nel database.')
         res.status(401).json({ message: 'user non esistente nel database' })
-        console.debug("---------------------------------------------------------")
         return
     }
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function handleApi_ChatInfoMessages(req, res) {
     const { chat_id } = req.body
-    console.debug('chat_id', chat_id)
+    const JWTdata = req.JWTdata
+
+    if (chat_id === null) {
+        res.status(404).json({ message: 'chat_id non fornito' })
+        return
+    }
 
     const chat_info = await db.collection('chats').findOne({ chat_id: chat_id })
 
-    let user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[1] })
-    let user_chat_info2 = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[0] })
+    let user_chat_info
 
-    console.debug('chat_info.messages', chat_info.messages)
-    res.status(200).json({ chatInfo: user_chat_info, chatInfo2: user_chat_info2, chatMessages: chat_info.messages })
-    console.debug("---------------------------------------------------------")
+    if (Number(JWTdata.user_id) === Number(chat_info.users_id[1])) {
+        user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[0] })
+    } else {
+        user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[1] })
+    }
+
+    res.status(200).json({ chatMessages: chat_info.messages, chatInfo: {user_id: user_chat_info.user_id, user_displayName: user_chat_info.user_displayName, user_logo: user_chat_info.user_logo}})
     return
- }
+}

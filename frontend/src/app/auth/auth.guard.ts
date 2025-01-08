@@ -3,6 +3,6 @@ import { AuthService } from './auth.service';
 import { inject } from '@angular/core';
 
 export const authGuard: CanActivateFn = async (route, state) => {
-    const auth = inject(AuthService) as AuthService;
-    return auth.isLoggedIn();
-};
+    const auth = inject(AuthService) as AuthService
+    return auth.isLoggedIn()
+}
