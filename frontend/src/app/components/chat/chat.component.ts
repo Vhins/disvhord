@@ -1,7 +1,6 @@
-import { Component, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { WebSocketService } from '../../web-socket.service';
-import { InitializeAppApiService } from '../../initialize-app-api.service';
-import { ActivatedRoute } from '@angular/router';
+import { ChatService } from '../../chat.service';
 
 @Component({
   selector: 'app-chat',
@@ -11,48 +10,46 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './chat.component.css'
 })
 export class ChatComponent {
-    user_id: number
-    IP = "localhost:3333"
+    user_id!: number
+    messages: {content: string, sender: number, receiver: number, message_id: number, timestamp: string}[] = []
+    users_info: {[key: number]: {id: number, name: string, img: string}} = {}
+    chat_id!: number
+    chat_user_id!: number
+
+
 
     @ViewChild('scrollContainer') scrollContainer!: ElementRef
     @ViewChild('input_container') input_container!: ElementRef
     @ViewChild('input') input!: ElementRef
 
-    users_info: {id: number, name: string, img: string}[] = []
 
     webSocketService!: WebSocketService
-    InitializeAppApiService: InitializeAppApiService
+    chatService: ChatService
 
-    chat_id!: number
-    chat_user_id!: number
-    messages: {content: string, sender: number, receiver: number, message_id: number, timestamp: number}[] = []
     
-    constructor (webSocketService: WebSocketService, InitializeAppApiService: InitializeAppApiService, private route: ActivatedRoute) {
-        this.InitializeAppApiService = InitializeAppApiService
+    constructor (webSocketService: WebSocketService, chatService: ChatService) {
         this.webSocketService = webSocketService
+        this.chatService = chatService
 
-        this.user_id = this.InitializeAppApiService.user_interface.user_id
-        this.chat_id = Number(this.route.snapshot.paramMap.get('chat_id'))
-        
-        this.users_info[this.user_id] = {id: this.InitializeAppApiService.user_interface.user_id, name: this.InitializeAppApiService.user_interface.user_displayName, img: this.InitializeAppApiService.user_interface.user_logo}
+        this.user_id = this.chatService.user_id
+        this.messages = this.chatService.messages
+        this.users_info = this.chatService.users_info
+        this.chat_id = this.chatService.chat_id
+        this.chat_user_id = this.chatService.chat_user_id
 
-        this.chat_user_id = this.InitializeAppApiService.user_interface.chats.find(chat => chat.chat_id === this.chat_id)!.chat_user_id
 
-        console.log('aaa', 0)
 
-        this.get_ChatInfoMessages()
-
-        console.log('aaa', 1)
 
         this.webSocketService.on("personal_message_received").subscribe(data => {
+            data.timestamp = new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(data.timestamp))
             this.messages.push(data)
-            const element = this.scrollContainer.nativeElement
-            element.scrollTop = element.scrollHeight
         })
     }
 
     adjustHeight(event: Event): void {
         const textarea = event.target as HTMLTextAreaElement
+        textarea.removeAttribute('style')
+
         textarea.style.height = `${textarea.scrollHeight}px`
 
         if (textarea.scrollHeight > 102) { 
@@ -67,9 +64,9 @@ export class ChatComponent {
 
     sendMessage() {
         const input = this.input.nativeElement as HTMLTextAreaElement
-        this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": input.value })
-        const element = this.scrollContainer.nativeElement
-        element.scrollTop = element.scrollHeight
+        this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": input.value.replace(/\n/g, '<br>'), "chat_id": this.chat_id })
+        input.value = ""
+        input.removeAttribute('style')
     }
 
     ngAfterViewChecked() {
@@ -77,29 +74,14 @@ export class ChatComponent {
         element.scrollTop = element.scrollHeight
     }
 
-    async get_ChatInfoMessages() {
-        const apiURL = `http://${this.IP}/ChatInfoMessages`
-        const request = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
-            },
-            body: JSON.stringify( {"chat_id": this.chat_id} ),
+    onKeydown(event: KeyboardEvent & Event) {
+        this.adjustHeight(event)
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault()
+            this.sendMessage()
         }
-
-        return fetch(apiURL, request)
-        .then(async response =>{
-            const responseData = await response.json()
-            if(response.ok){
-                this.messages = responseData.chatMessages
-
-                this.users_info[this.chat_user_id] = {id: responseData.chatInfo.user_id, name: responseData.chatInfo.user_displayName, img: responseData.chatInfo.user_logo}
-            }
-        })
-        .catch(error =>{
-            console.error(error)
-        })
     }
+
+
 
 }

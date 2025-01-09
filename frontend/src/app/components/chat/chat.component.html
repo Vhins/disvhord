@@ -3,10 +3,14 @@
         <div class="message-wrapper">
             <div [id]="message.message_id" class="message">
                 <img class="message-user_logo" [src]="users_info[message.sender].img">
-                <!-- <img class="message-user_logo" src="https://cdn.discordapp.com/avatars/704278954588110888/d348363a850a931bf7bd5e0b9ec894da.webp?size=100"> -->
-                <div> {{users_info[message.sender].name}}:{{message.sender}} </div>
-                <div class="content"> {{message.content}}, timestamp: {{message.timestamp}} </div>
-                <div class="data"> 29/12/2024 10:02 </div>
+                <div class="message-stuff">
+                    <div class="message-stufff">
+                        <div class="userdisplayname"> {{users_info[message.sender].name}} </div>
+                        <!-- <div class="data"> {{message.timestamp}} </div> -->
+                        <div class="timestamp"> {{message.timestamp}} </div>
+                    </div>
+                    <div class="content" [innerHTML]="message.content"> </div>
+                </div>
             </div>
         </div>
     }
@@ -16,7 +20,7 @@
         <button>
             <img class="input-icon" src="./assets/attachment.svg">
         </button>
-        <textarea #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="adjustHeight($event)"></textarea>
+        <textarea (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (keypress)="adjustHeight($event)" (input)="adjustHeight($event)"></textarea>
         <button (click)="sendMessage()">
             <img class="input-icon" src="./assets/send.svg">
         </button>

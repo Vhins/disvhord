@@ -6,9 +6,9 @@
 
 <div class="chat-container">
     @for (chat of getUserChats(); track $index) {
-        <div (click)="ruoteToChat($event)" routerLink="/app/home/chat" class="chat">
+        <div (click)="ruoteToChat($event)" [id]="chat.chat_id" routerLink="/app/home/chat" class="chat">
             <img class="chat-user_logo" [src]="chat.user_logo">
-            <span [id]="chat.chat_id" class="chat-user_name"> {{chat.user_displayName}} </span>
+            <span class="chat-user_name"> {{chat.user_displayName}} </span>
         </div>
     } 
 </div>

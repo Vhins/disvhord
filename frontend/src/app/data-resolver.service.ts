@@ -9,9 +9,7 @@ import { Router } from '@angular/router';
 export class DataResolver {
     constructor(private initializeAppApiService: InitializeAppApiService, private webSocketService: WebSocketService, private ruoter: Router) {}
 
-    async resolve(): Promise<boolean> {
-        console.log('Fetching data...')
-        
+    async resolve(): Promise<boolean> {        
         let result = await this.initializeAppApiService.get_basicUserInterfaceData()
 
         if (result === true) {

@@ -42,12 +42,10 @@ async function startServer(PORT){
 
             socket.on('connected', (token) => {
                 const decoded = jwt.verify(token, secretJWT)
-                console.log('connesso tramite socket.io, user_id:', decoded.user_id)
-                users[decoded.id] = socket.user_id
+                users[decoded.user_id] = socket.id
             })
 
             socket.on('personal_message', async (data) => {
-                console.log('message: ' + data.content, 'sender: ' + data.sender, users[data.sender], 'receiver: ' + data.receiver, users[data.receiver])
 
                 if (users[data.receiver] !== null) {
                     const message = {
@@ -58,16 +56,24 @@ async function startServer(PORT){
                         "receiver": data.receiver,
                         "timestamp": new Date().getTime()
                     }
+
+                    let op1 = await db.collection('chats').findOne({users_id: [data.sender, data.receiver]})
+                    let op2 = await db.collection('chats').findOne({users_id: [data.receiver, data.sender]})
+
+                    if (Number(op1?.chat_id) !== Number(data.chat_id) && Number(op2?.chat_id) !== Number(data.chat_id)) {
+                        console.log('id chat non corrisponde ai due utenti')
+                        return
+                    }
                 
                     const op = await db.collection('chats').updateOne(
-                        { chat_id: 4},
+                        { chat_id: data.chat_id},
                         { $push: { messages: message }}
                     )
 
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
-                    io.to(senderSocketId).emit('personal_message_received', data)
-                    io.to(receiverSocketId).emit('personal_message_received', data)
+                    io.to(senderSocketId).emit('personal_message_received', message)
+                    io.to(receiverSocketId).emit('personal_message_received', message)
                 }
                 
             })

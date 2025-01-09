@@ -22,7 +22,7 @@ export class ChatsComponent {
     }
 
     ruoteToChat(event: Event) {
-        const target = event.target as HTMLDivElement
+        const target = event.currentTarget  as HTMLDivElement
         this.ruoter.navigate([`/app/home/chat/${target.id}`])
     }
 }
