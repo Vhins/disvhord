@@ -49,7 +49,7 @@ async function startServer(PORT){
 
                 if (users[data.receiver] !== null) {
                     const message = {
-                        "message_id": 33,
+                        "message_id": await generateID(),
                         "content": data.content,
                         "attachments": null,
                         "sender": data.sender,
@@ -61,7 +61,7 @@ async function startServer(PORT){
                     let op2 = await db.collection('chats').findOne({users_id: [data.receiver, data.sender]})
 
                     if (Number(op1?.chat_id) !== Number(data.chat_id) && Number(op2?.chat_id) !== Number(data.chat_id)) {
-                        console.log('id chat non corrisponde ai due utenti')
+                        console.debug('id chat non corrisponde ai due utenti')
                         return
                     }
                 
@@ -74,6 +74,55 @@ async function startServer(PORT){
                     const receiverSocketId = users[data.receiver]
                     io.to(senderSocketId).emit('personal_message_received', message)
                     io.to(receiverSocketId).emit('personal_message_received', message)
+                }
+                
+            })
+
+            socket.on('delete_message', async (data) => {
+
+                if (users[data.message_id] !== null) {
+
+                    let op = await db.collection('chats').findOne( { chat_id: data.chat_id }, { projection: { messages: { $elemMatch: { message_id: data.message_id } } } })
+                    if (op == null) {
+                        return
+                    }
+
+                    const currentTimestamp = Date.now()
+                    if (currentTimestamp - op.messages[0].timestamp > 10 * 60 * 1000) {
+                        return
+                    }
+
+                    await db.collection('chats').updateOne( { chat_id: data.chat_id }, { $pull: { messages: { message_id: data.message_id } } })
+
+                    const senderSocketId = users[data.sender]
+                    const receiverSocketId = users[data.receiver]
+                    io.to(senderSocketId).emit('personal_message_deleted', data.message_id)
+                    io.to(receiverSocketId).emit('personal_message_deleted', data.message_id)
+                }
+                
+            })
+
+            socket.on('edit_message', async (data) => {
+
+                if (users[data.message_id] !== null) {
+
+                    let op = await db.collection('chats').findOne( { chat_id: data.chat_id }, { projection: { messages: { $elemMatch: { message_id: data.message_id } } } })
+                    if (op == null) {
+                        return
+                    }
+
+                    const currentTimestamp = Date.now()
+                    if (currentTimestamp - op.messages[0].timestamp > 10 * 60 * 1000) {
+                        return
+                    }
+
+                    data.content = "prova"
+                    await db.collection('chats').findOne( { chat_id: data.chat_id }, { $set: { "messages.$.content": data.content } })
+
+                    const senderSocketId = users[data.sender]
+                    const receiverSocketId = users[data.receiver]
+                    io.to(senderSocketId).emit('personal_message_edited', data.message_id)
+                    io.to(receiverSocketId).emit('personal_message_edited', data.message_id)
                 }
                 
             })
@@ -372,7 +421,7 @@ async function handleApi_ChatInfoMessages(req, res) {
     const { chat_id } = req.body
     const JWTdata = req.JWTdata
 
-    if (chat_id === null) {
+    if (chat_id === null || chat_id === undefined) {
         res.status(404).json({ message: 'chat_id non fornito' })
         return
     }

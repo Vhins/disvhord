@@ -29,7 +29,8 @@
               "src/assets/audio_settings.svg",
               "src/assets/home.svg",
               "src/assets/attachment.svg",
-              "src/assets/send.svg"
+              "src/assets/send.svg",
+              "src/assets/more.svg"
             ],
             "styles": [
               "src/styles.css"

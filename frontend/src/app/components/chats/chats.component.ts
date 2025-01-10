@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { Router } from '@angular/router';
+import { ChatService } from '../../chat.service';
 
 @Component({
   selector: 'app-chats',
@@ -11,18 +12,16 @@ import { Router } from '@angular/router';
   styleUrl: './chats.component.css'
 })
 export class ChatsComponent {
-    InitializeAppApiService: InitializeAppApiService
 
-    constructor(initializeAppApiService: InitializeAppApiService, private ruoter: Router) {
-        this.InitializeAppApiService = initializeAppApiService
-    }
+    constructor(public initializeAppApiService: InitializeAppApiService, private chatService: ChatService, private router: Router) {}
 
     getUserChats () {
-        return this.InitializeAppApiService.user_interface.chats
+        return this.initializeAppApiService.user_interface.chats
     }
 
     ruoteToChat(event: Event) {
         const target = event.currentTarget  as HTMLDivElement
-        this.ruoter.navigate([`/app/home/chat/${target.id}`])
+        this.chatService.chat_id = Number(target.id)
+        this.router.navigate([`/app/home/chat/${target.id}`])
     }
 }

@@ -16,7 +16,7 @@ export const routes: Routes = [
     { path: 'app', canActivate: [authGuard], component: DisvhordAppComponent, resolve: { data: DataResolver }, children: [
         { path: 'home', component: HomeComponent, children: [
             { path: 'me', component: NavbarComponent },
-            { path: 'chat/:chat_id', component: ChatComponent, resolve: { data: ChatService } },
+            { path: 'chat/:chat_id', component: ChatComponent},
         ]},
         { path: 'server', component: ChatComponent}
     ]

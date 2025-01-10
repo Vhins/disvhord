@@ -22,6 +22,19 @@
     margin-top: auto;
 }
 
+.message-actions {
+    display: none;
+    position: absolute;
+    font-size: 10px;
+    font-weight: 300;
+    top: 3px;
+    right: 3px;
+}
+
+.message-wrapper:hover .message-actions {
+    display: flex;
+}
+
 .message-stuff {
     display: flex;
     flex-direction: column;
@@ -41,13 +54,9 @@
 .timestamp {
     font-size: 10px;
     font-weight: 200;
-    /* visibility: hidden; */
     margin-top: auto;
+    transform: translateY(-3px);
     margin-left: 5px;
-}
-
-.timestamp:hover {
-    visibility: visible;
 }
 
 .input-container {
@@ -136,12 +145,6 @@ button:hover {
     font-size: 18px;
     margin: auto 0 auto 0;
     font-weight: 400;
-}
-
-.data {
-    position: absolute;
-    font-size: 10px;
-    font-weight: 300;
-    bottom: 3px;
-    right: 3px;
+    max-width: 500px;
+    word-wrap: break-word;
 }

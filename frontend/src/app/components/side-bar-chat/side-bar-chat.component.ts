@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ChatComponent } from '../chat/chat.component';
 import { ChatService } from '../../chat.service';
 
 @Component({
@@ -11,8 +10,14 @@ import { ChatService } from '../../chat.service';
 })
 export class SideBarChatComponent {
     user_chat_name!: string
+    user_chat_logo!: string
 
     constructor(private chatService: ChatService) {
-        this.user_chat_name = this.chatService.users_info[this.chatService.chat_user_id]?.name
     }
+
+    ngAfterContentChecked() {
+        this.user_chat_name = this.chatService.users_info[this.chatService.chat_user_id]?.name
+        this.user_chat_logo = this.chatService.users_info[this.chatService.chat_user_id]?.img
+    }
+    
 }

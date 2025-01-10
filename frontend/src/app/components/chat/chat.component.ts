@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { WebSocketService } from '../../web-socket.service';
 import { ChatService } from '../../chat.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-chat',
@@ -10,39 +10,15 @@ import { ChatService } from '../../chat.service';
   styleUrl: './chat.component.css'
 })
 export class ChatComponent {
-    user_id!: number
-    messages: {content: string, sender: number, receiver: number, message_id: number, timestamp: string}[] = []
-    users_info: {[key: number]: {id: number, name: string, img: string}} = {}
-    chat_id!: number
-    chat_user_id!: number
-
-
-
     @ViewChild('scrollContainer') scrollContainer!: ElementRef
     @ViewChild('input_container') input_container!: ElementRef
     @ViewChild('input') input!: ElementRef
 
-
-    webSocketService!: WebSocketService
-    chatService: ChatService
-
     
-    constructor (webSocketService: WebSocketService, chatService: ChatService) {
-        this.webSocketService = webSocketService
-        this.chatService = chatService
+    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute) {
 
-        this.user_id = this.chatService.user_id
-        this.messages = this.chatService.messages
-        this.users_info = this.chatService.users_info
-        this.chat_id = this.chatService.chat_id
-        this.chat_user_id = this.chatService.chat_user_id
-
-
-
-
-        this.webSocketService.on("personal_message_received").subscribe(data => {
-            data.timestamp = new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(data.timestamp))
-            this.messages.push(data)
+        this.activatedRoute.paramMap.subscribe(param => {
+            this.chatService.setThisChatID(Number(param.get('chat_id')))
         })
     }
 
@@ -64,9 +40,15 @@ export class ChatComponent {
 
     sendMessage() {
         const input = this.input.nativeElement as HTMLTextAreaElement
-        this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": input.value.replace(/\n/g, '<br>'), "chat_id": this.chat_id })
+        this.chatService.sendMessage(input.value)
         input.value = ""
         input.removeAttribute('style')
+    }
+
+    deleteMessage(event: Event) {
+        const target = event.currentTarget as HTMLButtonElement
+        const message_id = Number(target.id)
+        this.chatService.deleteMessage(message_id)
     }
 
     ngAfterViewChecked() {
@@ -81,7 +63,5 @@ export class ChatComponent {
             this.sendMessage()
         }
     }
-
-
 
 }
