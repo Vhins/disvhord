@@ -46,7 +46,6 @@ async function startServer(PORT){
             })
 
             socket.on('personal_message', async (data) => {
-
                 if (users[data.receiver] !== null) {
                     const message = {
                         "message_id": await generateID(),
@@ -87,17 +86,24 @@ async function startServer(PORT){
                         return
                     }
 
-                    const currentTimestamp = Date.now()
-                    if (currentTimestamp - op.messages[0].timestamp > 10 * 60 * 1000) {
+                    
+                    if (data.sender !== op.messages[0].sender) {
                         return
                     }
+                    
+                    const currentTimestamp = Date.now()
+                    if (currentTimestamp - op.messages[0].timestamp > 10 * 60 * 1000) {
+                        data.content = "[[Questo messaggio è stato eliminato dal creatore]]"
+                        await db.collection('chats').updateOne( { chat_id: data.chat_id, "messages.message_id": data.message_id }, { $set: { "messages.$.content": data.content }} )
+                    } else {
+                        await db.collection('chats').updateOne( { chat_id: data.chat_id }, { $pull: { messages: { message_id: data.message_id } } })
+                    }
 
-                    await db.collection('chats').updateOne( { chat_id: data.chat_id }, { $pull: { messages: { message_id: data.message_id } } })
 
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
-                    io.to(senderSocketId).emit('personal_message_deleted', data.message_id)
-                    io.to(receiverSocketId).emit('personal_message_deleted', data.message_id)
+                    io.to(senderSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": data.content})
+                    io.to(receiverSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": data.content})
                 }
                 
             })
@@ -116,13 +122,16 @@ async function startServer(PORT){
                         return
                     }
 
-                    data.content = "prova"
-                    await db.collection('chats').findOne( { chat_id: data.chat_id }, { $set: { "messages.$.content": data.content } })
+                    if (data.sender !== op.messages[0].sender) {
+                        return
+                    }
+
+                    await db.collection('chats').updateOne( { chat_id: data.chat_id, "messages.message_id": data.message_id }, { $set: { "messages.$.content": data.content }} )
 
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
-                    io.to(senderSocketId).emit('personal_message_edited', data.message_id)
-                    io.to(receiverSocketId).emit('personal_message_edited', data.message_id)
+                    io.to(senderSocketId).emit('personal_message_edited', {"message_id": data.message_id, "content": data.content})
+                    io.to(receiverSocketId).emit('personal_message_edited', {"message_id": data.message_id, "content": data.content})
                 }
                 
             })

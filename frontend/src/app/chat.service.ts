@@ -13,6 +13,7 @@ export class ChatService {
     chat_id!: number
     chat_user_id!: number
 
+    editingMessageMode: boolean = false
 
     constructor(private webSocketService: WebSocketService, private InitializeAppApiService: InitializeAppApiService) {
         this.InitializeAppApiService = InitializeAppApiService
@@ -25,8 +26,19 @@ export class ChatService {
             data.timestamp = new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(data.timestamp))
             this.messages.push(data)
         })
-        this.webSocketService.on("personal_message_deleted").subscribe(message_id => {
-            this.messages = this.messages.filter(message => message.message_id != message_id)
+        this.webSocketService.on("personal_message_deleted").subscribe(data => {
+            if (data.content) {
+                const index = this.messages.findIndex(message => message.message_id === data.message_id)
+                this.messages[index].content = data.content
+            } else {
+                this.messages = this.messages.filter(message => message.message_id != data.message_id)
+            }
+        })
+        this.webSocketService.on("personal_message_edited").subscribe(data => {
+            if (data.content) {
+                const index = this.messages.findIndex(message => message.message_id === data.message_id)
+                this.messages[index].content = data.content
+            }
         })
     }
 
@@ -38,11 +50,24 @@ export class ChatService {
     }
 
     sendMessage(content: string) {
-        this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content.replace(/\n/g, '<br>'), "chat_id": this.chat_id })
+        if (!this.editingMessageMode) {
+            this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content.replace(/\n/g, '<br>'), "chat_id": this.chat_id })
+        } else {
+            this.editingMessageMode = false
+        }
     }
 
     deleteMessage(message_id: number) {
         this.webSocketService.emit("delete_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id })
+    }
+
+    editMessage(message_id: number, content: string) {
+        this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "content": content.replace(/\n/g, '<br>'), "sender": this.user_id, "receiver": this.chat_user_id })
+        this.editingMessageMode = false
+    }
+
+    editingMessage() {
+        this.editingMessageMode = true
     }
 
     async initializeChat(): Promise<number> {

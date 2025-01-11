@@ -11,7 +11,7 @@
                     <div class="content" [innerHTML]="message.content"> </div>
                     <img [src]="message.attachments">
                 </div>
-                <button [id]="message.message_id" (click)="deleteMessage($event)" class="message-actions"> <img src="/assets/more.svg"> </button>
+                <button [id]="message.message_id" (click)="editingMessage($event)" class="message-actions"> <img src="/assets/more.svg"> </button>
             </div>
         </div>
     }
