@@ -30,6 +30,7 @@ export class ChatService {
             if (data.content) {
                 const index = this.messages.findIndex(message => message.message_id === data.message_id)
                 this.messages[index].content = data.content
+                this.messages[index].attachments = ""
             } else {
                 this.messages = this.messages.filter(message => message.message_id != data.message_id)
             }
@@ -51,7 +52,12 @@ export class ChatService {
 
     sendMessage(content: string) {
         if (!this.editingMessageMode) {
-            this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content.replace(/\n/g, '<br>'), "chat_id": this.chat_id })
+            if (!this.allegatedFile) {
+                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content.replace(/\n/g, '<br>'), "chat_id": this.chat_id })
+            } else { 
+                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content.replace(/\n/g, '<br>'), "chat_id": this.chat_id, "attachments": this.allegatedFile })
+            }
+            this.allegatedFile = ""
         } else {
             this.editingMessageMode = false
         }
@@ -66,8 +72,8 @@ export class ChatService {
         this.editingMessageMode = false
     }
 
-    editingMessage() {
-        this.editingMessageMode = true
+    editingMessage(bool: boolean) {
+        this.editingMessageMode = bool
     }
 
     async initializeChat(): Promise<number> {
@@ -104,5 +110,11 @@ export class ChatService {
         .catch(error =>{
             console.error(error)
         })
+    }
+
+    allegatedFile: string = ""
+
+    allegateFile(link: string) {
+        this.allegatedFile = link
     }
 }

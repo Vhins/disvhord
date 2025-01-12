@@ -13,6 +13,7 @@ export class ChatComponent {
     @ViewChild('scrollContainer') scrollContainer!: ElementRef
     @ViewChild('input_container') input_container!: ElementRef
     @ViewChild('input') input!: ElementRef
+    @ViewChild('inputlink') inputlink!: ElementRef
 
     
     constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute) {
@@ -47,10 +48,9 @@ export class ChatComponent {
         } else {
             const input = this.input.nativeElement as HTMLTextAreaElement
             this.editMessage(input.value)
-            input.value = ""
+            input.value = this.inputValueBeforeEditing
             input.removeAttribute('style')
         }
-
     }
 
     deleteMessage(event: Event) {
@@ -60,6 +60,7 @@ export class ChatComponent {
     }
 
     currentIDMessageEditing!: number
+    inputValueBeforeEditing!: string
 
     editingMessage(event: Event) {
         const input = this.input.nativeElement as HTMLTextAreaElement
@@ -70,25 +71,43 @@ export class ChatComponent {
         if (message.sender != this.chatService.user_id) return
 
         const currentTimestamp = Date.now()
-        console.log('aa', currentTimestamp, this.parseFormattedDate(message.timestamp), currentTimestamp - this.parseFormattedDate(message.timestamp)  > 10 * 60 * 1000)
-        if (currentTimestamp - this.parseFormattedDate(message.timestamp)  > 10 * 60 * 1000) {
-            return
-        }
+        if (currentTimestamp - this.parseFormattedDate(message.timestamp)  > 10 * 60 * 1000) return
 
+        this.inputValueBeforeEditing = String(input.value)
         input.value = message.content
 
         this.currentIDMessageEditing = Number(target.id)
 
-        this.chatService.editingMessage()
+        this.chatService.editingMessage(true)
+    }
+
+    thismessageimg: string = "none"
+
+    diocane(event: Event) {
+        const target =event.currentTarget as HTMLDivElement
+
+        const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
+        if (!message) return
+        if (message.sender != this.chatService.user_id) {
+            this.thismessageimg = "none"
+            return
+        }
+
+        if (Date.now() - this.parseFormattedDate(message.timestamp)  > 10 * 60 * 1000) {
+            this.thismessageimg = "delete"
+        } else {
+            this.thismessageimg = "edit"
+        }
     }
 
     editMessage(inputValue: string) {
         this.chatService.editMessage(this.currentIDMessageEditing, inputValue)
     }
 
-    ngAfterViewChecked() {
-        const element = this.scrollContainer.nativeElement
-        element.scrollTop = element.scrollHeight
+    stopEditMessage() {
+        const input = this.input.nativeElement as HTMLTextAreaElement
+        input.value = this.inputValueBeforeEditing
+        this.chatService.editingMessage(false)
     }
 
     onKeydown(event: KeyboardEvent & Event) {
@@ -105,5 +124,17 @@ export class ChatComponent {
         const [hours, minutes] = timePart.split(':').map(Number);
       
         return new Date(year, month - 1, day, hours, minutes).getTime();
+    }
+
+    allegatingFiles: boolean = false
+
+    allegateFile() {
+        this.allegatingFiles = true
+    }
+
+    confirmAllegateFile(event: Event) {
+        event.preventDefault()
+        const input = this.inputlink.nativeElement as HTMLInputElement
+        this.chatService.allegateFile(input.value)
     }
 }

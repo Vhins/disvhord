@@ -56,6 +56,10 @@ async function startServer(PORT){
                         "timestamp": new Date().getTime()
                     }
 
+                    if (data.attachments) {
+                        message.attachments = data.attachments
+                    }
+
                     let op1 = await db.collection('chats').findOne({users_id: [data.sender, data.receiver]})
                     let op2 = await db.collection('chats').findOne({users_id: [data.receiver, data.sender]})
 
@@ -94,7 +98,7 @@ async function startServer(PORT){
                     const currentTimestamp = Date.now()
                     if (currentTimestamp - op.messages[0].timestamp > 10 * 60 * 1000) {
                         data.content = "[[Questo messaggio è stato eliminato dal creatore]]"
-                        await db.collection('chats').updateOne( { chat_id: data.chat_id, "messages.message_id": data.message_id }, { $set: { "messages.$.content": data.content }} )
+                        await db.collection('chats').updateOne( { chat_id: data.chat_id, "messages.message_id": data.message_id }, { $set: { "messages.$.content": data.content, "messages.$.attachments": null }} )
                     } else {
                         await db.collection('chats').updateOne( { chat_id: data.chat_id }, { $pull: { messages: { message_id: data.message_id } } })
                     }

@@ -22,15 +22,11 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets/Check.svg",
-              "src/assets/chat_colorfull.svg",
-              "src/assets/microphone.svg",
-              "src/assets/headphone.svg",
-              "src/assets/audio_settings.svg",
-              "src/assets/home.svg",
-              "src/assets/attachment.svg",
-              "src/assets/send.svg",
-              "src/assets/more.svg"
+              {
+                "glob": "**/*",
+                "input": "src/assets/",
+                "output": "/assets/"
+              }
             ],
             "styles": [
               "src/styles.css"

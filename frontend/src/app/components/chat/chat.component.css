@@ -22,16 +22,33 @@
     margin-top: auto;
 }
 
-.message-actions {
+.message-actions-wrapper {
     display: none;
     position: absolute;
-    font-size: 10px;
-    font-weight: 300;
-    top: 3px;
-    right: 3px;
+    top: 2px;
+    right: 0px;
+    transform: translateX(30px);
+    width: 25px;
+    height: 25px;
 }
 
-.message-wrapper:hover .message-actions {
+.message-actions {
+    font-weight: 300;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    background-color: white;
+    border: 0px;
+    cursor: pointer;
+}
+
+.message-actions img {
+    width: 22px;
+    height: 22px;
+    margin-right: 110px;
+}
+
+.message-wrapper:hover .message-actions-wrapper {
     display: flex;
 }
 
@@ -50,13 +67,19 @@
     font-weight: 500;
     cursor: pointer;
 }
+.userdisplayname:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
 
 .timestamp {
+    width: max-content;
     font-size: 10px;
     font-weight: 200;
     margin-top: auto;
     transform: translateY(-3px);
     margin-left: 5px;
+    cursor: default;
 }
 
 .input-container {
@@ -66,6 +89,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
+    position: relative;
 }
 
 .input-box {
@@ -95,7 +120,7 @@
     outline: none;
 }
 
-button {
+.input-button {
     width: 50px;
     height: 50px;
     border-radius: 10px;
@@ -107,14 +132,15 @@ button {
     align-items: center;
 }
 
+.input-button:hover {
+    border: 2px solid white;
+}
+
 .button-icon {
     width: 30px;
     height: 30px;
 }
 
-button:hover {
-    border: 2px solid white;
-}
 
 .message-wrapper {
     width: 100%;
@@ -123,6 +149,7 @@ button:hover {
 .message {
     min-width: 130px;
     max-width: 900px;
+    width: max-content;
     margin-right: 23px;
     min-height: 44px;
     height: fit-content;
@@ -139,12 +166,26 @@ button:hover {
     width: 44px;
     height: 44px;
     border-radius: 50%;
+    cursor: pointer;
+}
+
+.message:hover {
+    background-color: rgba(255, 255, 255, 1);
 }
 
 .content {
     font-size: 18px;
     margin: auto 0 auto 0;
     font-weight: 400;
-    max-width: 500px;
+    max-width: 800px;
     word-wrap: break-word;
+}
+
+.allegatingFiles {
+    width: 300px;
+    height: 100px;
+    background-color: red;
+    position: absolute;
+    top: 50%;
+    left: 50%;
 }
