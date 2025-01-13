@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { InitializeAppApiService } from "./initialize-app-api.service";
 import { WebSocketService } from "./web-socket.service";
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -44,10 +45,14 @@ export class ChatService {
     }
 
 
-    setThisChatID(chat_id: number) {
-        this.chat_id = chat_id
-        this.chat_user_id = this.InitializeAppApiService.user_interface.chats.find(chat => chat.chat_id == this.chat_id)!.chat_user_id
-        this.get_ChatInfoMessages()
+    setThisChatID(chat_id: number | string) {
+        if (typeof chat_id === "number") {
+            this.chat_id = chat_id
+            this.chat_user_id = this.InitializeAppApiService.user_interface.chats.find(chat => chat.chat_id == this.chat_id)!.chat_user_id
+            this.get_ChatInfoMessages()
+        } else {
+            console.log('chat personale')
+        }
     }
 
     sendMessage(content: string) {
@@ -74,11 +79,6 @@ export class ChatService {
 
     editingMessage(bool: boolean) {
         this.editingMessageMode = bool
-    }
-
-    async initializeChat(): Promise<number> {
-
-        return 3
     }
 
     async get_ChatInfoMessages() {

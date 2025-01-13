@@ -1,7 +1,7 @@
 <div class="chat-container">
 
     @for (friend of getFriendsList(); track $index) {
-        <div class="user">
+        <div (click)="ruoteToChat($event)" [id]="friend.user_id" class="user">
             <div [id]="friend.user_id" class="user_info">
                 <img class="user_logo" [src]="friend.user_logo">
                 <div class="user_info3">

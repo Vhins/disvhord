@@ -1,6 +1,6 @@
 <div class="messages-container" #scrollContainer>
     @for (message of chatService.messages; track $index) {
-        <div [id]="message.message_id" (mouseenter)="diocane($event)" class="message-wrapper">
+        <div #messageRef [id]="message.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper">
             <div class="message">
                 <img class="message-user_logo" [src]="chatService.users_info[message.sender].img">
                 <div class="message-stuff">
@@ -9,13 +9,13 @@
                         <div class="timestamp"> {{message.timestamp}} </div>
                     </div>
                     <div class="content" [innerHTML]="message.content"> </div>
-                    <div style="text-decoration: underline; color: rgb(19, 77, 184);" [hidden]="!message.attachments || message.attachments.endsWith('.png') || message.attachments.endsWith('.jpg') || message.attachments.endsWith('.jpeg') || message.attachments.endsWith('.gif') || message.attachments.endsWith('.webp') || message.attachments.endsWith('.mp3') || message.attachments.endsWith('.mp4')" class="content"> {{message.attachments}} </div>
+                    <a style="text-decoration: underline; color: rgb(19, 77, 184);" [href]="message.attachments" target="_blank" [hidden]="!message.attachments || message.attachments.endsWith('.png') || message.attachments.endsWith('.jpg') || message.attachments.endsWith('.jpeg') || message.attachments.endsWith('.gif') || message.attachments.endsWith('.webp') || message.attachments.endsWith('.mp3') || message.attachments.endsWith('.mp4')" class="content"> {{message.attachments}} </a>
                     <img style="max-width: 500px; margin-top: 5px; border-radius: 10px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.png') && !message.attachments?.endsWith('.jpg') && !message.attachments?.endsWith('.jpeg') && !message.attachments?.endsWith('.gif') && !message.attachments?.endsWith('.webp')">
                     <audio style="margin-top: 5px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.mp3')" controls></audio>
                     <video width="500px" style="max-width: 500px; margin-top: 5px; border-radius: 10px;" style="margin-top: 5px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.mp4')" controls></video>
                 </div>
                 <div class="message-actions-wrapper"> 
-                    <button [hidden]="thismessageimg !== 'delete'" [id]="message.message_id" (click)="deleteMessage($event)" class="message-actions"> <img src="/assets/delete.svg"> </button>
+                    <button [hidden]="thismessageimg !== 'delete' || message.content === '[[Questo messaggio è stato eliminato dal creatore]]'" [id]="message.message_id" (click)="deleteMessage($event)" class="message-actions"> <img src="/assets/delete.svg"> </button>
                     <button [hidden]="thismessageimg !== 'edit'" [id]="message.message_id" (click)="editingMessage($event)" class="message-actions"> <img src="/assets/edit.svg"> </button>
                 </div>
             </div>
@@ -23,6 +23,10 @@
     }
 </div>
 <div class="input-container" #input_container>
+    <div [hidden]="!this.chatService.allegatedFile" style="position: absolute; top: 0px; left: 0px; height: 30px; background-color: red; transform: translateY(-50%);">
+        <span> {{this.chatService.allegatedFile}} </span>
+        <button (click)="deleteAllegatedFile()"> x </button>
+    </div>
     <div style="position: absolute; top: 0px; right: 0px; height: 30px; background-color: red; transform: translateY(-50%);" [hidden]="!this.chatService.editingMessageMode"> 
         <span> stai modificando un messaggio </span>
         <button (click)="stopEditMessage()"> x </button>
@@ -31,14 +35,25 @@
         <button (click)="allegateFile()" class="input-button">
             <img class="input-icon" src="./assets/attachment.svg">
         </button>
-        <textarea (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (keypress)="adjustHeight($event)" (input)="adjustHeight($event)"></textarea>
+            <textarea #text_area (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="adjustHeight()"></textarea>
         <button class="input-button" (click)="sendMessage()">
             <img class="input-icon" src="./assets/send.svg">
         </button>
     </div>
 </div>
 <div [hidden]="!this.allegatingFiles" class="allegatingFiles">
+    <h1 class="label">Inserisci un link valido  <button (click)="exitAllegatinFileUI()">X</button> </h1>
     <form (submit)="confirmAllegateFile($event)">
-        <input #inputlink type="text">
+        <input class="input-box" #inputlink type="text">
     </form>
+    <div class="description">
+        <p>Formati supportati:</p>
+        <ul>
+          <li> immagini: png, jpg, jpeg, webp, gif </li>
+          <li> audio: mp3 </li>
+          <li> video: mp4 </li>
+        </ul>
+        <p>Tutti gli altri verranno mostrati come link.</p>
+        <p>Puoi allegare solo 1 file per messaggio.</p>
+      </div>
 </div>

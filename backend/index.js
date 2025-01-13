@@ -439,7 +439,7 @@ async function handleApi_ChatInfoMessages(req, res) {
         return
     }
 
-    const chat_info = await db.collection('chats').findOne({ chat_id: chat_id })
+    const chat_info = await db.collection('chats').findOne({ chat_id: chat_id }, { projection: { messages: { $slice: -50 } } })
 
     let user_chat_info
 

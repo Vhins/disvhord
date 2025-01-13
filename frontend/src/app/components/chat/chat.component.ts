@@ -1,6 +1,7 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ChatService } from '../../chat.service';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -14,17 +15,45 @@ export class ChatComponent {
     @ViewChild('input_container') input_container!: ElementRef
     @ViewChild('input') input!: ElementRef
     @ViewChild('inputlink') inputlink!: ElementRef
+    @ViewChild('text_area') text_area!: ElementRef
+    @ViewChildren('messageRef') messageElements!: QueryList<ElementRef>
 
-    
+    newChat: boolean = false
+
     constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute) {
-
-        this.activatedRoute.paramMap.subscribe(param => {
+        this.newChat = true
+        this.activatedRoute.paramMap.subscribe(async param => {
+            this.newChat = true
             this.chatService.setThisChatID(Number(param.get('chat_id')))
+            this.allegatingFiles = false
+            this.chatService.allegateFile("")
+
         })
     }
 
-    adjustHeight(event: Event): void {
-        const textarea = event.target as HTMLTextAreaElement
+    currentIDMessageEditing!: number
+    inputValueBeforeEditing!: string
+    thismessageimg: string = "none"
+
+    ngAfterViewInit() {
+        const input = this.input.nativeElement as HTMLInputElement
+        input.value = ""
+        const inputlink = this.inputlink.nativeElement as HTMLInputElement
+        inputlink.value = ""
+        this.adjustHeight()
+
+        const suvb = this.messageElements.changes.subscribe(() => {
+            if (this.newChat === true ){
+                console.log("chat messages number:", this.messageElements.length)
+                const element = this.scrollContainer.nativeElement
+                element.scrollTop = element.scrollHeight
+                this.newChat = false
+            }
+        })
+    }
+
+    adjustHeight(): void {
+        const textarea = this.text_area.nativeElement as HTMLTextAreaElement
         textarea.removeAttribute('style')
 
         textarea.style.height = `${textarea.scrollHeight}px`
@@ -59,9 +88,6 @@ export class ChatComponent {
         this.chatService.deleteMessage(message_id)
     }
 
-    currentIDMessageEditing!: number
-    inputValueBeforeEditing!: string
-
     editingMessage(event: Event) {
         const input = this.input.nativeElement as HTMLTextAreaElement
         const target = event.currentTarget as HTMLButtonElement
@@ -81,9 +107,7 @@ export class ChatComponent {
         this.chatService.editingMessage(true)
     }
 
-    thismessageimg: string = "none"
-
-    diocane(event: Event) {
+    showCorretImgMessageActionButton(event: Event) {
         const target =event.currentTarget as HTMLDivElement
 
         const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
@@ -110,8 +134,8 @@ export class ChatComponent {
         this.chatService.editingMessage(false)
     }
 
-    onKeydown(event: KeyboardEvent & Event) {
-        this.adjustHeight(event)
+    onKeydown(event: KeyboardEvent) {
+        this.adjustHeight()
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
             this.sendMessage()
@@ -136,5 +160,20 @@ export class ChatComponent {
         event.preventDefault()
         const input = this.inputlink.nativeElement as HTMLInputElement
         this.chatService.allegateFile(input.value)
+        this.allegatingFiles = false
     }
+
+    deleteAllegatedFile() {
+        this.chatService.allegateFile("")
+    }
+
+    exitAllegatinFileUI() {
+        const input = this.inputlink.nativeElement as HTMLInputElement
+        input.value = ""
+        this.allegatingFiles = false
+    }
+
+    // ngOnDestroy() {
+    //     this.allegatingFiles = false
+    // }
 }
