@@ -16,6 +16,11 @@ export class ChatService {
 
     editingMessageMode: boolean = false
 
+    scrollDownNow = new BehaviorSubject<Boolean>(false)
+    scrollDown(): void {
+        this.scrollDownNow.next(false)
+    }
+
     constructor(private webSocketService: WebSocketService, private InitializeAppApiService: InitializeAppApiService) {
         this.InitializeAppApiService = InitializeAppApiService
         this.webSocketService = webSocketService

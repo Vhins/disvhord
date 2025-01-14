@@ -13,7 +13,7 @@ import { ChatService } from '../../chat.service';
 })
 export class ChatsComponent {
 
-    constructor(public initializeAppApiService: InitializeAppApiService, private chatService: ChatService, private router: Router) {}
+    constructor(public initializeAppApiService: InitializeAppApiService, public chatService: ChatService, private router: Router) {}
 
     getUserChats () {
         return this.initializeAppApiService.user_interface.chats

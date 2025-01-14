@@ -23,17 +23,19 @@
     }
 </div>
 <div class="input-container" #input_container>
-    <div [hidden]="!this.chatService.allegatedFile" style="position: absolute; top: 0px; left: 0px; height: 30px; background-color: red; transform: translateY(-50%);">
+    <div [hidden]="!this.chatService.allegatedFile" style="margin-top: -30px; margin-right: auto; height: 30px; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;">
         <span> {{this.chatService.allegatedFile}} </span>
-        <button (click)="deleteAllegatedFile()"> x </button>
+        <button (click)="deleteAllegatedFile()"> X </button>
     </div>
-    <div style="position: absolute; top: 0px; right: 0px; height: 30px; background-color: red; transform: translateY(-50%);" [hidden]="!this.chatService.editingMessageMode"> 
-        <span> stai modificando un messaggio </span>
-        <button (click)="stopEditMessage()"> x </button>
+    <div style="margin-top: -30px; margin-right: auto; height: 30px; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;" [hidden]="!this.chatService.editingMessageMode"> 
+        <span> stai modificando questo messaggio </span>
     </div>
     <div class="input-box">
-        <button (click)="allegateFile()" class="input-button">
+        <button [hidden]="this.chatService.editingMessageMode === true" (click)="allegateFile()" class="input-button">
             <img class="input-icon" src="./assets/attachment.svg">
+        </button>
+        <button [hidden]="this.chatService.editingMessageMode === false" (click)="stopEditMessage()" class="input-button">
+            <img class="input-icon" src="./assets/delete.svg">
         </button>
             <textarea #text_area (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="adjustHeight()"></textarea>
         <button class="input-button" (click)="sendMessage()">

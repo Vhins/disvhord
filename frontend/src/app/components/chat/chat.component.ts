@@ -18,6 +18,7 @@ export class ChatComponent {
     @ViewChild('text_area') text_area!: ElementRef
     @ViewChildren('messageRef') messageElements!: QueryList<ElementRef>
 
+    private scrollDownNowSubscription!: Subscription;
     newChat: boolean = false
 
     constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute) {
@@ -27,7 +28,13 @@ export class ChatComponent {
             this.chatService.setThisChatID(Number(param.get('chat_id')))
             this.allegatingFiles = false
             this.chatService.allegateFile("")
+            this.chatService.editingMessage(false)
+        })
 
+        this.scrollDownNowSubscription = this.chatService.scrollDownNow.asObservable().subscribe(value => {
+            const element = this.scrollContainer.nativeElement
+            element.scrollTop = element.scrollHeight
+            console.log('scroll down')  
         })
     }
 
@@ -41,13 +48,24 @@ export class ChatComponent {
         const inputlink = this.inputlink.nativeElement as HTMLInputElement
         inputlink.value = ""
         this.adjustHeight()
-
+        const element = this.scrollContainer.nativeElement
+        element.scrollTop = element.scrollHeight
         const suvb = this.messageElements.changes.subscribe(() => {
             if (this.newChat === true ){
-                console.log("chat messages number:", this.messageElements.length)
                 const element = this.scrollContainer.nativeElement
                 element.scrollTop = element.scrollHeight
                 this.newChat = false
+
+                const input = this.input.nativeElement as HTMLInputElement
+                input.value = ""
+                const inputlink = this.inputlink.nativeElement as HTMLInputElement
+                inputlink.value = ""
+                this.adjustHeight()
+                this.chatService.editingMessage(false)
+            } else {
+                const element = this.scrollContainer.nativeElement as HTMLDivElement
+                console.log('aggiungere condizioni', element.scrollHeight, 'g:', element.clientHeight)
+                element.scrollTop = element.scrollHeight
             }
         })
     }
@@ -89,6 +107,10 @@ export class ChatComponent {
     }
 
     editingMessage(event: Event) {
+        this.exAllegatedFile = this.chatService.allegatedFile
+        this.chatService.allegateFile("")
+        this.exitAllegatinFileUI()
+
         const input = this.input.nativeElement as HTMLTextAreaElement
         const target = event.currentTarget as HTMLButtonElement
 
@@ -124,14 +146,18 @@ export class ChatComponent {
         }
     }
 
+    exAllegatedFile: string = ''
+
     editMessage(inputValue: string) {
         this.chatService.editMessage(this.currentIDMessageEditing, inputValue)
+        this.chatService.allegateFile(this.exAllegatedFile)
     }
 
     stopEditMessage() {
         const input = this.input.nativeElement as HTMLTextAreaElement
         input.value = this.inputValueBeforeEditing
         this.chatService.editingMessage(false)
+        this.chatService.allegateFile(this.exAllegatedFile)
     }
 
     onKeydown(event: KeyboardEvent) {
@@ -153,14 +179,18 @@ export class ChatComponent {
     allegatingFiles: boolean = false
 
     allegateFile() {
-        this.allegatingFiles = true
+        if (!this.chatService.editingMessageMode) {
+            this.allegatingFiles = true
+        }
     }
 
     confirmAllegateFile(event: Event) {
         event.preventDefault()
-        const input = this.inputlink.nativeElement as HTMLInputElement
-        this.chatService.allegateFile(input.value)
-        this.allegatingFiles = false
+        if (!this.chatService.editingMessageMode) {
+            const input = this.inputlink.nativeElement as HTMLInputElement
+            this.chatService.allegateFile(input.value)
+            this.allegatingFiles = false
+        }
     }
 
     deleteAllegatedFile() {
@@ -173,7 +203,8 @@ export class ChatComponent {
         this.allegatingFiles = false
     }
 
-    // ngOnDestroy() {
-    //     this.allegatingFiles = false
-    // }
+    ngOnDestroy(): void {
+        this.scrollDownNowSubscription.unsubscribe()
+        this.allegatingFiles = false
+    }
 }
