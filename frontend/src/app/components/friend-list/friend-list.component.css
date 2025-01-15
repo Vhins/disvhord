@@ -6,7 +6,7 @@
 
 .chat-container {
     max-height: calc(100% - 96px);
-    overflow-y: scroll;
+    overflow-y: auto;
     padding-right: 10px;
     display: flex;
     flex-direction: column;

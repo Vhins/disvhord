@@ -2,11 +2,12 @@ import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angu
 import { ChatService } from '../../chat.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [],
+  imports: [NgStyle],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })
@@ -16,6 +17,7 @@ export class ChatComponent {
     @ViewChild('input') input!: ElementRef
     @ViewChild('inputlink') inputlink!: ElementRef
     @ViewChild('text_area') text_area!: ElementRef
+    @ViewChild('input_box') input_box!: ElementRef
     @ViewChildren('messageRef') messageElements!: QueryList<ElementRef>
 
     private scrollDownNowSubscription!: Subscription;
@@ -70,20 +72,29 @@ export class ChatComponent {
         })
     }
 
+    heightWidgetEdit_Attachment: string = "80"
+
     adjustHeight(): void {
         const textarea = this.text_area.nativeElement as HTMLTextAreaElement
         textarea.removeAttribute('style')
 
-        textarea.style.height = `${textarea.scrollHeight}px`
 
         if (textarea.scrollHeight > 102) { 
             textarea.style.lineHeight = "30px"
+            textarea.style.height = `${textarea.scrollHeight}px`
         } else {
             textarea.style.lineHeight = "60px"
+            textarea.style.height = `${textarea.scrollHeight}px`
         }
-        
+
+        const input_box = this.input_box.nativeElement as HTMLDivElement
+        this.heightWidgetEdit_Attachment = String(window.getComputedStyle(input_box).height)
+
         const input_container = this.input_container.nativeElement as HTMLDivElement
         input_container.style.minHeight = `${42 + textarea.scrollHeight}px`
+
+        const element = this.scrollContainer.nativeElement
+        element.scrollTop = element.scrollHeight
     }
 
     sendMessage() {
@@ -111,7 +122,7 @@ export class ChatComponent {
         this.chatService.allegateFile("")
         this.exitAllegatinFileUI()
 
-        const input = this.input.nativeElement as HTMLTextAreaElement
+        const input = this.input.nativeElement as HTMLTextAreaElement //todo: convert input textarea to a div
         const target = event.currentTarget as HTMLButtonElement
 
         const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
@@ -125,6 +136,8 @@ export class ChatComponent {
         input.value = message.content
 
         this.currentIDMessageEditing = Number(target.id)
+
+        this.adjustHeight()
 
         this.chatService.editingMessage(true)
     }
@@ -158,10 +171,12 @@ export class ChatComponent {
         input.value = this.inputValueBeforeEditing
         this.chatService.editingMessage(false)
         this.chatService.allegateFile(this.exAllegatedFile)
+        this.adjustHeight()
     }
 
     onKeydown(event: KeyboardEvent) {
         this.adjustHeight()
+        console.log('bro ;)')
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
             this.sendMessage()

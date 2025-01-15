@@ -12,7 +12,7 @@
                     <a style="text-decoration: underline; color: rgb(19, 77, 184);" [href]="message.attachments" target="_blank" [hidden]="!message.attachments || message.attachments.endsWith('.png') || message.attachments.endsWith('.jpg') || message.attachments.endsWith('.jpeg') || message.attachments.endsWith('.gif') || message.attachments.endsWith('.webp') || message.attachments.endsWith('.mp3') || message.attachments.endsWith('.mp4')" class="content"> {{message.attachments}} </a>
                     <img style="max-width: 500px; margin-top: 5px; border-radius: 10px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.png') && !message.attachments?.endsWith('.jpg') && !message.attachments?.endsWith('.jpeg') && !message.attachments?.endsWith('.gif') && !message.attachments?.endsWith('.webp')">
                     <audio style="margin-top: 5px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.mp3')" controls></audio>
-                    <video width="500px" style="max-width: 500px; margin-top: 5px; border-radius: 10px;" style="margin-top: 5px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.mp4')" controls></video>
+                    <video style="max-width: 500px; margin-top: 5px; border-radius: 10px;" width="500px" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.mp4')" controls></video>
                 </div>
                 <div class="message-actions-wrapper"> 
                     <button [hidden]="thismessageimg !== 'delete' || message.content === '[[Questo messaggio è stato eliminato dal creatore]]'" [id]="message.message_id" (click)="deleteMessage($event)" class="message-actions"> <img src="/assets/delete.svg"> </button>
@@ -23,30 +23,34 @@
     }
 </div>
 <div class="input-container" #input_container>
-    <div [hidden]="!this.chatService.allegatedFile" style="margin-top: -30px; margin-right: auto; height: 30px; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;">
-        <span> {{this.chatService.allegatedFile}} </span>
-        <button (click)="deleteAllegatedFile()"> X </button>
-    </div>
-    <div style="margin-top: -30px; margin-right: auto; height: 30px; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;" [hidden]="!this.chatService.editingMessageMode"> 
-        <span> stai modificando questo messaggio </span>
-    </div>
-    <div class="input-box">
+    <div class="input-box" #input_box>
+        <div [ngStyle]="{'bottom': this.heightWidgetEdit_Attachment}" style="position: absolute; left: 0; height: 30px; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;" [hidden]="!this.chatService.editingMessageMode"> 
+            <span> stai modificando questo messaggio </span>
+        </div>
+        <div [hidden]="!this.chatService.allegatedFile" [ngStyle]="{'bottom': this.heightWidgetEdit_Attachment}" style="position: absolute; left: 0; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;">
+            <a style="text-decoration: underline; color: rgb(19, 77, 184);" [href]="this.chatService.allegatedFile" target="_blank" [hidden]="!this.chatService.allegatedFile || this.chatService.allegatedFile.endsWith('.png') || this.chatService.allegatedFile.endsWith('.jpg') || this.chatService.allegatedFile.endsWith('.jpeg') || this.chatService.allegatedFile.endsWith('.gif') || this.chatService.allegatedFile.endsWith('.webp') || this.chatService.allegatedFile.endsWith('.mp3') || this.chatService.allegatedFile.endsWith('.mp4')" class="content"> {{this.chatService.allegatedFile}} </a>
+            <img style="max-width: 500px; margin-top: 5px; border-radius: 10px;" [src]="this.chatService.allegatedFile" [hidden]="!this.chatService.allegatedFile.endsWith('.png') && !this.chatService.allegatedFile.endsWith('.jpg') && !this.chatService.allegatedFile.endsWith('.jpeg') && !this.chatService.allegatedFile.endsWith('.gif') && !this.chatService.allegatedFile.endsWith('.webp')">
+            <audio style="margin-top: 5px;" [src]="this.chatService.allegatedFile" [hidden]="!this.chatService.allegatedFile.endsWith('.mp3')" controls></audio>
+            <video width="500px" style="max-width: 500px; margin-top: 5px; border-radius: 10px;" [src]="this.chatService.allegatedFile" [hidden]="!this.chatService.allegatedFile.endsWith('.mp4')" controls></video>
+       
+            <button (click)="deleteAllegatedFile()"> X </button>
+        </div>
         <button [hidden]="this.chatService.editingMessageMode === true" (click)="allegateFile()" class="input-button">
             <img class="input-icon" src="./assets/attachment.svg">
         </button>
         <button [hidden]="this.chatService.editingMessageMode === false" (click)="stopEditMessage()" class="input-button">
             <img class="input-icon" src="./assets/delete.svg">
         </button>
-            <textarea #text_area (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="adjustHeight()"></textarea>
+            <textarea #text_area (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="this.adjustHeight()"></textarea>
         <button class="input-button" (click)="sendMessage()">
             <img class="input-icon" src="./assets/send.svg">
         </button>
     </div>
 </div>
 <div [hidden]="!this.allegatingFiles" class="allegatingFiles">
-    <h1 class="label">Inserisci un link valido  <button (click)="exitAllegatinFileUI()">X</button> </h1>
+    <h1 class="label">Inserisci un link valido  <button class="exitUI" (click)="exitAllegatinFileUI()">X</button> </h1>
     <form (submit)="confirmAllegateFile($event)">
-        <input class="input-box" #inputlink type="text">
+        <input class="input-box-ui" #inputlink type="text">
     </form>
     <div class="description">
         <p>Formati supportati:</p>

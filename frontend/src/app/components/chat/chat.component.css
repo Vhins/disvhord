@@ -103,6 +103,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 10px;
+    position: relative;
 }
 
 .input {
@@ -210,14 +211,15 @@
     color: #333;
 }
 
-.input-box {
+.input-box-ui {
     width: 100%;
     padding: 10px;
     font-size: 16px;
-    /* border: 1px solid #ccc; */
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
-    /* margin-bottom: 15px; */
+    margin-bottom: 15px;
+    position: relative;
 }
 
 .description {
@@ -234,4 +236,11 @@
 .description ul li {
     list-style-type: disc;
     margin-bottom: 5px;
+}
+
+.exitUI {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
 }
