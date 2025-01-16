@@ -63,9 +63,9 @@ export class ChatService {
     sendMessage(content: string) {
         if (!this.editingMessageMode) {
             if (!this.allegatedFile) {
-                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content.replace(/\n/g, '<br>'), "chat_id": this.chat_id })
+                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id })
             } else { 
-                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content.replace(/\n/g, '<br>'), "chat_id": this.chat_id, "attachments": this.allegatedFile })
+                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id, "attachments": this.allegatedFile })
             }
             this.allegatedFile = ""
         } else {
@@ -78,7 +78,7 @@ export class ChatService {
     }
 
     editMessage(message_id: number, content: string) {
-        this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "content": content.replace(/\n/g, '<br>'), "sender": this.user_id, "receiver": this.chat_user_id })
+        this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "content": content, "sender": this.user_id, "receiver": this.chat_user_id })
         this.editingMessageMode = false
     }
 

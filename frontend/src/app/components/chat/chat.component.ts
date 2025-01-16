@@ -32,7 +32,6 @@ export class ChatComponent {
             this.chatService.allegateFile("")
             this.chatService.editingMessage(false)
         })
-
         this.scrollDownNowSubscription = this.chatService.scrollDownNow.asObservable().subscribe(value => {
             const element = this.scrollContainer.nativeElement
             element.scrollTop = element.scrollHeight
@@ -88,7 +87,8 @@ export class ChatComponent {
         }
 
         const input_box = this.input_box.nativeElement as HTMLDivElement
-        this.heightWidgetEdit_Attachment = String(window.getComputedStyle(input_box).height)
+
+        this.heightWidgetEdit_Attachment = String(Number(window.getComputedStyle(input_box).height.slice(0, -2)) + 10) + "px"
 
         const input_container = this.input_container.nativeElement as HTMLDivElement
         input_container.style.minHeight = `${42 + textarea.scrollHeight}px`
@@ -98,17 +98,28 @@ export class ChatComponent {
     }
 
     sendMessage() {
-        if ( !this.chatService.editingMessageMode ) {
-            const input = this.input.nativeElement as HTMLTextAreaElement
-            this.chatService.sendMessage(input.value)
+        const input = this.input.nativeElement as HTMLTextAreaElement
+        const message = input.value.
+        replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/\r\n|\r|\n/g, '<br>')
+        .replace(/ /g, '&nbsp;')
+        .replace(/\bhttps?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+
+        console.log('messaggio inviato:', message)
+        if (!this.chatService.editingMessageMode) {
+            this.chatService.sendMessage(message)
             input.value = ""
-            input.removeAttribute('style')
         } else {
-            const input = this.input.nativeElement as HTMLTextAreaElement
-            this.editMessage(input.value)
+            this.editMessage(message)
             input.value = this.inputValueBeforeEditing
-            input.removeAttribute('style')
         }
+        input.removeAttribute('style')
+        this.adjustHeight()
     }
 
     deleteMessage(event: Event) {
@@ -122,7 +133,7 @@ export class ChatComponent {
         this.chatService.allegateFile("")
         this.exitAllegatinFileUI()
 
-        const input = this.input.nativeElement as HTMLTextAreaElement //todo: convert input textarea to a div
+        const input = this.input.nativeElement as HTMLTextAreaElement
         const target = event.currentTarget as HTMLButtonElement
 
         const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
@@ -133,7 +144,17 @@ export class ChatComponent {
         if (currentTimestamp - this.parseFormattedDate(message.timestamp)  > 10 * 60 * 1000) return
 
         this.inputValueBeforeEditing = String(input.value)
-        input.value = message.content
+        const processed_message_content = message.content.
+        replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gi, '$1')
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        input.value = processed_message_content
 
         this.currentIDMessageEditing = Number(target.id)
 
@@ -174,9 +195,18 @@ export class ChatComponent {
         this.adjustHeight()
     }
 
+    typing: boolean = true
+    startTyping() {
+        this.typing = true
+    }
+    stopTyping() {
+        this.typing = false
+    }
+
     onKeydown(event: KeyboardEvent) {
         this.adjustHeight()
-        console.log('bro ;)')
+        const textarea = this.text_area.nativeElement as HTMLDivElement
+        textarea.innerHTML = "textarea.innerHTML" + String.fromCharCode(event.keyCode)
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
             this.sendMessage()
