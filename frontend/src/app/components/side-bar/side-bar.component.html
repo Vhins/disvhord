@@ -1,4 +1,28 @@
 <div class="chat">
     <img class="user_logo" [src]="user_chat_logo">
     <span class="user_name"> {{user_chat_name}} </span>
+    <span class="add_post"> Posta qualcosa </span>
+</div>
+
+<div class="chat">
+    <h1 style="margin: 0; padding-top: 10px;"> Notifiche </h1>
+    @if (!this.friend_request) {
+        Non hai nessuna notifica
+    } @else {
+        <div class="notifications">
+            <div class="chat_request">
+                @for (notification of this.friend_request; track $index) {
+                    <div class="aaa">
+                        <img class="user_logo_request" [src]="notification.user_logo">
+                        <span class="user_name_request"> {{notification.user_handle}} </span>
+                    </div>
+                    <div class="aaa">
+                        <span class="user_name"> {{notification.timestamp}} </span>
+                        <button (click)="acceptFriendRequest(notification.user_id)"> acceptFriendRequest </button>
+                        <button (click)="deleteFriendRequest(notification.user_id)"> deleteFriendRequest </button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>

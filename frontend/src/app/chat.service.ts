@@ -107,7 +107,7 @@ export class ChatService {
                     for(let message of this.messages) {
                         message.timestamp =  new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(message.timestamp))
                     }
-                }                
+                }
                 
                 this.users_info[this.chat_user_id] = {id: responseData.chatInfo.user_id, name: responseData.chatInfo.user_displayName, img: responseData.chatInfo.user_logo}
             }

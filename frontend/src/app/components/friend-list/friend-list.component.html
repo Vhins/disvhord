@@ -1,5 +1,34 @@
 <div class="chat-container">
 
+    <div class="user nopointer">
+        <div class="user_info">
+            <span class="add_friend">
+                <img src="./assets/logo_default.svg">
+            </span>
+            <div class="user_info3">
+                <form (submit)="sendFriendRequest($event)">
+                    <input #input class="user_name_input" type="text" placeholder="Aggiungi un amico">
+                </form>
+            </div>
+        </div>
+        <div class="user_info2">
+            @if (this.statusFriendRequest == 1) {
+                <div class="user_status" style="color: green;"> Richiesta d'amicizia inviata </div>
+            } @else if(this.statusFriendRequest == 2) {
+                <div class="user_status" style="color: red;"> Handle utente non esistente </div>
+            } @else if(this.statusFriendRequest == 3) {
+                <div class="user_status" style="color: rgb(70, 8, 95);"> Richiesta d'amicizia giá inviata </div>
+            } @else if(this.statusFriendRequest == 4) {
+                <div class="user_status" style="color: rgb(203, 45, 224);"> Siete gia amici </div>
+            } @else if(this.statusFriendRequest == 5) {
+                <div class="user_status" style="color: rgb(0, 0, 0);"> L'utente ti ha bloccato </div>
+            }
+            <button (click)="sendFriendRequest(null)" class="chat_icon_button">
+                <img class="chat_icon" src="./assets/add_friend.svg">
+            </button>
+        </div>
+    </div>
+
     @for (friend of getFriendsList(); track $index) {
         <div (click)="ruoteToChat($event)" [id]="friend.user_id" class="user">
             <div [id]="friend.user_id" class="user_info">
@@ -11,7 +40,9 @@
             </div>
             <div class="user_info2">
                 <div class="user_status"> Stava usando visual studio.. </div>
-                <img class="chat_icon" src="./assets/chat_colorfull.svg">
+                <button class="chat_icon_button">
+                    <img class="chat_icon" src="./assets/chat_colorfull.svg">
+                </button>
             </div>
         </div>
     }

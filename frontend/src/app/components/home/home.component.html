@@ -5,5 +5,11 @@
 
 <router-outlet></router-outlet>
 
-<app-side-bar [hidden]="!showorhide()" ></app-side-bar>
-<app-side-bar-chat [hidden]="showorhide()"></app-side-bar-chat>
+<div style="    min-width: 300px;
+margin-left: 91px; /* 90px  61 */
+margin-right: 29px;
+margin-top: 30px;">
+    <app-side-bar [hidden]="!showorhide()" ></app-side-bar>
+    <app-side-bar-chat [hidden]="showorhide()"></app-side-bar-chat>
+    <app-rapid-controls></app-rapid-controls>
+</div>

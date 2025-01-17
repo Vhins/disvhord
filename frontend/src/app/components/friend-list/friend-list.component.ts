@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { Router } from '@angular/router';
 import { ChatService } from '../../chat.service';
@@ -11,8 +11,11 @@ import { ChatService } from '../../chat.service';
   styleUrl: './friend-list.component.css'
 })
 export class FriendListComponent {
+    @ViewChild('input') input!: ElementRef
 
     constructor(private initializeAppApiService: InitializeAppApiService, private router: Router, private chatService: ChatService) {}
+
+    statusFriendRequest: number = 0
 
     getFriendsList () {
         return this.initializeAppApiService.user_interface.friends
@@ -27,5 +30,27 @@ export class FriendListComponent {
                 // this.chatService.toggleBooleanInternally()
             }
         }
+    }
+
+    sendFriendRequest(event: Event | null) {
+        event?.preventDefault()
+
+        const input = this.input.nativeElement as HTMLInputElement
+
+        fetch('http://localhost:3333/tryToSendFriendRequest', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
+            },
+            body: JSON.stringify({
+                'friend_user_handle': input.value
+            })
+        }).then( res => {
+            res.json().then( resjson => {
+                console.log('resjson', resjson.statusFriendRequest)
+                this.statusFriendRequest = resjson.statusFriendRequest
+            })
+        })
     }
 }

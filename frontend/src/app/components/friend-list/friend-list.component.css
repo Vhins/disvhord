@@ -50,6 +50,10 @@
     cursor: pointer;
 }
 
+.nopointer {
+    cursor: default !important;
+}
+
 .user:hover {
     background-color: white;
 }
@@ -58,18 +62,27 @@
     margin-bottom: 5px;
 }
 
+.chat_icon_button {
+    width: 45px;
+    height: 45px;
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 10px;
+}
 
 .chat_icon {
     width: 40px;
     height: 40px;
 }
 
-.chat_icon:hover {
+.chat_icon_button:hover {
     background-color: #e0e0e0;
-    border-radius: 10px;
-    padding: 3px;
     transition: all 0.2s ease-in-out;
-    margin-right: -3px;
+    margin-left: 0px;
 }
 
 .user_logo{
@@ -79,9 +92,45 @@
 }
 
 .user_name {
-    width: 100%;
+    /* width: 100%; */
     font-size: 1.5rem;
     font-weight: 500;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.user_name_input {
+    width: 500px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: none;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #222222;
+}
+
+.add_friend {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #222222;
+    cursor: default;
+}
+
+.add_friend img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+}
+
+.user_name_input:focus {
+    outline: none;
 }

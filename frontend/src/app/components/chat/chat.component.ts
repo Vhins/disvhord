@@ -107,7 +107,9 @@ export class ChatComponent {
         .replace(/'/g, '&#39;')
         .replace(/\r\n|\r|\n/g, '<br>')
         .replace(/ /g, '&nbsp;')
-        .replace(/\bhttps?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+        // .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+        .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+        .replace(/https?:\/\/[^\s<>()\[\]{}]*(?=(?!.*&nbsp;)[\s|[^\w-]|$])/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
         .replace(/[\u200B-\u200D\uFEFF]/g, '')
 
         console.log('messaggio inviato:', message)

@@ -35,6 +35,9 @@ async function startServer(PORT){
 
         app.post('/basicUserInterfaceData', verifyJWT, (req, res) => { handleApi_basicUserInterfaceData(req, res) })
         app.post('/ChatInfoMessages', verifyJWT, (req, res) => { handleApi_ChatInfoMessages(req, res) })
+        app.post('/tryToSendFriendRequest', verifyJWT, (req, res) => { handleApi_tryToSendFriendRequest(req, res) })
+        app.post('/acceptFriendRequest', verifyJWT, (req, res) => { handleApi_acceptFriendRequest(req, res) })
+        app.post('/deleteFriendRequest', verifyJWT, (req, res) => { handleApi_deleteFriendRequest(req, res) })
 
 
         //* Socket.io
@@ -98,7 +101,10 @@ async function startServer(PORT){
                     const currentTimestamp = Date.now()
                     if (currentTimestamp - op.messages[0].timestamp > 10 * 60 * 1000) {
                         data.content = "[[Questo messaggio è stato eliminato dal creatore]]"
-                        await db.collection('chats').updateOne( { chat_id: data.chat_id, "messages.message_id": data.message_id }, { $set: { "messages.$.content": data.content, "messages.$.attachments": null }} )
+                        await db.collection('chats').updateOne( 
+                            { chat_id: data.chat_id, "messages.message_id": data.message_id }, 
+                            { $set: { "messages.$.content": data.content, "messages.$.attachments": null }} 
+                        )
                     } else {
                         await db.collection('chats').updateOne( { chat_id: data.chat_id }, { $pull: { messages: { message_id: data.message_id } } })
                     }
@@ -154,7 +160,7 @@ async function startServer(PORT){
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function handleApi_userCreateAccount(req, res){
@@ -219,7 +225,7 @@ async function handleApi_userCreateAccount(req, res){
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function handleApi_userLogin(req, res){
@@ -252,7 +258,7 @@ async function handleApi_userLogin(req, res){
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function verifyJWT(req, res, next){
@@ -306,7 +312,7 @@ async function handleApi_checkUserTokenValidity(req, res){
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function generaSaltHashedPassword(user_password){
     return await hash(user_password, await genSalt())
@@ -346,7 +352,7 @@ function isValidDisplayName(name) {
     return nameRegex.test(name)
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function handleApi_basicUserInterfaceData(req, res){
@@ -418,6 +424,22 @@ async function handleApi_basicUserInterfaceData(req, res){
     user_interfaceDB.servers_joined = servers_info
 
 
+    const notifications_info = {}
+    if (user_interfaceDB.notifications !== null || user_interfaceDB.notifications !== undefined) {
+        if (user_interfaceDB.notifications?.friend_request !== undefined) {
+            notifications_info.friend_request = []
+
+            for (let friend_request of user_interfaceDB.notifications.friend_request) {
+                const user_data = await db.collection('users_interface').findOne({ user_id: friend_request.user_id })
+                notifications_info.friend_request.push({
+                    user_id: user_data.user_id, user_handle: user_data.user_handle, user_logo: user_data.user_logo , timestamp: friend_request.timestamp
+                })
+            }
+        }
+    }
+    user_interfaceDB.notifications = notifications_info
+
+
     if(user_interfaceDB !== null){
         res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
     }else{
@@ -427,7 +449,7 @@ async function handleApi_basicUserInterfaceData(req, res){
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function handleApi_ChatInfoMessages(req, res) {
@@ -449,6 +471,118 @@ async function handleApi_ChatInfoMessages(req, res) {
         user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[1] })
     }
 
-    res.status(200).json({ chatMessages: chat_info.messages, chatInfo: {user_id: user_chat_info.user_id, user_displayName: user_chat_info.user_displayName, user_logo: user_chat_info.user_logo}})
+    res.status(200).json({ 
+        chatMessages: chat_info.messages, 
+        chatInfo: {user_id: user_chat_info.user_id, user_displayName: user_chat_info.user_displayName, user_logo: user_chat_info.user_logo}}
+    )
     return
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_requests -, socket.io
+    const { friend_user_handle } = req.body
+    const JWTdata = req.JWTdata
+    
+    const friend_user = await db.collection('users_info').findOne({ user_handle: friend_user_handle })
+    
+    if (!friend_user) {
+        res.status(404).json({ statusFriendRequest: 2 })
+        return
+    }
+
+    const friend_user_interface = await db.collection('users_interface').findOne({ user_handle: friend_user_handle })
+
+    if (friend_user_interface.friends) {
+        for(let friend of friend_user_interface.friends) {
+            if (friend == JWTdata.user_id) {
+                res.status(402).json({ statusFriendRequest: 4 })
+                return
+            }
+        }
+    }
+    
+    if (friend_user_interface.notifications) {
+        if (friend_user_interface.notifications.friend_request) {
+            for(let {user_id} of friend_user_interface.notifications.friend_request) {
+                if (user_id == JWTdata.user_id) {
+                    res.status(401).json({ statusFriendRequest: 3 })
+                    return
+                }
+            }
+        }
+    }
+
+    if (friend_user_interface.blocked) {
+        if (friend_user_interface.blocked) {
+            for(let user_id of friend_user_interface.blocked) {
+                if (user_id == JWTdata.user_id) {
+                    res.status(405).json({ statusFriendRequest: 5 })
+                    return
+                }
+            }
+        }
+    }
+
+    const sendRequest = await db.collection('users_interface').updateOne(
+        {user_id: friend_user.user_id}, 
+        { $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: new Date() } }} 
+    )
+
+    if (!sendRequest) {
+        res.status(500).json({ statusFriendRequest: 0 })
+        return
+    }
+
+    res.status(200).json({ statusFriendRequest: 1 })
+    return
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requests -, socket.io
+    const { friend_user_id } = req.body
+    const JWTdata = req.JWTdata
+
+    const friend_user_interface = await db.collection('users_interface').findOne({ user_id: friend_user_id })
+    if (!friend_user_interface) {
+        return
+    }
+
+    if (friend_user_interface.blocked) {
+        for(let user_id of friend_user_interface.blocked) {
+            if (Number(user_id) === Number(JWTdata.user_id)) {
+                await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+                //* ti ha blokato billy
+                return
+            }
+        }
+    }
+
+    friend_user_interface.friends.push(Number(JWTdata.user_id))
+
+    const my_user_interface = await db.collection('users_interface').findOne({ user_id: Number(JWTdata.user_id) })
+
+    my_user_interface.friends.push(Number(friend_user_id))
+
+    await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+
+    await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $set: { friends:  my_user_interface.friends }} )
+    await db.collection('users_interface').updateOne( { user_id: friend_user_id}, { $set: { friends:  friend_user_interface.friends }} )
+
+
+    res.status(200).json( {user_id: friend_user_interface.user_id, user_displayName: friend_user_interface.displayName, user_logo: friend_user_interface.user_logo} )
+    return
+}
+
+async function handleApi_deleteFriendRequest(req, res) {
+    const { friend_user_id } = req.body
+    const JWTdata = req.JWTdata
+
+    await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+    res.status(200)
 }
