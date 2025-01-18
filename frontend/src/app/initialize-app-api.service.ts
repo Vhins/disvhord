@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth/auth.service';
+import { PeerService } from './peer.service';
 
 interface user_interface {
     user_id: number,

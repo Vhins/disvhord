@@ -3,11 +3,13 @@ import { ChatService } from '../../chat.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NgStyle } from '@angular/common';
+import { PeerService } from '../../peer.service';
+import { CallComponent } from "../call/call.component";
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [NgStyle],
+  imports: [NgStyle, CallComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })
@@ -253,5 +255,18 @@ export class ChatComponent {
     ngOnDestroy(): void {
         this.scrollDownNowSubscription.unsubscribe()
         this.allegatingFiles = false
+    }
+
+    PeerService!: PeerService
+
+    callnow: boolean = false
+    callID: string = ''
+    callChat() {
+        const input = this.inputlink.nativeElement as HTMLInputElement
+        this.callID = input.value
+        this.callnow = true
+    }
+    exitChat() {
+        this.callnow = false
     }
 }
