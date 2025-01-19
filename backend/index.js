@@ -6,6 +6,7 @@ import { connectToDatabase } from "./db.js"; let db
 import jwt from 'jsonwebtoken'; const { sign } = jwt;
 import rateLimit from 'express-rate-limit'
 import { compare, hash, genSalt } from 'bcrypt'
+import { PeerServer } from 'peer'
 const secretJWT = "90628be6876cdbed544203e26c89ce931b10e1ca4163d41f7b6f4131b2c77bae0f9998d6fefa65d4570effdc12a36fce2bdf87ad3821714d1326798eff1d85ad"
 
 startServer(3333)
@@ -18,6 +19,7 @@ async function startServer(PORT){
         db = await connectToDatabase()
 
         io.listen(3332)
+        const peerServer = PeerServer({ path: '/peerjs', port: 3331, secure: false, allow_discovery: true })
         app.listen(PORT, ()=>{ console.debug(`‎ \n Server backend avviato | Port: ${PORT} \n ---------------------------------------------------------`) })
 
         app.use((req, res, next) => {        
@@ -144,6 +146,12 @@ async function startServer(PORT){
                     io.to(receiverSocketId).emit('personal_message_edited', {"message_id": data.message_id, "content": data.content})
                 }
                 
+            })
+
+            socket.on('start_personal_call', async (data) => {
+                console.log('started call', data)
+                const receiverSocketId = users[data.receiver]
+                io.to(receiverSocketId).emit('personal_call_started', {"call_id": data.call_id})
             })
 
             socket.on('disconnect', () => {

@@ -1,13 +1,13 @@
 <div>
     chiamata :
-    @if (callnow) {
-        <app-call [callid]="this.callID"></app-call>
+    @if (aCallHasStarted) {
+        <app-call></app-call>
     }
 </div>
-<button (click)="callChat()" style="position: absolute; top: 20px; right: 20px;"> CALL </button>
-<button (click)="exitChat()" style="position: absolute; top: 40px; right: 20px;"> EXIT_CALL </button>
+<button (click)="callThisChat()" style="position: absolute; top: 20px; right: 20px;"> CALL </button>
 <div class="messages-container" #scrollContainer>
     @for (message of chatService.messages; track $index) {
+        <!-- <div [hidden]="this.callnow" #messageRef [id]="message.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper"> -->
         <div #messageRef [id]="message.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper">
             <div class="message">
                 <img class="message-user_logo" [src]="chatService.users_info[message.sender].img">

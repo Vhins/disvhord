@@ -3,8 +3,8 @@ import { ChatService } from '../../chat.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NgStyle } from '@angular/common';
-import { PeerService } from '../../peer.service';
-import { CallComponent } from "../call/call.component";
+import { WebSocketService } from '../../web-socket.service';
+import { CallComponent } from '../call/call.component';
 
 @Component({
   selector: 'app-chat',
@@ -25,7 +25,7 @@ export class ChatComponent {
     private scrollDownNowSubscription!: Subscription;
     newChat: boolean = false
 
-    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute) {
+    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute, private webSocketService: WebSocketService, public callComponent: CallComponent) {
         this.newChat = true
         this.activatedRoute.paramMap.subscribe(async param => {
             this.newChat = true
@@ -38,6 +38,10 @@ export class ChatComponent {
             const element = this.scrollContainer.nativeElement
             element.scrollTop = element.scrollHeight
             console.log('scroll down')  
+        })
+
+        this.webSocketService.on("personal_call_started").subscribe(data => {
+            this.aCallHasStarted = true
         })
     }
 
@@ -257,16 +261,11 @@ export class ChatComponent {
         this.allegatingFiles = false
     }
 
-    PeerService!: PeerService
+    aCallHasStarted: boolean = false
 
-    callnow: boolean = false
-    callID: string = ''
-    callChat() {
-        const input = this.inputlink.nativeElement as HTMLInputElement
-        this.callID = input.value
-        this.callnow = true
-    }
-    exitChat() {
-        this.callnow = false
+    async callThisChat() {
+        this.aCallHasStarted = true
+        await this.callComponent.startConnectionToPeerServer()
+        this.callComponent.startCall(this.chatService.user_id, this.chatService.chat_user_id)
     }
 }
