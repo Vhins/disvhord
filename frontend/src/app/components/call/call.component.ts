@@ -13,57 +13,38 @@ import { ChatService } from '../../chat.service';
   styleUrl: './call.component.css'
 })
 export class CallComponent {
-    @ViewChild('localVideo') refLocalVideo!: ElementRef
-    @ViewChild('remoteVideo') refRemoteVideo!: ElementRef
+    @ViewChild('localVideo',{static: true}) refLocalVideo!: ElementRef
+    @ViewChild('remoteVideo',{static: true}) refRemoteVideo!: ElementRef
 
-    @Input() callid!: any
+    callid!: string
 
     constructor(private peerService: PeerService) {}
 
-    localStream!: HTMLVideoElement
-    remoteStream!: HTMLVideoElement
+    localStreamHTML!: HTMLVideoElement
+    remoteStreamHTML!: HTMLVideoElement
 
-    loaded: boolean = false
-
-    ngAfterViewInit() {
-        this.localStream = this.refLocalVideo.nativeElement as HTMLVideoElement
-        this.remoteStream = this.refRemoteVideo.nativeElement as HTMLVideoElement
-        this.loaded = true
-        console.log('ngAfterViewInit eseguito, loaded:', this.loaded);
+    async requestPermission(): Promise<boolean> {
+        this.localStreamHTML = this.refLocalVideo.nativeElement as HTMLVideoElement
+        this.remoteStreamHTML = this.refRemoteVideo.nativeElement as HTMLVideoElement
+        return await this.peerService.requestPermission(this)
     }
 
-    async startConnectionToPeerServer() {
-        console.log('cool')
-        await this.waitForViewInit()
-        console.log('cool2')
-        this.peerService.startConnectionToPeerServer(this)
+    async startConnectionToPeerServerAndStartCall(user_id: number, chat_user_id: number): Promise<boolean> {
+        return this.peerService.startConnectionToPeerServerAndStartCall(user_id,chat_user_id)
     }
 
-    private waitForViewInit(): Promise<void> {
-        return new Promise((resolve) => {
-            const checkLoaded = () => {
-                console.log('this.loaded', this.loaded)
-                if (this.loaded) {
-                    resolve()
-                } else {
-                    console.log('la')
-                    setTimeout(checkLoaded, 50)
-                }
-            }
-            checkLoaded()
-        })
+    async enterCall(): Promise<boolean> {
+        if (this.callid) {
+            return this.peerService.startConnectionToPeerServerAndEnterCall(this.callid)
+        } else {
+            return false
+        }
     }
 
-    startCall(user_id: number, chat_user_id: number) {
-        this.peerService.startCall(user_id, chat_user_id)
-    }
-
-    enterCall(callid: string, user_id: number, chat_user_id: number) {
-        this.peerService.enterCall(callid, user_id, chat_user_id)
-    }
+    infoCall!: {call_id: string, user_id: number, chat_user_id: number}
 
     exitCall() {
-
+        this.peerService.ExitCall()
     }
 
 }

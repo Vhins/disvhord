@@ -25,7 +25,9 @@ export class ChatComponent {
     private scrollDownNowSubscription!: Subscription;
     newChat: boolean = false
 
-    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute, private webSocketService: WebSocketService, public callComponent: CallComponent) {
+    @ViewChild(CallComponent) callComponent!: CallComponent;
+
+    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute, private webSocketService: WebSocketService) {
         this.newChat = true
         this.activatedRoute.paramMap.subscribe(async param => {
             this.newChat = true
@@ -34,14 +36,14 @@ export class ChatComponent {
             this.chatService.allegateFile("")
             this.chatService.editingMessage(false)
         })
-        this.scrollDownNowSubscription = this.chatService.scrollDownNow.asObservable().subscribe(value => {
-            const element = this.scrollContainer.nativeElement
-            element.scrollTop = element.scrollHeight
-            console.log('scroll down')  
-        })
 
-        this.webSocketService.on("personal_call_started").subscribe(data => {
+        this.webSocketService.on("personal_call_started").subscribe(async data => {
             this.aCallHasStarted = true
+            this.callComponent.infoCall = {call_id: data.call_id, user_id: data.sender, chat_user_id: data.receiver}
+            this.callComponent.callid = data.call_id
+
+            const status = await this.callComponent.requestPermission()
+            if (!status) { console.log('status', status); return }
         })
     }
 
@@ -50,6 +52,11 @@ export class ChatComponent {
     thismessageimg: string = "none"
 
     ngAfterViewInit() {
+        this.scrollDownNowSubscription = this.chatService.scrollDownNow.asObservable().subscribe(value => {
+            const element = this.scrollContainer.nativeElement
+            element.scrollTop = element.scrollHeight
+        })
+
         const input = this.input.nativeElement as HTMLInputElement
         input.value = ""
         const inputlink = this.inputlink.nativeElement as HTMLInputElement
@@ -71,7 +78,6 @@ export class ChatComponent {
                 this.chatService.editingMessage(false)
             } else {
                 const element = this.scrollContainer.nativeElement as HTMLDivElement
-                console.log('aggiungere condizioni', element.scrollHeight, 'g:', element.clientHeight)
                 element.scrollTop = element.scrollHeight
             }
         })
@@ -265,7 +271,11 @@ export class ChatComponent {
 
     async callThisChat() {
         this.aCallHasStarted = true
-        await this.callComponent.startConnectionToPeerServer()
-        this.callComponent.startCall(this.chatService.user_id, this.chatService.chat_user_id)
+        
+        const status = await this.callComponent.requestPermission()
+        if (!status) { console.log('status', status); return }
+
+        const status2 = await this.callComponent.startConnectionToPeerServerAndStartCall(this.chatService.user_id, this.chatService.chat_user_id)
+        if (!status2) { console.log('status2', status2); return }
     }
 }
