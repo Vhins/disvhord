@@ -1,6 +1,5 @@
-import { Component, ElementRef, Injectable, Input, ViewChild, ViewRef } from '@angular/core';
+import { Component, ElementRef, Injectable, ViewChild } from '@angular/core';
 import { PeerService } from '../../peer.service';
-import { ChatService } from '../../chat.service';
 
 @Injectable({
     providedIn: 'root'
@@ -23,10 +22,16 @@ export class CallComponent {
     localStreamHTML!: HTMLVideoElement
     remoteStreamHTML!: HTMLVideoElement
 
+    other_user_has_connected: boolean = false
+
     async requestPermission(): Promise<boolean> {
         this.localStreamHTML = this.refLocalVideo.nativeElement as HTMLVideoElement
         this.remoteStreamHTML = this.refRemoteVideo.nativeElement as HTMLVideoElement
-        return await this.peerService.requestPermission(this)
+        return await this.peerService.requestAudioPermission(this)
+    }
+
+    async requestVideoPermission() {
+        this.peerService.requestVideoPermission()
     }
 
     async startConnectionToPeerServerAndStartCall(user_id: number, chat_user_id: number): Promise<boolean> {

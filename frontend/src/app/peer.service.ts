@@ -10,28 +10,35 @@ export class PeerService {
     peer!: Peer
     callComponent!: CallComponent
 
-    localStream!: any
-    videoEnabled: any = true
-    audioEnabled: any = true
+    localStream!: MediaStream
+    videoEnabled: boolean = true
+    audioEnabled: boolean = true
     currentCall!: any
 
-    callID!: any
+    callID!: string
 
     constructor(private webSocketService: WebSocketService) {}
 
 
-    async requestPermission(component: CallComponent): Promise<boolean> {
+    async requestAudioPermission(component: CallComponent): Promise<boolean> {
         this.callComponent = component
+        this.localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+        return true
+    }
 
+    // this.currentCall.close()
+    // this.currentCall.answer(this.localStream)
+
+    async requestVideoPermission() {
         this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        
-        if (this.callComponent.localStreamHTML) {
-            this.callComponent.localStreamHTML.srcObject = this.localStream
-            // this.callComponent.localStreamHTML.muted = true
-            //this.stream.play()
-            return true
-        }
-        return false
+
+        this.currentCall.peerConnection.getSenders().forEach((sender: { track: { kind: string }; replaceTrack: (arg0: any) => void }) => {
+            if (sender.track.kind == "video") {
+                sender.replaceTrack(this.localStream.getTracks()[0])
+                this.callComponent.localStreamHTML.srcObject = this.localStream
+                // this.currentCall.addTrack() ???????
+            }
+        })
     }
 
     connectToServer(): boolean {
@@ -44,22 +51,37 @@ export class PeerService {
         }
     }
 
+    setupYourStream() {
+        if (this.callComponent.localStreamHTML) {
+            this.callComponent.localStreamHTML.srcObject = this.localStream
+            this.callComponent.localStreamHTML.muted = true
+            this.callComponent.localStreamHTML.play()
+        }
+    }
+
     startConnectionToPeerServerAndStartCall(user_id: number, chat_user_id: number) {
         if (!this.connectToServer()) return false
 
         this.peer.on('open', id => {
             this.callID = id
+
+            this.setupYourStream()
+
             this.webSocketService.emit("start_personal_call", { sender: user_id, receiver: chat_user_id, call_id: id })
 
             this.peer.on('call', call => {
-                // this.callComponent.localStreamHTML.muted = false
+                this.currentCall = call
+
+                call.on('error', error => { console.error('error', error) })
 
                 call.answer(this.localStream)
-                this.currentCall = call
-    
+
                 call.on('stream', remoteStream => {
                     this.callComponent.remoteStreamHTML.srcObject = remoteStream
                 })
+
+
+                this.callComponent.other_user_has_connected = true
             })
         })
 
@@ -71,25 +93,22 @@ export class PeerService {
         if (!this.connectToServer()) return false
 
         this.peer.on('open', () => {
-            this.peer.on('call', call => {
-                // this.callComponent.localStreamHTML.muted = false
+            this.setupYourStream()
 
-                call.answer(this.localStream)
-                this.currentCall = call
-    
-                call.on('stream', remoteStream => {
-                    this.callComponent.remoteStreamHTML.srcObject = remoteStream
-                })
-            })
-    
             const call = this.peer.call(call_id, this.localStream)
             this.currentCall = call
+
+            call.on('error', error => { console.error('error', error) })
+
+            call.on('stream', remoteStream => {
+                this.callComponent.remoteStreamHTML.srcObject = remoteStream
+            })
         })
 
         return true
     }
 
-    ExitCall() {
+    ExitCall() { 
         if (this.currentCall) {
             this.currentCall.close()
             this.currentCall = null

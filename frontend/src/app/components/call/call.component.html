@@ -3,12 +3,13 @@
     <hr>
     <div style="display: flex; flex-direction: row;">
         <div style="display: flex; flex-direction: column; align-items: center;">
-            <video width="400px" #localVideo autoplay muted></video>
+            <video style="border: 2px solid red;" width="400px" #localVideo autoplay muted></video>
             <h2> TU </h2>
+            <button (click)="requestVideoPermission()"> turn on video </button>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center;">
-            <video width="400px" #remoteVideo autoplay></video>
-            <h2> ALTRO </h2>
+            <video style="border: 2px solid violet;" width="400px" #remoteVideo autoplay></video>
+            <h2> ALTRO <span [hidden]="!this.other_user_has_connected"> E Connesso! </span> </h2>
         </div>
     </div>
     <hr>
