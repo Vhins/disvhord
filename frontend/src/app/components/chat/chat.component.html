@@ -2,8 +2,6 @@
     chiamata :
     <app-call></app-call>
 </div>
-<button (click)="callThisChat()" style="position: absolute; top: 20px; right: 20px;"> CALL </button>
-
 <div class="messages-container" #scrollContainer>
     @for (message of chatService.messages; track $index) {
         <div [hidden]="this.aCallHasStarted" #messageRef [id]="message.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper">

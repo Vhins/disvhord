@@ -270,6 +270,7 @@ export class ChatComponent {
     aCallHasStarted: boolean = false
 
     async callThisChat() {
+        console.log('suco')
         this.aCallHasStarted = true
         
         const status = await this.callComponent.requestPermission()
