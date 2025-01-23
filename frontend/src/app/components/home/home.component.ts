@@ -5,11 +5,12 @@ import { SideBarChatComponent } from '../side-bar-chat/side-bar-chat.component';
 import { RouterOutlet } from '@angular/router';
 import { SideBarComponent } from "../side-bar/side-bar.component";
 import { Location } from '@angular/common';
+import { ControlsBarComponent } from "../controls-bar/controls-bar.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterOutlet, ChatsComponent, RapidControlsComponent, SideBarComponent, SideBarChatComponent],
+  imports: [RouterOutlet, ChatsComponent, RapidControlsComponent, SideBarComponent, SideBarChatComponent, ControlsBarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
