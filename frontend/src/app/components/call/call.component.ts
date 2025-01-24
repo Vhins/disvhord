@@ -25,6 +25,7 @@ export class CallComponent {
     other_user_has_connected: boolean = false
 
     async requestPermission(): Promise<boolean> {
+        console.log('aigh!')
         this.localStreamHTML = this.refLocalVideo.nativeElement as HTMLVideoElement
         this.remoteStreamHTML = this.refRemoteVideo.nativeElement as HTMLVideoElement
         return await this.peerService.requestAudioPermission(this)
