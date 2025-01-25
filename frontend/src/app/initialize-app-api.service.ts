@@ -3,7 +3,7 @@ import { AuthService } from './auth/auth.service';
 
 interface user_interface {
     user_id: number,
-    user_handle: number,
+    user_handle: string,
     user_displayName: string,
     user_logo: string,
     friends: Array<{user_id: number, user_displayName: string, user_logo: string}>,

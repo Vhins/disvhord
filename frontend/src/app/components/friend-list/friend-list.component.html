@@ -22,6 +22,8 @@
                 <div class="user_status" style="color: rgb(203, 45, 224);"> Siete gia amici </div>
             } @else if(this.statusFriendRequest == 5) {
                 <div class="user_status" style="color: rgb(0, 0, 0);"> L'utente ti ha bloccato </div>
+            } @else if(this.statusFriendRequest == 6) {
+                <div class="user_status" style="color: rgb(0, 0, 0);">  </div>
             }
             <button (click)="sendFriendRequest(null)" class="chat_icon_button">
                 <img class="chat_icon" src="./assets/add_friend.svg">

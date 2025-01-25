@@ -501,6 +501,11 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
         return
     }
 
+    if (JWTdata.user_id == friend_user.user_id) {
+        res.status(403).json({ statusFriendRequest: 6 })
+        return
+    }
+
     const friend_user_interface = await db.collection('users_interface').findOne({ user_handle: friend_user_handle })
 
     if (friend_user_interface.friends) {

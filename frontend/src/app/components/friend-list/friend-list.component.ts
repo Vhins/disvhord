@@ -37,6 +37,11 @@ export class FriendListComponent {
 
         const input = this.input.nativeElement as HTMLInputElement
 
+        if (String(this.initializeAppApiService.user_interface.user_handle) == input.value) {
+            this.statusFriendRequest = 6
+            return
+        }
+
         fetch('http://localhost:3333/tryToSendFriendRequest', {
             method: 'POST',
             headers: {
