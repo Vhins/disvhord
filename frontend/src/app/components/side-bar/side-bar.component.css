@@ -54,6 +54,11 @@
     flex-direction: row;
 }
 
+.aaa > button {
+    width: 44%;
+    margin: 3%;
+}
+
 .notifications {
     width: 95%;
     background-color: white;

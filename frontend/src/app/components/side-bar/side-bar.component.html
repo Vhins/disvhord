@@ -13,13 +13,13 @@
             <div class="chat_request">
                 @for (notification of this.friend_request; track $index) {
                     <div class="aaa">
-                        <img class="user_logo_request" [src]="notification.user_logo">
-                        <span class="user_name_request"> {{notification.user_handle}} </span>
+                        <!-- <img class="user_logo_request" [src]="notification.user_logo"> -->
+                        <span class="user_name_request"> <u><b> {{notification.user_handle}} </b></u> ti ha inviato una richiesta di amicizia, {{notification.timestamp}} </span>
                     </div>
                     <div class="aaa">
-                        <span class="user_name"> {{notification.timestamp}} </span>
-                        <button (click)="acceptFriendRequest(notification.user_id)"> acceptFriendRequest </button>
-                        <button (click)="deleteFriendRequest(notification.user_id)"> deleteFriendRequest </button>
+                        <span class="user_name">  </span>
+                        <button (click)="acceptFriendRequest(notification.user_id)"> Accetta </button>
+                        <button (click)="deleteFriendRequest(notification.user_id)"> Rifiuta </button>
                     </div>
                 }
             </div>

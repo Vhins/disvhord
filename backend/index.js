@@ -306,7 +306,7 @@ async function handleApi_checkUserTokenValidity(req, res){
     const privateToken = authHeader && authHeader.split(' ')[1]
 
     const user_info = await db.collection('users_info').findOne({user_id: Number(user_id)})
-
+    
     if (user_info === null){
         res.status(404).json({ message: 'Utente non trovato' })
         return
@@ -596,6 +596,10 @@ async function handleApi_deleteFriendRequest(req, res) {
     const { friend_user_id } = req.body
     const JWTdata = req.JWTdata
 
-    await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+    let succesDeletingRequest = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+    if (!succesDeletingRequest) {
+        res.status(404)
+        return
+    }
     res.status(200)
 }
