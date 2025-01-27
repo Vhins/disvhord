@@ -26,19 +26,23 @@ export class PeerService {
         return true
     }
 
-    // this.currentCall.close()
-    // this.currentCall.answer(this.localStream)
-
     async requestVideoPermission() {
         this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        //* this.localStream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: { "mediaSource": "screen", "cursor": "always" } })
 
-        this.currentCall.peerConnection.getSenders().forEach((sender: { track: { kind: string }; replaceTrack: (arg0: any) => void }) => {
-            if (sender.track.kind == "video") {
-                sender.replaceTrack(this.localStream.getTracks()[0])
-                this.callComponent.localStreamHTML.srcObject = this.localStream
-                // this.currentCall.addTrack() ???????
-            }
-        })
+        // console.log('_!_', this.currentCall)
+        // this.currentCall.peerConnection.addStream(this.localStream)
+
+        
+
+        //todo
+    }
+
+    getTracksTest() {
+        // console.log('_!_', this.currentCall.peerConnection.getSenders())
+        // console.log('_!_', this.currentCall.peerConnection.getRemoteStream())
+
+        // todo
     }
 
     connectToServer(): boolean {

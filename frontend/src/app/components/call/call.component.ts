@@ -35,6 +35,10 @@ export class CallComponent {
         this.peerService.requestVideoPermission()
     }
 
+    getTracksTest() {
+        this.peerService.getTracksTest()
+    }
+
     async startConnectionToPeerServerAndStartCall(user_id: number, chat_user_id: number): Promise<boolean> {
         return this.peerService.startConnectionToPeerServerAndStartCall(user_id,chat_user_id)
     }
