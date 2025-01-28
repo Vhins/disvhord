@@ -5,8 +5,10 @@
         <div style="display: flex; flex-direction: column; align-items: center;">
             <video style="border: 2px solid red;" width="400px" #localVideo autoplay muted></video>
             <h2> TU </h2>
-            <button (click)="requestVideoPermission()"> turn on video </button>
-            <button (click)="getTracksTest()"> getTracksTest </button>
+            <button (click)="requestVideoPermission()"> turn on camera </button>
+            <button (click)="turnOffCamera()"> turn off camera </button>
+            <button (click)="requestScreenSharePermission()"> turn on screen share </button>
+            <button (click)="turnOffVideoStreaming()"> turn off screen share </button>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center;">
             <video style="border: 2px solid violet;" width="400px" #remoteVideo autoplay></video>

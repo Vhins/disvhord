@@ -28,15 +28,23 @@ export class CallComponent {
         console.log('aigh!')
         this.localStreamHTML = this.refLocalVideo.nativeElement as HTMLVideoElement
         this.remoteStreamHTML = this.refRemoteVideo.nativeElement as HTMLVideoElement
-        return await this.peerService.requestAudioPermission(this)
+        return await this.peerService.requestVideoAudioPermission(this)
     }
 
     async requestVideoPermission() {
         this.peerService.requestVideoPermission()
     }
 
-    getTracksTest() {
-        this.peerService.getTracksTest()
+    async requestScreenSharePermission() {
+        this.peerService.requestScreenSharePermission()
+    }
+
+    turnOffCamera() {
+        this.peerService.turnOffCamera()
+    }
+
+    turnOffVideoStreaming() {
+        this.peerService.turnOffVideoStreaming()
     }
 
     async startConnectionToPeerServerAndStartCall(user_id: number, chat_user_id: number): Promise<boolean> {

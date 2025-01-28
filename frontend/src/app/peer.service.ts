@@ -20,29 +20,45 @@ export class PeerService {
     constructor(private webSocketService: WebSocketService) {}
 
 
-    async requestAudioPermission(component: CallComponent): Promise<boolean> {
+    async requestVideoAudioPermission(component: CallComponent): Promise<boolean> {
         this.callComponent = component
-        this.localStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+
+        this.localStream = new MediaStream([stream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
         return true
     }
 
     async requestVideoPermission() {
         this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        //* this.localStream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: { "mediaSource": "screen", "cursor": "always" } })
-
-        // console.log('_!_', this.currentCall)
-        // this.currentCall.peerConnection.addStream(this.localStream)
-
-        
-
-        //todo
+        let videoTrack = this.localStream.getVideoTracks()[0];
+        videoTrack.onended = () => { this.turnOffCamera() }
+        this.sendNewVideoTrack(this.localStream)
     }
 
-    getTracksTest() {
-        // console.log('_!_', this.currentCall.peerConnection.getSenders())
-        // console.log('_!_', this.currentCall.peerConnection.getRemoteStream())
+    async requestScreenSharePermission() {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true })
+        let videoTrack = stream.getVideoTracks()[0];
+        videoTrack.onended = () => { this.turnOffVideoStreaming() }
+        this.sendNewVideoTrack(stream)
+    }
 
-        // todo
+    sendNewVideoTrack(stream: MediaStream) {
+        this.currentCall.peerConnection.getSenders().forEach((sender: { track: { kind: string }; replaceTrack: (arg0: any) => void }) => {
+            if (sender.track.kind == "video") {
+                sender.replaceTrack(stream.getVideoTracks()[0])
+            }
+        })
+
+        this.callComponent.localStreamHTML.srcObject = stream
+    }
+
+    turnOffVideoStreaming() {
+        this.sendNewVideoTrack(this.localStream)
+    }
+
+    async turnOffCamera() { //! non funziona, quello sopra si, funziona solo dopo una combinazione
+        this.localStream = new MediaStream([this.localStream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
+        this.sendNewVideoTrack(this.localStream)
     }
 
     connectToServer(): boolean {
@@ -119,6 +135,17 @@ export class PeerService {
             this.callComponent.remoteStreamHTML.srcObject = null
             this.callComponent.localStreamHTML.srcObject = null
         }
+    }
+
+    createEmptyVideoTrack({ width, height }: { width: number, height: number }) {
+        const canvas = Object.assign(document.createElement('canvas'), { width, height })
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+        ctx.fillStyle = "violet"
+        ctx.fillRect(0, 0, width, height)
+
+        const videoTrack = canvas.captureStream().getVideoTracks()[0]
+
+        return Object.assign(videoTrack, { enabled: false })
     }
 
 }
