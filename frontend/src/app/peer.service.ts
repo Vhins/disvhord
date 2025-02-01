@@ -29,23 +29,24 @@ export class PeerService {
     }
 
     async requestVideoPermission() {
-        this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        let videoTrack = this.localStream.getVideoTracks()[0];
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        let videoTrack = stream.getVideoTracks()[0]
         videoTrack.onended = () => { this.turnOffCamera() }
-        this.sendNewVideoTrack(this.localStream)
+        this.sendNewVideoTrack(stream)
     }
 
     async requestScreenSharePermission() {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ audio: true, video: true })
-        let videoTrack = stream.getVideoTracks()[0];
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
+        let videoTrack = stream.getVideoTracks()[0]
         videoTrack.onended = () => { this.turnOffVideoStreaming() }
         this.sendNewVideoTrack(stream)
     }
 
     sendNewVideoTrack(stream: MediaStream) {
         this.currentCall.peerConnection.getSenders().forEach((sender: { track: { kind: string }; replaceTrack: (arg0: any) => void }) => {
-            if (sender.track.kind == "video") {
+            if (sender.track.kind == "video") { 
                 sender.replaceTrack(stream.getVideoTracks()[0])
+                this.localStream = stream
             }
         })
 
@@ -53,6 +54,7 @@ export class PeerService {
     }
 
     turnOffVideoStreaming() {
+        this.localStream = new MediaStream([this.localStream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
         this.sendNewVideoTrack(this.localStream)
     }
 
@@ -97,6 +99,9 @@ export class PeerService {
                 call.answer(this.localStream)
 
                 call.on('stream', remoteStream => {
+                    remoteStream.getVideoTracks().forEach(track => {
+                        track.onended = () => {console.debug('Il video track remoto è terminato')} //*
+                    })
                     this.callComponent.remoteStreamHTML.srcObject = remoteStream
                 })
 
@@ -119,8 +124,10 @@ export class PeerService {
             this.currentCall = call
 
             call.on('error', error => { console.error('error', error) })
-
             call.on('stream', remoteStream => {
+                remoteStream.getVideoTracks().forEach(track => {
+                    track.onended = () => {console.debug('Il video track remoto è terminato')} //*
+                })
                 this.callComponent.remoteStreamHTML.srcObject = remoteStream
             })
         })
