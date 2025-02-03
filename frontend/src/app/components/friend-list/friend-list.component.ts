@@ -53,7 +53,6 @@ export class FriendListComponent {
             })
         }).then( res => {
             res.json().then( resjson => {
-                console.log('resjson', resjson.statusFriendRequest)
                 this.statusFriendRequest = resjson.statusFriendRequest
             })
         })

@@ -12,8 +12,13 @@ import { PeerService } from '../../peer.service';
   styleUrl: './call.component.css'
 })
 export class CallComponent {
-    @ViewChild('localVideo',{static: true}) refLocalVideo!: ElementRef
+    @ViewChild('localVideo', {static: true}) refLocalVideo!: ElementRef
     @ViewChild('remoteVideo',{static: true}) refRemoteVideo!: ElementRef
+
+    ngAfterViewInit() {
+        this.localStreamHTML = this.refLocalVideo.nativeElement as HTMLVideoElement
+        this.remoteStreamHTML = this.refRemoteVideo.nativeElement as HTMLVideoElement
+    }
 
     callid!: string
 
@@ -25,9 +30,6 @@ export class CallComponent {
     other_user_has_connected: boolean = false
 
     async requestPermission(): Promise<boolean> {
-        console.log('aigh!')
-        this.localStreamHTML = this.refLocalVideo.nativeElement as HTMLVideoElement
-        this.remoteStreamHTML = this.refRemoteVideo.nativeElement as HTMLVideoElement
         return await this.peerService.requestVideoAudioPermission(this)
     }
 

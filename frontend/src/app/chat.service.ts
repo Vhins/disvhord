@@ -20,6 +20,11 @@ export class ChatService {
     scrollDown(): void {
         this.scrollDownNow.next(false)
     }
+    
+    callThisChat = new BehaviorSubject<Boolean>(false)
+    callThisChatNow(): void {
+        this.callThisChat.next(true)
+    }
 
     constructor(private webSocketService: WebSocketService, private InitializeAppApiService: InitializeAppApiService) {
         this.InitializeAppApiService = InitializeAppApiService

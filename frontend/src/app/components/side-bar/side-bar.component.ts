@@ -40,7 +40,6 @@ export class SideBarComponent {
             })
         }).then( res => {
             res.json().then( resjson => {
-                console.log('accettata!', resjson.friendInfo)
                 this.initializeAppService.user_interface.friends.push(
                     {user_id: resjson.friendInfo.user_id, user_displayName: resjson.friendInfo.displayName, user_logo: resjson.friendInfo.user_logo}
                 )
