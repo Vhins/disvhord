@@ -1,15 +1,16 @@
 import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ChatService } from '../../chat.service';
+import { ChatService } from './chat.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { NgStyle } from '@angular/common';
 import { WebSocketService } from '../../web-socket.service';
 import { CallComponent } from '../call/call.component';
+import { MessageComponent } from "./message/message.component";
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [NgStyle, CallComponent],
+  imports: [NgStyle, CallComponent, MessageComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })
@@ -111,6 +112,7 @@ export class ChatComponent {
 
     sendMessage() {
         const input = this.input.nativeElement as HTMLTextAreaElement
+        if (input.value === "") return
         const message = input.value.
         replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -150,6 +152,10 @@ export class ChatComponent {
         const input = this.input.nativeElement as HTMLTextAreaElement
         const target = event.currentTarget as HTMLButtonElement
 
+        if (!this.chatService.messages) {
+            this.stopEditMessage()
+            return
+        }
         const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
         if (!message) return
         if (message.sender != this.chatService.user_id) return
@@ -180,6 +186,7 @@ export class ChatComponent {
     showCorretImgMessageActionButton(event: Event) {
         const target =event.currentTarget as HTMLDivElement
 
+        if (!this.chatService.messages) { return }
         const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
         if (!message) return
         if (message.sender != this.chatService.user_id) {

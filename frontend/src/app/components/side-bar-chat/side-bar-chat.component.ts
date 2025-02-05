@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ChatService } from '../../chat.service';
+import { ChatService } from '../chat/chat.service';
 
 @Component({
   selector: 'app-side-bar-chat',

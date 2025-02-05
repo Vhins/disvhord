@@ -9,7 +9,6 @@ import { authGuard } from './auth/auth.guard';
 import { ChatComponent } from './components/chat/chat.component';
 import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { ChatService } from './chat.service';
 
 export const routes: Routes = [
     { path: '', component: MainSiteComponent },

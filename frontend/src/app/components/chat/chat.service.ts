@@ -1,15 +1,15 @@
 import { Injectable } from "@angular/core";
-import { InitializeAppApiService } from "./initialize-app-api.service";
-import { WebSocketService } from "./web-socket.service";
+import { InitializeAppApiService } from "../../initialize-app-api.service";
+import { WebSocketService } from "../../web-socket.service";
 import { BehaviorSubject } from 'rxjs';
+import { environment } from "../../../environments/environment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ChatService {
-    IP = "localhost:3333"
     user_id: number
-    messages: {content: string, sender: number, receiver: number, message_id: number, timestamp: string, attachments: string | null}[] = []
+    messages: {content: string, sender: number, receiver: number, message_id: number, timestamp: string, attachments: string | null}[] | undefined = undefined
     users_info: {[key: number]: {id: number, name: string, img: string}} = {}
     chat_id!: number
     chat_user_id!: number
@@ -92,7 +92,7 @@ export class ChatService {
     }
 
     async get_ChatInfoMessages() {
-        const apiURL = `http://${this.IP}/ChatInfoMessages`
+        const apiURL = `http://${environment.IP}/ChatInfoMessages`
         const request = {
             method: 'POST',
             headers: {

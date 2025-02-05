@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { Router } from '@angular/router';
-import { ChatService } from '../../chat.service';
+import { ChatService } from '../chat/chat.service';
 
 @Component({
   selector: 'app-chats',

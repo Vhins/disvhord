@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { Router } from '@angular/router';
-import { ChatService } from '../../chat.service';
+import { ChatService } from '../chat/chat.service';
 
 @Component({
   selector: 'app-friend-list',

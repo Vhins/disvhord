@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-    IP: string
-    
-    constructor(private router: Router) {
-        this.IP = "localhost:3333"
-    }
+
+    constructor(private router: Router) {}
 
     public async isLoggedIn(): Promise<boolean> {
         const isTokenValid: boolean = await this.checkTokenValidity()
@@ -24,7 +22,7 @@ export class AuthService {
 
     
     public async tryCreateAccount(accountData: object): Promise<{return: boolean, code: number}> {
-        const apiURL = `http://${this.IP}/userCreateAccount`
+        const apiURL = `http://${environment.IP}/userCreateAccount`
         const request = {
             method: 'POST',
             headers: {
@@ -58,7 +56,7 @@ export class AuthService {
     }
 
     public async login(email: string, password: string): Promise<boolean>{
-        const apiURL = `http://${this.IP}/userLogin`
+        const apiURL = `http://${environment.IP}/userLogin`
         const request = {
             method: 'POST',
             headers: {
@@ -93,7 +91,7 @@ export class AuthService {
         
         if(privateToken != null && user_id != null){
             
-            const apiURL = new URL(`http://${this.IP}/checkUserTokenValidity`)
+            const apiURL = new URL(`http://${environment.IP}/checkUserTokenValidity`)
             const request: RequestInit = {
                 method: 'POST',
                 headers: {
