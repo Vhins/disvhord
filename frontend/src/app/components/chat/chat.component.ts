@@ -2,26 +2,24 @@ import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angu
 import { ChatService } from './chat.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { NgStyle } from '@angular/common';
 import { WebSocketService } from '../../web-socket.service';
 import { CallComponent } from '../call/call.component';
 import { MessageComponent } from "./message/message.component";
+import { AddLinkPopupComponent } from "./add-link-popup/add-link-popup.component";
+import { ChatInputComponent } from "./chat-input/chat-input.component";
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [NgStyle, CallComponent, MessageComponent],
+  imports: [CallComponent, MessageComponent, AddLinkPopupComponent, ChatInputComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })
 export class ChatComponent {
     @ViewChild('scrollContainer') scrollContainer!: ElementRef
     @ViewChild('input_container') input_container!: ElementRef
-    @ViewChild('input') input!: ElementRef
-    @ViewChild('inputlink') inputlink!: ElementRef
-    @ViewChild('text_area') text_area!: ElementRef
-    @ViewChild('input_box') input_box!: ElementRef
     @ViewChildren('messageRef') messageElements!: QueryList<ElementRef>
+
 
     private scrollDownNowSubscription!: Subscription;
     newChat: boolean = false
@@ -33,8 +31,8 @@ export class ChatComponent {
         this.activatedRoute.paramMap.subscribe(async param => {
             this.newChat = true
             this.chatService.setThisChatID(Number(param.get('chat_id')))
-            this.allegatingFiles = false
-            this.chatService.allegateFile("")
+            this.chatService.allegatingLink = false
+            this.chatService.allegateLink("")
             this.chatService.editingMessage(false)
         })
 
@@ -50,7 +48,6 @@ export class ChatComponent {
 
     currentIDMessageEditing!: number
     inputValueBeforeEditing!: string
-    thismessageimg: string = "none"
 
     ngAfterViewInit() {
         this.scrollDownNowSubscription = this.chatService.scrollDownNow.asObservable().subscribe(value => {
@@ -60,8 +57,7 @@ export class ChatComponent {
 
         const input = this.input.nativeElement as HTMLInputElement
         input.value = ""
-        const inputlink = this.inputlink.nativeElement as HTMLInputElement
-        inputlink.value = ""
+        // this.inputlinkValue = ""
         this.adjustHeight()
         const element = this.scrollContainer.nativeElement
         element.scrollTop = element.scrollHeight
@@ -73,8 +69,7 @@ export class ChatComponent {
 
                 const input = this.input.nativeElement as HTMLInputElement
                 input.value = ""
-                const inputlink = this.inputlink.nativeElement as HTMLInputElement
-                inputlink.value = ""
+                // this.inputlinkValue = ""
                 this.adjustHeight()
                 this.chatService.editingMessage(false)
             } else {
@@ -110,33 +105,7 @@ export class ChatComponent {
         element.scrollTop = element.scrollHeight
     }
 
-    sendMessage() {
-        const input = this.input.nativeElement as HTMLTextAreaElement
-        if (input.value === "") return
-        const message = input.value.
-        replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/\r\n|\r|\n/g, '<br>')
-        .replace(/ /g, '&nbsp;')
-        // .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-        .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-        .replace(/https?:\/\/[^\s<>()\[\]{}]*(?=(?!.*&nbsp;)[\s|[^\w-]|$])/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-        .replace(/[\u200B-\u200D\uFEFF]/g, '')
 
-        console.log('messaggio inviato:', message)
-        if (!this.chatService.editingMessageMode) {
-            this.chatService.sendMessage(message)
-            input.value = ""
-        } else {
-            this.editMessage(message)
-            input.value = this.inputValueBeforeEditing
-        }
-        input.removeAttribute('style')
-        this.adjustHeight()
-    }
 
     deleteMessage(event: Event) {
         const target = event.currentTarget as HTMLButtonElement
@@ -145,9 +114,9 @@ export class ChatComponent {
     }
 
     editingMessage(event: Event) {
-        this.exAllegatedFile = this.chatService.allegatedFile
-        this.chatService.allegateFile("")
-        this.exitAllegatinFileUI()
+        this.exAllegatedFile = this.chatService.allegatedLink
+        this.chatService.allegateLink("")
+        // this.exitAllegatinFileUI()
 
         const input = this.input.nativeElement as HTMLTextAreaElement
         const target = event.currentTarget as HTMLButtonElement
@@ -183,36 +152,13 @@ export class ChatComponent {
         this.chatService.editingMessage(true)
     }
 
-    showCorretImgMessageActionButton(event: Event) {
-        const target =event.currentTarget as HTMLDivElement
-
-        if (!this.chatService.messages) { return }
-        const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
-        if (!message) return
-        if (message.sender != this.chatService.user_id) {
-            this.thismessageimg = "none"
-            return
-        }
-
-        if (Date.now() - this.parseFormattedDate(message.timestamp)  > 10 * 60 * 1000) {
-            this.thismessageimg = "delete"
-        } else {
-            this.thismessageimg = "edit"
-        }
-    }
-
     exAllegatedFile: string = ''
-
-    editMessage(inputValue: string) {
-        this.chatService.editMessage(this.currentIDMessageEditing, inputValue)
-        this.chatService.allegateFile(this.exAllegatedFile)
-    }
 
     stopEditMessage() {
         const input = this.input.nativeElement as HTMLTextAreaElement
         input.value = this.inputValueBeforeEditing
         this.chatService.editingMessage(false)
-        this.chatService.allegateFile(this.exAllegatedFile)
+        this.chatService.allegateLink(this.exAllegatedFile)
         this.adjustHeight()
     }
 
@@ -242,36 +188,9 @@ export class ChatComponent {
         return new Date(year, month - 1, day, hours, minutes).getTime();
     }
 
-    allegatingFiles: boolean = false
-
-    allegateFile() {
-        if (!this.chatService.editingMessageMode) {
-            this.allegatingFiles = true
-        }
-    }
-
-    confirmAllegateFile(event: Event) {
-        event.preventDefault()
-        if (!this.chatService.editingMessageMode) {
-            const input = this.inputlink.nativeElement as HTMLInputElement
-            this.chatService.allegateFile(input.value)
-            this.allegatingFiles = false
-        }
-    }
-
-    deleteAllegatedFile() {
-        this.chatService.allegateFile("")
-    }
-
-    exitAllegatinFileUI() {
-        const input = this.inputlink.nativeElement as HTMLInputElement
-        input.value = ""
-        this.allegatingFiles = false
-    }
-
     ngOnDestroy(): void {
         this.scrollDownNowSubscription.unsubscribe()
-        this.allegatingFiles = false
+        this.chatService.allegatingLink = false
     }
 
     aCallHasStarted: boolean = false
@@ -286,4 +205,19 @@ export class ChatComponent {
         const status2 = await this.callComponent.startConnectionToPeerServerAndStartCall(this.chatService.user_id, this.chatService.chat_user_id)
         if (!status2) { console.log('status2', status2); return }
     }
+
+
+
+
+
+
+    onOpenAddLinkPopup() {
+        this.chatService.allegatingLink = true
+    }
+
+    deleteAllegatedLink() {
+        this.chatService.allegatingLink = false
+        this.chatService.allegateLink("")
+    }
+
 }

@@ -35,9 +35,11 @@ export class ChatService {
 
         this.webSocketService.on("personal_message_received").subscribe(data => {
             data.timestamp = new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(data.timestamp))
+            if (this.messages === undefined) {return}
             this.messages.push(data)
         })
         this.webSocketService.on("personal_message_deleted").subscribe(data => {
+            if (this.messages === undefined) {return}
             if (data.content) {
                 const index = this.messages.findIndex(message => message.message_id === data.message_id)
                 this.messages[index].content = data.content
@@ -48,6 +50,7 @@ export class ChatService {
         })
         this.webSocketService.on("personal_message_edited").subscribe(data => {
             if (data.content) {
+                if (this.messages === undefined) {return}
                 const index = this.messages.findIndex(message => message.message_id === data.message_id)
                 this.messages[index].content = data.content
             }
@@ -67,12 +70,12 @@ export class ChatService {
 
     sendMessage(content: string) {
         if (!this.editingMessageMode) {
-            if (!this.allegatedFile) {
+            if (!this.allegatedLink) {
                 this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id })
             } else { 
-                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id, "attachments": this.allegatedFile })
+                this.webSocketService.emit("personal_message", { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id, "attachments": this.allegatedLink })
             }
-            this.allegatedFile = ""
+            this.allegatedLink = ""
         } else {
             this.editingMessageMode = false
         }
@@ -122,9 +125,10 @@ export class ChatService {
         })
     }
 
-    allegatedFile: string = ""
+    allegatingLink: boolean = false
+    allegatedLink: string = ""
 
-    allegateFile(link: string) {
-        this.allegatedFile = link
+    allegateLink(link: string) {
+        this.allegatedLink = link
     }
 }

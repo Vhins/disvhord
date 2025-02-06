@@ -1,23 +1,21 @@
-<!-- <div [hidden]="this.aCallHasStarted" #messageRef [id]="message.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper">
-    <div #messageRef [id]="message.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper"> 
+<div #messageRef [id]="messageData.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper">
+    <div #messageRef [id]="messageData.message_id" (mouseenter)="showCorretImgMessageActionButton($event)" class="message-wrapper">
         <div class="message">
-            <img class="message-user_logo" [src]="chatService.users_info[message.sender].img">
+            <img class="message-user_logo" [src]="chatService.users_info[messageData.sender].img">
             <div class="message-stuff">
                 <div class="message-stufff">
-                    <div class="userdisplayname"> {{chatService.users_info[message.sender].name}} </div>
-                    <div class="timestamp"> {{message.timestamp}} </div>
+                    <div class="userdisplayname"> {{chatService.users_info[messageData.sender].name}} </div>
+                    <div class="timestamp"> {{messageData.timestamp}} </div>
                 </div>
-                <div class="content" [innerHTML]="message.content"> </div>
-                <a style="text-decoration: underline; color: rgb(19, 77, 184);" [href]="message.attachments" target="_blank" [hidden]="!message.attachments || message.attachments.endsWith('.png') || message.attachments.endsWith('.jpg') || message.attachments.endsWith('.jpeg') || message.attachments.endsWith('.gif') || message.attachments.endsWith('.webp') || message.attachments.endsWith('.mp3') || message.attachments.endsWith('.mp4')" class="content"> {{message.attachments}} </a>
-                <img style="max-width: 500px; margin-top: 5px; border-radius: 10px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.png') && !message.attachments?.endsWith('.jpg') && !message.attachments?.endsWith('.jpeg') && !message.attachments?.endsWith('.gif') && !message.attachments?.endsWith('.webp')">
-                <audio style="margin-top: 5px;" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.mp3')" controls></audio>
-                <video style="max-width: 500px; margin-top: 5px; border-radius: 10px;" width="500px" [src]="message.attachments" [hidden]="!message.attachments?.endsWith('.mp4')" controls></video>
+                <div class="content" [innerHTML]="messageData.content"> </div>
+                <a style="text-decoration: underline; color: rgb(19, 77, 184);" [href]="messageData.attachments" target="_blank" [hidden]="!messageData.attachments || messageData.attachments.endsWith('.png') || messageData.attachments.endsWith('.jpg') || messageData.attachments.endsWith('.jpeg') || messageData.attachments.endsWith('.gif') || messageData.attachments.endsWith('.webp') || messageData.attachments.endsWith('.mp3') || messageData.attachments.endsWith('.mp4')" class="content"> {{messageData.attachments}} </a>
+                <img style="max-width: 500px; margin-top: 5px; border-radius: 10px;" [src]="messageData.attachments" [hidden]="!messageData.attachments?.endsWith('.png') && !messageData.attachments?.endsWith('.jpg') && !messageData.attachments?.endsWith('.jpeg') && !messageData.attachments?.endsWith('.gif') && !messageData.attachments?.endsWith('.webp')">
+                <audio style="margin-top: 5px;" [src]="messageData.attachments" [hidden]="!messageData.attachments?.endsWith('.mp3')" controls></audio>
+                <video style="max-width: 500px; margin-top: 5px; border-radius: 10px;" width="500px" [src]="messageData.attachments" [hidden]="!messageData.attachments?.endsWith('.mp4')" controls></video>
             </div>
             <div class="message-actions-wrapper"> 
-                <button [hidden]="thismessageimg !== 'delete' || message.content === '[[Questo messaggio è stato eliminato dal creatore]]'" [id]="message.message_id" (click)="deleteMessage($event)" class="message-actions"> <img src="/assets/delete.svg"> </button>
-                <button [hidden]="thismessageimg !== 'edit'" [id]="message.message_id" (click)="editingMessage($event)" class="message-actions"> <img src="/assets/edit.svg"> </button>
+                <button [hidden]="thismessageimg !== 'delete' || messageData.content === '[[Questo messaggio è stato eliminato dal creatore]]'" [id]="messageData.message_id" (click)="onDeleteMessage($event)" class="message-actions"> <img src="/assets/delete.svg"> </button>
+                <button [hidden]="thismessageimg !== 'edit'" [id]="messageData.message_id" (click)="onEditingMessage($event)" class="message-actions"> <img src="/assets/edit.svg"> </button>
             </div>
         </div>
-</div> -->
-
-<button (click)="printtt()">printtt</button>
+</div>

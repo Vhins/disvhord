@@ -1,0 +1,19 @@
+
+<div class="allegatingFiles">
+    <h1 class="label"> Inserisci un link valido 
+        <button class="exitUI" (click)="onExit()">X</button>
+    </h1>
+    <form (submit)="onAllegateFile()">
+        <input class="input-box-ui" [(ngModel)]="inputlinkValue" name="inputlinkValue" type="text">
+    </form>
+    <div class="description">
+        <p>Formati supportati:</p>
+        <ul>
+          <li> immagini: png, jpg, jpeg, webp, gif </li>
+          <li> audio: mp3 </li>
+          <li> video: mp4 </li>
+        </ul>
+        <p>Tutti gli altri verranno mostrati come link.</p>
+        <p>Puoi allegare solo 1 file per messaggio.</p>
+      </div>
+</div>
