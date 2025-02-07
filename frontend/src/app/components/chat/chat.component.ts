@@ -1,4 +1,4 @@
-import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, QueryList, viewChild, ViewChild, ViewChildren } from '@angular/core';
 import { ChatService } from './chat.service';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -16,7 +16,8 @@ import { ChatInputComponent } from "./chat-input/chat-input.component";
   styleUrl: './chat.component.css'
 })
 export class ChatComponent {
-    @ViewChild('scrollContainer') scrollContainer!: ElementRef
+    // @ViewChild('scrollContainer') scrollContainer!: ElementRef
+    private scrollContainer = viewChild.required<ElementRef>('scrollContainer')
     @ViewChild('input_container') input_container!: ElementRef
     @ViewChildren('messageRef') messageElements!: QueryList<ElementRef>
 
@@ -81,29 +82,6 @@ export class ChatComponent {
 
     heightWidgetEdit_Attachment: string = "80"
 
-    adjustHeight(): void {
-        const textarea = this.text_area.nativeElement as HTMLTextAreaElement
-        textarea.removeAttribute('style')
-
-
-        if (textarea.scrollHeight > 102) { 
-            textarea.style.lineHeight = "30px"
-            textarea.style.height = `${textarea.scrollHeight}px`
-        } else {
-            textarea.style.lineHeight = "60px"
-            textarea.style.height = `${textarea.scrollHeight}px`
-        }
-
-        const input_box = this.input_box.nativeElement as HTMLDivElement
-
-        this.heightWidgetEdit_Attachment = String(Number(window.getComputedStyle(input_box).height.slice(0, -2)) + 10) + "px"
-
-        const input_container = this.input_container.nativeElement as HTMLDivElement
-        input_container.style.minHeight = `${42 + textarea.scrollHeight}px`
-
-        const element = this.scrollContainer.nativeElement
-        element.scrollTop = element.scrollHeight
-    }
 
 
 
@@ -170,15 +148,7 @@ export class ChatComponent {
         this.typing = false
     }
 
-    onKeydown(event: KeyboardEvent) {
-        this.adjustHeight()
-        const textarea = this.text_area.nativeElement as HTMLDivElement
-        textarea.innerHTML = "textarea.innerHTML" + String.fromCharCode(event.keyCode)
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault()
-            this.sendMessage()
-        }
-    }
+
 
     parseFormattedDate(formattedDate: string): number {
         const [datePart, timePart] = formattedDate.split(', ');
@@ -211,13 +181,8 @@ export class ChatComponent {
 
 
 
-    onOpenAddLinkPopup() {
-        this.chatService.allegatingLink = true
-    }
 
-    deleteAllegatedLink() {
-        this.chatService.allegatingLink = false
-        this.chatService.allegateLink("")
-    }
+
+
 
 }

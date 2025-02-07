@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, viewChild, ViewChild } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { FormsModule } from '@angular/forms';
 import { NgStyle } from '@angular/common';
@@ -12,15 +12,18 @@ import { NgStyle } from '@angular/common';
 })
 export class ChatInputComponent {
     constructor(public chatService: ChatService) {}
-    input: string = ""
+    // input: string = ""
+    private input = viewChild.required<ElementRef<HTMLInputElement>>('input')
+    private text_area = viewChild.required<ElementRef<HTMLDivElement>>('text_area')
     @ViewChild('input_box') input_box!: ElementRef
     @ViewChild('input_container') input_container!: ElementRef
 
     inputValueBeforeEditing!: string
 
     onSendMessage() {
-        if (this.input === "") return
-        const message = this.input.replace(/&/g, '&amp;')
+        const input = this.input().nativeElement as HTMLInputElement
+        if (input.value === "") return
+        const message = input.value.replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
@@ -35,10 +38,10 @@ export class ChatInputComponent {
         console.log('messaggio inviato:', message)
         if (!this.chatService.editingMessageMode) {
             this.chatService.sendMessage(message)
-            this.input = ""
+            input.value = ""
         } else {
             this.editMessage(message)
-            this.input = this.inputValueBeforeEditing
+            input.value = this.inputValueBeforeEditing
         }
         // this.input.removeAttribute('style')
         this.adjustHeight()
@@ -79,4 +82,56 @@ export class ChatInputComponent {
         this.chatService.editMessage(this.currentIDMessageEditing, inputValue)
         this.chatService.allegateLink(this.exAllegatedFile)
     }
+
+    deleteAllegatedLink() {
+        this.chatService.allegatingLink = false
+        this.chatService.allegateLink("")
+    }
+
+    stopEditMessage() {
+        const input = this.input().nativeElement as HTMLInputElement
+        input.value = this.inputValueBeforeEditing
+        this.chatService.editingMessage(false)
+        this.chatService.allegateLink(this.exAllegatedFile)
+        this.adjustHeight()
+    }
+
+    onOpenAddLinkPopup() {
+        this.chatService.allegatingLink = true
+    }
+
+    onKeydown(event: KeyboardEvent) {
+        this.adjustHeight()
+        const textarea = this.text_area().nativeElement as HTMLDivElement
+        textarea.innerHTML = "textarea.innerHTML" + String.fromCharCode(event.keyCode)
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault()
+            this.onSendMessage()
+        }
+    }
+
+    adjustHeight(): void {
+        const textarea = this.text_area().nativeElement as HTMLDivElement
+        textarea.removeAttribute('style')
+
+
+        if (textarea.scrollHeight > 102) { 
+            textarea.style.lineHeight = "30px"
+            textarea.style.height = `${textarea.scrollHeight}px`
+        } else {
+            textarea.style.lineHeight = "60px"
+            textarea.style.height = `${textarea.scrollHeight}px`
+        }
+
+        const input_box = this.input_box.nativeElement as HTMLDivElement
+
+        this.heightWidgetEdit_Attachment = String(Number(window.getComputedStyle(input_box).height.slice(0, -2)) + 10) + "px"
+
+        const input_container = this.input_container.nativeElement as HTMLDivElement
+        input_container.style.minHeight = `${42 + textarea.scrollHeight}px`
+
+        const element = this.scrollContainer.nativeElement
+        element.scrollTop = element.scrollHeight
+    }
+
 }

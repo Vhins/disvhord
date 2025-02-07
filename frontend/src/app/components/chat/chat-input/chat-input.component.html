@@ -17,7 +17,7 @@
         <button [hidden]="this.chatService.editingMessageMode === false" (click)="stopEditMessage()" class="input-button">
             <img class="input-icon" src="./assets/delete.svg">
         </button>
-            <textarea #text_area (keydown)="onKeydown($event)" [(ngModel)]="input" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="this.adjustHeight()"></textarea>
+            <textarea #text_area (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="this.adjustHeight()"></textarea>
         <button class="input-button" (click)="onSendMessage()">
             <img class="input-icon" src="./assets/send.svg">
         </button>
