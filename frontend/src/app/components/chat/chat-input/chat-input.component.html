@@ -1,8 +1,10 @@
+
 <div class="input-container" #input_container>
     <div class="input-box" #input_box>
         <div [ngStyle]="{'bottom': this.heightWidgetEdit_Attachment}" style="position: absolute; left: 0; height: 30px; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;" [hidden]="!this.chatService.editingMessageMode"> 
             <span> stai modificando questo messaggio </span>
         </div>
+
         <div [hidden]="!this.chatService.allegatedLink" [ngStyle]="{'bottom': this.heightWidgetEdit_Attachment}" style="position: absolute; left: 0; background-color: white; border-radius: 5px 5px 0px 5px; border-bottom: 1px solid black; padding: 0px 5px 0px 5px;">
             <a style="text-decoration: underline; color: rgb(19, 77, 184);" [href]="this.chatService.allegatedLink" target="_blank" [hidden]="!this.chatService.allegatedLink || this.chatService.allegatedLink.endsWith('.png') || this.chatService.allegatedLink.endsWith('.jpg') || this.chatService.allegatedLink.endsWith('.jpeg') || this.chatService.allegatedLink.endsWith('.gif') || this.chatService.allegatedLink.endsWith('.webp') || this.chatService.allegatedLink.endsWith('.mp3') || this.chatService.allegatedLink.endsWith('.mp4')" class="content"> {{this.chatService.allegatedLink}} </a>
             <img style="max-width: 500px; margin-top: 5px; border-radius: 10px;" [src]="this.chatService.allegatedLink" [hidden]="!this.chatService.allegatedLink.endsWith('.png') && !this.chatService.allegatedLink.endsWith('.jpg') && !this.chatService.allegatedLink.endsWith('.jpeg') && !this.chatService.allegatedLink.endsWith('.gif') && !this.chatService.allegatedLink.endsWith('.webp')">
@@ -11,13 +13,15 @@
        
             <button (click)="deleteAllegatedLink()"> X </button>
         </div>
+
         <button [hidden]="this.chatService.editingMessageMode === true" (click)="onOpenAddLinkPopup()" class="input-button">
             <img class="input-icon" src="./assets/attachment.svg">
         </button>
         <button [hidden]="this.chatService.editingMessageMode === false" (click)="stopEditMessage()" class="input-button">
             <img class="input-icon" src="./assets/delete.svg">
         </button>
-            <textarea #text_area (keydown)="onKeydown($event)" #input placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="this.adjustHeight()"></textarea>
+
+        <textarea #text_area (keydown)="onKeydown($event)" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000" (input)="this.adjustHeight()"></textarea>
         <button class="input-button" (click)="onSendMessage()">
             <img class="input-icon" src="./assets/send.svg">
         </button>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../chat.service';
 
@@ -9,19 +9,28 @@ import { ChatService } from '../chat.service';
   templateUrl: './add-link-popup.component.html',
   styleUrl: './add-link-popup.component.css'
 })
-export class AddLinkPopupComponent {
+export class AddLinkPopupComponent implements AfterViewInit {
     inputlinkValue: string = ""
 
     constructor(private chatService: ChatService) {}
 
-    onAllegateFile() {
-        this.chatService.allegatingLink = false
+    onConfirmAllegateFile(): void {
+        this.chatService.allegatingLink.set(false)
+        console.log('quattro4')
         this.chatService.allegateLink(this.inputlinkValue)
     }
 
-    onExit() {
-        this.inputlinkValue = "" //* reset to inital value
-        this.chatService.allegatingLink = false
+    onExit(): void {
+        this.chatService.allegatingLink.set(false)
+        this.resetValues()
+    }
+
+    ngAfterViewInit(): void {
+        this.resetValues()
+    }
+
+    resetValues(): void {
+        this.inputlinkValue = ""
         this.chatService.allegateLink("")
     }
 

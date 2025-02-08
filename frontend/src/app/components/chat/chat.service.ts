@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 import { InitializeAppApiService } from "../../initialize-app-api.service";
 import { WebSocketService } from "../../web-socket.service";
 import { BehaviorSubject } from 'rxjs';
@@ -125,7 +125,7 @@ export class ChatService {
         })
     }
 
-    allegatingLink: boolean = false
+    allegatingLink = signal<boolean>(false)
     allegatedLink: string = ""
 
     allegateLink(link: string) {

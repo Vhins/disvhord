@@ -13,15 +13,14 @@ import { NgStyle } from '@angular/common';
 export class ChatInputComponent {
     constructor(public chatService: ChatService) {}
     // input: string = ""
-    private input = viewChild.required<ElementRef<HTMLInputElement>>('input')
-    private text_area = viewChild.required<ElementRef<HTMLDivElement>>('text_area')
+    private text_area = viewChild.required<ElementRef<HTMLTextAreaElement>>('text_area')
     @ViewChild('input_box') input_box!: ElementRef
     @ViewChild('input_container') input_container!: ElementRef
 
     inputValueBeforeEditing!: string
 
     onSendMessage() {
-        const input = this.input().nativeElement as HTMLInputElement
+        const input = this.text_area().nativeElement as HTMLTextAreaElement
         if (input.value === "") return
         const message = input.value.replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -84,12 +83,11 @@ export class ChatInputComponent {
     }
 
     deleteAllegatedLink() {
-        this.chatService.allegatingLink = false
         this.chatService.allegateLink("")
     }
 
     stopEditMessage() {
-        const input = this.input().nativeElement as HTMLInputElement
+        const input = this.text_area().nativeElement as HTMLTextAreaElement
         input.value = this.inputValueBeforeEditing
         this.chatService.editingMessage(false)
         this.chatService.allegateLink(this.exAllegatedFile)
@@ -97,12 +95,12 @@ export class ChatInputComponent {
     }
 
     onOpenAddLinkPopup() {
-        this.chatService.allegatingLink = true
+        this.chatService.allegatingLink.set(true)
     }
 
     onKeydown(event: KeyboardEvent) {
         this.adjustHeight()
-        const textarea = this.text_area().nativeElement as HTMLDivElement
+        const textarea = this.text_area().nativeElement as HTMLTextAreaElement
         textarea.innerHTML = "textarea.innerHTML" + String.fromCharCode(event.keyCode)
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
@@ -110,7 +108,7 @@ export class ChatInputComponent {
         }
     }
 
-    adjustHeight(): void {
+    /*adjustHeight(): void {
         const textarea = this.text_area().nativeElement as HTMLDivElement
         textarea.removeAttribute('style')
 
@@ -132,6 +130,12 @@ export class ChatInputComponent {
 
         const element = this.scrollContainer.nativeElement
         element.scrollTop = element.scrollHeight
+    }*/
+
+    ngAfterViewInit() {
+        (this.text_area().nativeElement as HTMLTextAreaElement).value = ""
+        this.adjustHeight()
+        this.chatService.editingMessage(false)
     }
 
 }
