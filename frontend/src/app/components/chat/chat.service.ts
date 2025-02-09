@@ -3,19 +3,23 @@ import { InitializeAppApiService } from "../../initialize-app-api.service";
 import { WebSocketService } from "../../web-socket.service";
 import { BehaviorSubject } from 'rxjs';
 import { environment } from "../../../environments/environment";
+import { Messages } from "./chat.model";
+import { ApiChatService } from "./api-chat.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ChatService {
-    user_id: number
-    messages: {content: string, sender: number, receiver: number, message_id: number, timestamp: string, attachments: string | null}[] | undefined = undefined
+    user_id: number //* personal userid
+    messages: Messages[] | null = null
     users_info: {[key: number]: {id: number, name: string, img: string}} = {}
     chat_id!: number
     chat_user_id!: number
 
     editingMessageMode: boolean = false
+    allegatingLink = signal<boolean>(false)
 
+    
     scrollDownNow = new BehaviorSubject<Boolean>(false)
     scrollDown(): void {
         this.scrollDownNow.next(false)
@@ -26,7 +30,7 @@ export class ChatService {
         this.callThisChat.next(true)
     }
 
-    constructor(private webSocketService: WebSocketService, private InitializeAppApiService: InitializeAppApiService) {
+    constructor(private webSocketService: WebSocketService, private InitializeAppApiService: InitializeAppApiService, private apiChatService: ApiChatService) {
         this.InitializeAppApiService = InitializeAppApiService
         this.webSocketService = webSocketService
 
@@ -35,11 +39,11 @@ export class ChatService {
 
         this.webSocketService.on("personal_message_received").subscribe(data => {
             data.timestamp = new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(data.timestamp))
-            if (this.messages === undefined) {return}
+            if (this.messages === null) {return}
             this.messages.push(data)
         })
         this.webSocketService.on("personal_message_deleted").subscribe(data => {
-            if (this.messages === undefined) {return}
+            if (this.messages === null) {return}
             if (data.content) {
                 const index = this.messages.findIndex(message => message.message_id === data.message_id)
                 this.messages[index].content = data.content
@@ -50,7 +54,7 @@ export class ChatService {
         })
         this.webSocketService.on("personal_message_edited").subscribe(data => {
             if (data.content) {
-                if (this.messages === undefined) {return}
+                if (this.messages === null) {return}
                 const index = this.messages.findIndex(message => message.message_id === data.message_id)
                 this.messages[index].content = data.content
             }
@@ -62,7 +66,7 @@ export class ChatService {
         if (typeof chat_id === "number") {
             this.chat_id = chat_id
             this.chat_user_id = this.InitializeAppApiService.user_interface.chats.find(chat => chat.chat_id == this.chat_id)!.chat_user_id
-            this.get_ChatInfoMessages()
+            this.apiChatService.get_ChatInfoMessages(this.chat_id)
         } else {
             console.log('chat personale')
         }
@@ -94,38 +98,8 @@ export class ChatService {
         this.editingMessageMode = bool
     }
 
-    async get_ChatInfoMessages() {
-        const apiURL = `http://${environment.IP}/ChatInfoMessages`
-        const request = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
-            },
-            body: JSON.stringify( {"chat_id": this.chat_id} ),
-        }
 
-        return fetch(apiURL, request)
-        .then(async response =>{
-            const responseData = await response.json()
-            if(response.ok){
-                this.messages = responseData.chatMessages
 
-                if (this.messages != null) {
-                    for(let message of this.messages) {
-                        message.timestamp =  new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(message.timestamp))
-                    }
-                }
-                
-                this.users_info[this.chat_user_id] = {id: responseData.chatInfo.user_id, name: responseData.chatInfo.user_displayName, img: responseData.chatInfo.user_logo}
-            }
-        })
-        .catch(error =>{
-            console.error(error)
-        })
-    }
-
-    allegatingLink = signal<boolean>(false)
     allegatedLink: string = ""
 
     allegateLink(link: string) {
