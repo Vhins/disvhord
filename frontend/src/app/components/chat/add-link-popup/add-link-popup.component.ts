@@ -16,8 +16,7 @@ export class AddLinkPopupComponent implements AfterViewInit {
 
     onConfirmAllegateFile(): void {
         this.chatService.allegatingLink.set(false)
-        console.log('quattro4')
-        this.chatService.allegateLink(this.inputlinkValue)
+        this.chatService.allegatedLink = this.inputlinkValue
     }
 
     onExit(): void {
@@ -31,7 +30,7 @@ export class AddLinkPopupComponent implements AfterViewInit {
 
     resetValues(): void {
         this.inputlinkValue = ""
-        this.chatService.allegateLink("")
+        this.chatService.allegatedLink = ""
     }
 
 }

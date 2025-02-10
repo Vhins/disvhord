@@ -2,6 +2,7 @@ import { Component, ElementRef, viewChild, ViewChild } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { FormsModule } from '@angular/forms';
 import { NgStyle } from '@angular/common';
+import { MessagesService } from '../messages.service';
 
 @Component({
   selector: 'app-chat-input',
@@ -11,14 +12,15 @@ import { NgStyle } from '@angular/common';
   styleUrl: './chat-input.component.css'
 })
 export class ChatInputComponent {
-    constructor(public chatService: ChatService) {}
     // input: string = ""
     private text_area = viewChild.required<ElementRef<HTMLTextAreaElement>>('text_area')
     @ViewChild('input_box') input_box!: ElementRef
     @ViewChild('input_container') input_container!: ElementRef
-
+        
     inputValueBeforeEditing!: string
-
+    
+    constructor(public chatService: ChatService, public messagesService: MessagesService) {}
+    
     onSendMessage() {
         const input = this.text_area().nativeElement as HTMLTextAreaElement
         if (input.value === "") return
@@ -34,9 +36,9 @@ export class ChatInputComponent {
         .replace(/https?:\/\/[^\s<>()\[\]{}]*(?=(?!.*&nbsp;)[\s|[^\w-]|$])/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
         .replace(/[\u200B-\u200D\uFEFF]/g, '')
 
-        console.log('messaggio inviato:', message)
+        console.debug('messaggio inviato:', message)
         if (!this.chatService.editingMessageMode) {
-            this.chatService.sendMessage(message)
+            this.messagesService.sendMessage(message)
             input.value = ""
         } else {
             this.editMessage(message)
@@ -54,7 +56,7 @@ export class ChatInputComponent {
     adjustHeight(): void {
         // textarea.removeAttribute('style')
 
-        console.log('aaa', Number(this.textarea_scrollHeight.replace("px", "")), " : _ : ", this.textarea_scrollHeight)
+        console.debug('adjustHeight:', Number(this.textarea_scrollHeight.replace("px", "")), " : _ : ", this.textarea_scrollHeight)
         if (Number(this.textarea_scrollHeight.replace("px", "")) > 102) { 
             this.textarea_lineHeight = "30px"
             this.textarea_height = `${this.textarea_scrollHeight}px`
@@ -78,19 +80,19 @@ export class ChatInputComponent {
     currentIDMessageEditing!: number
 
     editMessage(inputValue: string) {
-        this.chatService.editMessage(this.currentIDMessageEditing, inputValue)
-        this.chatService.allegateLink(this.exAllegatedFile)
+        this.messagesService.editMessage(this.currentIDMessageEditing, inputValue)
+        this.chatService.allegatedLink = this.exAllegatedFile
     }
 
     deleteAllegatedLink() {
-        this.chatService.allegateLink("")
+        this.chatService.allegatedLink = ""
     }
 
     stopEditMessage() {
         const input = this.text_area().nativeElement as HTMLTextAreaElement
         input.value = this.inputValueBeforeEditing
-        this.chatService.editingMessage(false)
-        this.chatService.allegateLink(this.exAllegatedFile)
+        this.chatService.editingMessageMode = false
+        this.chatService.allegatedLink = this.exAllegatedFile
         this.adjustHeight()
     }
 
@@ -135,7 +137,7 @@ export class ChatInputComponent {
     ngAfterViewInit() {
         (this.text_area().nativeElement as HTMLTextAreaElement).value = ""
         this.adjustHeight()
-        this.chatService.editingMessage(false)
+        this.chatService.editingMessageMode = false
     }
 
 }

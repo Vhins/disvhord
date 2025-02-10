@@ -7,7 +7,7 @@
         <div class="message-stuff">
             <div class="message-stufff">
                 <div class="userdisplayname"> {{chatService.users_info[messageData.sender].name}} </div>
-                <div class="timestamp"> {{messageData.timestamp}} </div>
+                <div class="timestamp"> {{messageData.timestamp | date:'dd/MM/yyyy HH:mm'}} </div>
             </div>
             <div class="content" [innerHTML]="messageData.content"> </div>
             <a style="text-decoration: underline; color: rgb(19, 77, 184);" [href]="messageData.attachments" target="_blank" [hidden]="!messageData.attachments || messageData.attachments.endsWith('.png') || messageData.attachments.endsWith('.jpg') || messageData.attachments.endsWith('.jpeg') || messageData.attachments.endsWith('.gif') || messageData.attachments.endsWith('.webp') || messageData.attachments.endsWith('.mp3') || messageData.attachments.endsWith('.mp4')" class="content"> {{messageData.attachments}} </a>

@@ -7,6 +7,7 @@ import { CallComponent } from '../call/call.component';
 import { MessageComponent } from "./message/message.component";
 import { AddLinkPopupComponent } from "./add-link-popup/add-link-popup.component";
 import { ChatInputComponent } from "./chat-input/chat-input.component";
+import { MessagesService } from './messages.service';
 
 @Component({
   selector: 'app-chat',
@@ -27,14 +28,15 @@ export class ChatComponent {
 
     @ViewChild(CallComponent) callComponent!: CallComponent;
 
-    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute, private webSocketService: WebSocketService) {
+    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute, private webSocketService: WebSocketService, public messagesService: MessagesService) {
         this.newChat = true
         this.activatedRoute.paramMap.subscribe(async param => {
             this.newChat = true
             this.chatService.setThisChatID(Number(param.get('chat_id')))
+            this.messagesService.getMessages(Number(param.get('chat_id')))
             this.chatService.allegatingLink.set(false)
-            this.chatService.allegateLink("")
-            this.chatService.editingMessage(false)
+            this.chatService.allegatedLink = ""
+            this.chatService.editingMessageMode = false
         })
 
         this.webSocketService.on("personal_call_started").subscribe(async data => {
@@ -43,7 +45,7 @@ export class ChatComponent {
             this.callComponent.callid = data.call_id
 
             const status = await this.callComponent.requestPermission()
-            if (!status) { console.log('status', status); return }
+            if (!status) { console.debug('status', status); return }
         })
     }
 
@@ -72,7 +74,7 @@ export class ChatComponent {
                 // input.value = ""
                 // this.inputlinkValue = ""
                 // this.adjustHeight()
-                this.chatService.editingMessage(false)
+                this.chatService.editingMessageMode = false
             } else {
                 const element = this.scrollContainer().nativeElement as HTMLDivElement
                 element.scrollTop = element.scrollHeight
@@ -82,33 +84,24 @@ export class ChatComponent {
 
     heightWidgetEdit_Attachment: string = "80"
 
-
-
-
-    deleteMessage(event: Event) {
-        const target = event.currentTarget as HTMLButtonElement
-        const message_id = Number(target.id)
-        this.chatService.deleteMessage(message_id)
-    }
-
     editingMessage(event: Event) {
         this.exAllegatedFile = this.chatService.allegatedLink
-        this.chatService.allegateLink("")
+        this.chatService.allegatedLink = ""
         // this.exitAllegatinFileUI()
 
         // const input = this.input.nativeElement as HTMLTextAreaElement
         const target = event.currentTarget as HTMLButtonElement
 
-        if (!this.chatService.messages) {
+        if (!this.messagesService.messages) {
             this.stopEditMessage()
             return
         }
-        const message = this.chatService.messages.find(message => { return message.message_id == Number(target.id) })
+        const message = this.messagesService.messages.find(message => { return message.message_id == Number(target.id) })
         if (!message) return
         if (message.sender != this.chatService.user_id) return
 
         const currentTimestamp = Date.now()
-        if (currentTimestamp - this.parseFormattedDate(message.timestamp)  > 10 * 60 * 1000) return
+        if (currentTimestamp - Number(message.timestamp)  > 10 * 60 * 1000) return
 
         // this.inputValueBeforeEditing = String(input.value)
         const processed_message_content = message.content.
@@ -127,7 +120,7 @@ export class ChatComponent {
 
         // this.adjustHeight()
 
-        this.chatService.editingMessage(true)
+        this.chatService.editingMessageMode = true
     }
 
     exAllegatedFile: string = ''
@@ -150,14 +143,6 @@ export class ChatComponent {
 
 
 
-    parseFormattedDate(formattedDate: string): number {
-        const [datePart, timePart] = formattedDate.split(', ');
-        const [day, month, year] = datePart.split('/').map(Number);
-        const [hours, minutes] = timePart.split(':').map(Number);
-      
-        return new Date(year, month - 1, day, hours, minutes).getTime();
-    }
-
     ngOnDestroy(): void {
         this.scrollDownNowSubscription.unsubscribe()
     }
@@ -169,10 +154,10 @@ export class ChatComponent {
         this.aCallHasStarted = true
         
         const status = await this.callComponent.requestPermission()
-        if (!status) { console.log('status', status); return }
+        if (!status) { console.debug('status', status); return }
 
         const status2 = await this.callComponent.startConnectionToPeerServerAndStartCall(this.chatService.user_id, this.chatService.chat_user_id)
-        if (!status2) { console.log('status2', status2); return }
+        if (!status2) { console.debug('status2', status2); return }
     }
 
 

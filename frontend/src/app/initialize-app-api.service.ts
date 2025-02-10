@@ -22,9 +22,11 @@ export class InitializeAppApiService {
 
     constructor(private authService: AuthService) {}
 
-    user_interface!: user_interface
+    private _user_interface!: user_interface
+    get user_interface(): user_interface { return this._user_interface }
 
-    async get_basicUserInterfaceData(): Promise< boolean>{
+
+    async get_basicUserInterfaceData(): Promise<boolean>{
         const apiURL = `http://${this.IP}/basicUserInterfaceData`
         const request = {
             method: 'POST',
@@ -39,7 +41,7 @@ export class InitializeAppApiService {
         .then(async response =>{
             const responseData = await response.json()
             if(response.ok){
-                this.user_interface = responseData.user_interfaceDB
+                this._user_interface = responseData.user_interfaceDB
                 return true
             }else{
                 this.authService.removeDataLocalStorage()

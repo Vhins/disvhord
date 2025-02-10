@@ -3,7 +3,7 @@
 </div>
 
 <div class="messages-container" #scrollContainer [hidden]="this.aCallHasStarted">
-    @for (message of chatService.messages; track $index) {
+    @for (message of messagesService.messages; track $index) {
         <app-message [messageData]="message" (editingMessage)="editingMessage($event)"/>
     }
 </div>

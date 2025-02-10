@@ -58,7 +58,7 @@ export class SideBarComponent {
                 'friend_user_id': friend_user_id
             })
         }).then( () => {
-            console.log('tolta richiesta amicizia!')
+            console.debug('tolta richiesta amicizia!')
         })
     }
 

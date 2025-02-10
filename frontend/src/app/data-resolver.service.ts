@@ -10,18 +10,14 @@ export class DataResolver {
     constructor(private initializeAppApiService: InitializeAppApiService, private webSocketService: WebSocketService, private ruoter: Router) {}
 
     async resolve(): Promise<boolean> {        
-        let result = await this.initializeAppApiService.get_basicUserInterfaceData()
+        const RESULT = await this.initializeAppApiService.get_basicUserInterfaceData()
 
-        if (result === true) {
-            result = this.webSocketService.start()
-            if (result !== true) {
-                return false
-            }
-            
-            return true
+        if (RESULT === true) {
+            const STARTED = this.webSocketService.start()
+            if (STARTED === true) return true
         } else {
             this.ruoter.navigate(['/login'])
-            return false
         }
+        return false
     }
 }
