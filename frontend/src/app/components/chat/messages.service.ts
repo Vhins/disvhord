@@ -63,7 +63,7 @@ export class MessagesService {
     }
 
     sendMessage(content: string) {
-        if (!this.chatService.editingMessageMode) {
+        if (!this.chatService.editingMessageMode()) {
             const messageData: MessageData = { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id }
             
             if (this.chatService.allegatedLink) { messageData.attachments = this.chatService.allegatedLink }
@@ -71,7 +71,7 @@ export class MessagesService {
             this.webSocketService.emit("personal_message", messageData)
             this.chatService.allegatedLink = ""
         } else {
-            this.chatService.editingMessageMode = false
+            this.chatService.editingMessageMode.set(false)
         }
     }
 
@@ -81,6 +81,6 @@ export class MessagesService {
 
     editMessage(message_id: number, content: string) {
         this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id, "content": content } as MessageData)
-        this.chatService.editingMessageMode = false
+        this.chatService.editingMessageMode.set(false)
     }
 }

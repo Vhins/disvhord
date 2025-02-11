@@ -16,6 +16,7 @@ export class ChatService {
         this.setMyInfo()
     }
 
+    currentEditingMessageText$ = new BehaviorSubject<string>("")
 
     //todo:  !!!
     scrollDownNow = new BehaviorSubject<Boolean>(false)
@@ -47,11 +48,12 @@ export class ChatService {
     }
 
 
-    
-    protected _editingMessageMode: boolean = false
-    get editingMessageMode() { return this._editingMessageMode }
-    set editingMessageMode(bool: boolean) {
-        this._editingMessageMode = bool
+    editingMessageMode = signal<boolean>(false)
+
+    private _currentIDMessageEditing: number | null = null
+    get currentIDMessageEditing(): number | null { return this._currentIDMessageEditing || null }
+    set currentIDMessageEditing(bool: number) {
+        this._currentIDMessageEditing = bool
     }
 
 
@@ -61,7 +63,6 @@ export class ChatService {
     private _allegatedLink: string = ""
     get allegatedLink() { return this._allegatedLink }
     set allegatedLink(newLink: string) {
-        // if (!newLink.startsWith("http")) throw new Error('Invalid link')
         this._allegatedLink = newLink
     }
 }

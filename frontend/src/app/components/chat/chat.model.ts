@@ -3,7 +3,7 @@ export interface Messages {
     sender: number, 
     receiver: number, 
     message_id: number, 
-    timestamp: string, 
+    timestamp: number, 
     attachments: string | null
 }
 

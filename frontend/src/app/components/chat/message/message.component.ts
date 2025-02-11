@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, input, Output } from '@angular/core';
+import { Component, Input, output } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { MessagesService } from '../messages.service';
 import { DatePipe } from '@angular/common';
+import { Messages } from '../chat.model';
 
 @Component({
   selector: 'app-message',
@@ -11,35 +12,49 @@ import { DatePipe } from '@angular/common';
   styleUrl: './message.component.css'
 })
 export class MessageComponent {
-    @Input() messageData: any
-    thismessageimg: string = "none"
-    @Output() editingMessage = new EventEmitter<any>()
+    @Input({required: true}) messageData!: Messages
+    message_option: string = "none"
+    editingMessage = output<number>()
 
     constructor(public chatService: ChatService, public messagesService: MessagesService) {}
     
-    showCorretImgMessageActionButton(event: Event) {
-        const target = event.currentTarget as HTMLDivElement
-
-        if (!this.messagesService.messages) { return }
-        const message = this.messagesService.messages.find(message => { return message.message_id == Number(target.id) })
-        if (!message) return
-        if (message.sender != this.chatService.user_id) {
-            this.thismessageimg = "none"
+    messageOption() {
+        if (this.messageData.sender != this.chatService.user_id || this.messageData.content === "[[Questo messaggio è stato eliminato dal creatore]]") {
+            this.message_option = "none"
             return
         }
 
-        if (Date.now() - Number(message.timestamp)  > 10 * 60 * 1000) {
-            this.thismessageimg = "delete"
+        if (Date.now() - this.messageData.timestamp  > 10 * 60 * 1000) {
+            this.message_option = "delete"
         } else {
-            this.thismessageimg = "edit"
+            this.message_option = "edit"
         }
     }
 
-    onEditingMessage(event: any) {
-        this.editingMessage.emit(event)
+    onEditingMessage() {
+        this.editingMessage.emit(this.messageData.message_id)
+    }
+    
+    onDeleteMessage() {
+        this.message_option = 'none'
+        this.messagesService.deleteMessage(this.messageData.message_id)
     }
 
-    onDeleteMessage(event: any) {
-        this.editingMessage.emit(event)
+    
+    linkType(url: string | null | undefined): string {
+        let type
+
+        if (!!url && ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.bmp'].some(ext => url.endsWith(ext))) {
+            type = 'image'
+        } else if(!!url && ['.mp3', '.ogg', '.wav', '.aac', '.flac'].some(ext => url.endsWith(ext))) {
+            type = 'audio'
+        } else if(!!url && ['.mp4', '.webm', '.mov', '.mkv'].some(ext => url.endsWith(ext))) {
+            type = 'video'
+        } else {
+            type = 'link'
+        }
+
+        return type
     }
+      
 }

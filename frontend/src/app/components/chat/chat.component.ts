@@ -36,7 +36,7 @@ export class ChatComponent {
             this.messagesService.getMessages(Number(param.get('chat_id')))
             this.chatService.allegatingLink.set(false)
             this.chatService.allegatedLink = ""
-            this.chatService.editingMessageMode = false
+            this.chatService.editingMessageMode.set(false)
         })
 
         this.webSocketService.on("personal_call_started").subscribe(async data => {
@@ -48,9 +48,6 @@ export class ChatComponent {
             if (!status) { console.debug('status', status); return }
         })
     }
-
-    currentIDMessageEditing!: number
-    inputValueBeforeEditing!: string
 
     ngAfterViewInit() {
         this.scrollDownNowSubscription = this.chatService.scrollDownNow.asObservable().subscribe(value => {
@@ -74,7 +71,7 @@ export class ChatComponent {
                 // input.value = ""
                 // this.inputlinkValue = ""
                 // this.adjustHeight()
-                this.chatService.editingMessageMode = false
+                this.chatService.editingMessageMode.set(false)
             } else {
                 const element = this.scrollContainer().nativeElement as HTMLDivElement
                 element.scrollTop = element.scrollHeight
@@ -84,53 +81,25 @@ export class ChatComponent {
 
     heightWidgetEdit_Attachment: string = "80"
 
-    editingMessage(event: Event) {
-        this.exAllegatedFile = this.chatService.allegatedLink
+    editingMessage(message_id: number) {
         this.chatService.allegatedLink = ""
-        // this.exitAllegatinFileUI()
+        this.chatService.allegatingLink.set(false)
 
-        // const input = this.input.nativeElement as HTMLTextAreaElement
-        const target = event.currentTarget as HTMLButtonElement
-
-        if (!this.messagesService.messages) {
-            this.stopEditMessage()
-            return
-        }
-        const message = this.messagesService.messages.find(message => { return message.message_id == Number(target.id) })
+        const message = this.messagesService.messages!.find(message => { return message.message_id == message_id })
+        console.log('messagemessage', message)
         if (!message) return
         if (message.sender != this.chatService.user_id) return
 
-        const currentTimestamp = Date.now()
-        if (currentTimestamp - Number(message.timestamp)  > 10 * 60 * 1000) return
+        if (Date.now() - Number(message.timestamp)  > 10 * 60 * 1000) return
 
-        // this.inputValueBeforeEditing = String(input.value)
-        const processed_message_content = message.content.
-        replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&amp;/g, '&')
-        .replace(/<br\s*\/?>/gi, '\n')
-        .replace(/&nbsp;/g, ' ')
-        .replace(/<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gi, '$1')
-        .replace(/[\u200B-\u200D\uFEFF]/g, '')
-        // input.value = processed_message_content
+        const processed_message_content = this.convertMessageToBrowserFormat(message.content)
+        this.chatService.currentEditingMessageText$.next(processed_message_content)
 
-        this.currentIDMessageEditing = Number(target.id)
+        this.chatService.currentIDMessageEditing = message_id
 
         // this.adjustHeight()
 
-        this.chatService.editingMessageMode = true
-    }
-
-    exAllegatedFile: string = ''
-
-    stopEditMessage() {
-        // const input = this.input.nativeElement as HTMLTextAreaElement
-        // input.value = this.inputValueBeforeEditing
-        // this.chatService.editingMessage(false)
-        // this.chatService.allegateLink(this.exAllegatedFile)
-        // this.adjustHeight()
+        this.chatService.editingMessageMode.set(true)
     }
 
     typing: boolean = true
@@ -141,7 +110,19 @@ export class ChatComponent {
         this.typing = false
     }
 
-
+    convertMessageToBrowserFormat(content: string): string {
+        return content.
+            replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&amp;/g, '&')
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gi, '$1')
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    }
+    
 
     ngOnDestroy(): void {
         this.scrollDownNowSubscription.unsubscribe()
