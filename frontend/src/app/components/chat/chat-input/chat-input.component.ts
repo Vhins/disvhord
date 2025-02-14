@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, viewChild, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, Renderer2, viewChild, ViewChild } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { FormsModule } from '@angular/forms';
 import { NgStyle } from '@angular/common';
@@ -12,57 +12,57 @@ import { MessagesService } from '../messages.service';
   styleUrl: './chat-input.component.css'
 })
 export class ChatInputComponent implements OnInit {
+    private input_zone = viewChild.required<ElementRef<HTMLSpanElement>>('input_zone')
     private text_area = viewChild.required<ElementRef<HTMLTextAreaElement>>('text_area')
     text_area_innerHTML: string = ''
 
-    constructor(public chatService: ChatService, private messagesService: MessagesService) {}
+    constructor(public chatService: ChatService, private messagesService: MessagesService, private renderer: Renderer2) {}
 
     ngOnInit() {
         this.chatService.currentEditingMessageText$.subscribe( value => {
-            ;(this.text_area().nativeElement as HTMLTextAreaElement).innerHTML = value
-            if (value !== "") { this.adjustHeight() }
-        } )
+            console.log('valuevaluevaluevalue', value)
+            this.createNewTextArea(value)
+            if (value !== "") { 
+                setTimeout(() => this.adjustHeight())
+            }
+        })
     }
 
-    private moveCursorToEnd(element: HTMLElement) {
-        const range = document.createRange();
-        const selection = window.getSelection();
-        range.selectNodeContents(element);
-        range.collapse(false); // Sposta il cursore alla fine
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-    }
 
     onKeydown(event: KeyboardEvent) {
+        console.log('KeyboardEvent', event)
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
             this.onSendMessage()
         } else {
-            this.adjustHeight()
+            const allowedKeys = /^[a-zA-Z0-9\s.,?!]+$/
+            if (event.key.length === 1 && allowedKeys.test(event.key)) {
+                this.text_area_innerHTML = this.text_area_innerHTML + event.key
+                this.adjustHeight()
+            }
         }
     }
 
     onSendMessage() {
-        const textarea = this.text_area().nativeElement as HTMLTextAreaElement
-        if (textarea.value === "") return
-        const message = this.convertMessageToDatabaseFormat(textarea.value)        
+        if (this.text_area_innerHTML === "") return
+        const message = this.convertMessageToDatabaseFormat(this.text_area_innerHTML)        
 
         if (!this.chatService.editingMessageMode()) {
             this.messagesService.sendMessage(message)
-            textarea.value = ""
+            this.text_area_innerHTML = ""
         } else {
             this.sendEditedMessage(message)
         }
 
-        textarea.removeAttribute('style')
+        ;(this.text_area().nativeElement as HTMLTextAreaElement).removeAttribute('style')
+        this.createNewTextArea()
         this.adjustHeight()
     }
-
 
     sendEditedMessage(inputValue: string) {
         if (this.chatService.currentIDMessageEditing === null) return
         this.messagesService.editMessage(this.chatService.currentIDMessageEditing, inputValue)
-        ;(this.text_area().nativeElement as HTMLTextAreaElement).value = ""
+        this.text_area_innerHTML = ""
         this.adjustHeight()
     }
 
@@ -72,9 +72,48 @@ export class ChatInputComponent implements OnInit {
     }
 
     onStopEditMessage() {
-        ;(this.text_area().nativeElement as HTMLTextAreaElement).value = ""
+        this.text_area_innerHTML = ""
         this.chatService.editingMessageMode.set(false)
         this.adjustHeight()
+    }
+
+    last_textarea!: any
+
+    createNewTextArea(content?: string) {
+        console.log('createNewTextArea value:', content)
+
+        let ppalle_span = this.input_zone().nativeElement as HTMLSpanElement
+
+        if (this.last_textarea) {
+            let bo = this.renderer.removeChild(ppalle_span, this.last_textarea)
+        }
+
+        const textarea = this.renderer.createElement('textarea');
+
+        // this.text_area().nativeElement.hidden = true
+
+        this.renderer.setAttribute(textarea, 'contenteditable', 'true');
+        this.renderer.setAttribute(textarea, 'placeholder', 'Scrivi un messaggio.......');
+        this.renderer.setAttribute(textarea, 'name', 'text');
+        this.renderer.setAttribute(textarea, 'rows', '14');
+        this.renderer.setAttribute(textarea, 'cols', '10');
+        this.renderer.setAttribute(textarea, 'wrap', 'soft');
+        this.renderer.setAttribute(textarea, 'maxlength', '1000');
+        this.renderer.addClass(textarea, 'input');
+
+        this.renderer.listen(textarea, 'keydown', (event: KeyboardEvent) => { 
+            this.onKeydown(event)
+        })
+
+        if (content) {
+            // this.renderer.setValue(textarea, content)
+            this.renderer.setProperty(textarea, 'innerHTML', content);
+        }
+        textarea.innerHTML = this.text_area_innerHTML;
+
+        let rendered = this.renderer.appendChild(ppalle_span, textarea);
+        this.last_textarea = textarea
+        console.log('redereddd', rendered)
     }
 
     onAddLinkPopup() {
@@ -119,10 +158,9 @@ export class ChatInputComponent implements OnInit {
 
     // aggiungere un observer/signal per ascoltare il agiustare altezzza
     adjustHeight(): void {
-        const textarea = this.text_area().nativeElement as HTMLTextAreaElement
-        textarea.removeAttribute('style')
+        ;(this.text_area().nativeElement as HTMLTextAreaElement).removeAttribute('style')
 
-        console.debug('adjustHeight:', Number(this.textarea_scrollHeight.replace("px", "")), " : _ : ", this.textarea_scrollHeight)
+        //! console.debug('adjustHeight:', Number(this.textarea_scrollHeight.replace("px", "")), " : _ : ", this.textarea_scrollHeight)
         if (Number(this.textarea_scrollHeight.replace("px", "")) > 102) { 
             this.textarea_lineHeight = "30px"
             this.textarea_height = `${this.textarea_scrollHeight}px`

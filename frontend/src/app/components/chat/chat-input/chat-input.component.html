@@ -1,5 +1,5 @@
 
-<div class="input-container" #input_container (keydown)="onKeydown($event)">
+<div class="input-container" #input_container>
     <div class="input-box" #input_box>
         @if (chatService.editingMessageMode()) {
             <div [ngStyle]="{'bottom': heightWidgetEdit_Attachment}" class="modifing-message"> 
@@ -35,8 +35,10 @@
             <img class="input-icon" src="./assets/delete.svg">
         </button>
 
-        <!-- <textarea #text_area contenteditable="true" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000"></textarea> -->
-        <div #text_area [innerHTML]="text_area_innerHTML" contenteditable="true" class="input"></div>
+        <span #input_zone class="input">
+            <!-- <textarea #text_area (keydown)="onKeydown($event)" (submit)="onSendMessage()" contenteditable="true" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000"></textarea> -->
+        </span>
+
         <button class="input-button" (click)="onSendMessage()">
             <img class="input-icon" src="./assets/send.svg">
         </button>
