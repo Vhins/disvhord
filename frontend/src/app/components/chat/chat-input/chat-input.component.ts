@@ -31,13 +31,21 @@ export class ChatInputComponent implements OnInit {
 
     onKeydown(event: KeyboardEvent) {
         console.log('KeyboardEvent', event)
-        if (event.key === 'Enter' && !event.shiftKey) {
+        if (event.key === 'Enter' && event.shiftKey) {
+            this.text_area_innerHTML = this.text_area_innerHTML + "\n"
+        }else if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
             this.onSendMessage()
         } else {
             const allowedKeys = /^[a-zA-Z0-9\s.,?!]+$/
-            if (event.key.length === 1 && allowedKeys.test(event.key)) {
+            if (event.key === '(') {
                 this.text_area_innerHTML = this.text_area_innerHTML + event.key
+                console.log('text_area_innerHTML', this.text_area_innerHTML)
+                this.adjustHeight()
+            }
+            else if (event.key.length === 1 && allowedKeys.test(event.key)) {
+                this.text_area_innerHTML = this.text_area_innerHTML + event.key
+                console.log('text_area_innerHTML', this.text_area_innerHTML)
                 this.adjustHeight()
             }
         }
@@ -102,12 +110,16 @@ export class ChatInputComponent implements OnInit {
         this.renderer.addClass(textarea, 'input');
 
         this.renderer.listen(textarea, 'keydown', (event: KeyboardEvent) => { 
+            console.log('event1:', event)
             this.onKeydown(event)
+            console.log('event2:', event)
         })
 
         if (content) {
+            console.log('content', content)
+            // this.renderer.setProperty(textarea, 'value', content)
             // this.renderer.setValue(textarea, content)
-            this.renderer.setProperty(textarea, 'innerHTML', content);
+            // this.renderer.setProperty(textarea, 'innerHTML', content);
         }
         textarea.innerHTML = this.text_area_innerHTML;
 
@@ -158,6 +170,7 @@ export class ChatInputComponent implements OnInit {
 
     // aggiungere un observer/signal per ascoltare il agiustare altezzza
     adjustHeight(): void {
+        /*
         ;(this.text_area().nativeElement as HTMLTextAreaElement).removeAttribute('style')
 
         //! console.debug('adjustHeight:', Number(this.textarea_scrollHeight.replace("px", "")), " : _ : ", this.textarea_scrollHeight)
@@ -178,5 +191,6 @@ export class ChatInputComponent implements OnInit {
 
         // const element = this.scrollContainer.nativeElement
         // element.scrollTop = element.scrollHeight
+        */
     }
 }
