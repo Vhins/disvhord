@@ -1,14 +1,14 @@
 
-<div class="input-container" #input_container>
-    <div class="input-box" #input_box>
+<div class="input-container">
+    <div class="input-box">
         @if (chatService.editingMessageMode()) {
-            <div [ngStyle]="{'bottom': heightWidgetEdit_Attachment}" class="modifing-message"> 
+            <div class="modifing-message"> 
                 <span> stai modificando questo messaggio </span>
             </div>
         }
 
         @if (chatService.allegatedLink) {
-            <div class="link-wrapper" [ngStyle]="{'bottom': heightWidgetEdit_Attachment}">
+            <div class="link-wrapper">
                 @switch (linkType(chatService.allegatedLink)) {
                     @case ('image') {
                         <img class="img_link" [src]="chatService.allegatedLink" alt="Image">
@@ -35,7 +35,14 @@
             <img class="input-icon" src="./assets/delete.svg">
         </button>
 
-        <span #input_zone class="input">
+        <span #input_zone class="input" (keydown)="onKeydown($event)">
+            @for (line of message_lines; track $index) {
+                <div class="input" contenteditable="true">
+                    @for (_line of line; track $index) {
+                        <span contenteditable="true"> {{ _line.content }} </span>
+                    }
+                </div>
+            }
             <!-- <textarea #text_area (keydown)="onKeydown($event)" (submit)="onSendMessage()" contenteditable="true" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000"></textarea> -->
         </span>
 
