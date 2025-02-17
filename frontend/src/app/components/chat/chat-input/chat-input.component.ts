@@ -15,6 +15,7 @@ export class ChatInputComponent implements OnInit {
     private input_zone = viewChild.required<ElementRef<HTMLSpanElement>>('input_zone')
     message_lines: {type: 'text' | 'link', content: string}[][] = [[{type: 'text', content: ''}]]
     current_line: number = 0
+    current_span: number = 0
 
     constructor(public chatService: ChatService, private messagesService: MessagesService, private renderer: Renderer2) {}
 
@@ -31,6 +32,16 @@ export class ChatInputComponent implements OnInit {
 
     onKeydown(event: KeyboardEvent) {
         console.log('KeyboardEvent', event)
+
+        if (event.key === 'Enter' && !event.shiftKey) {
+            this.onSendMessage()
+        } else if(event.key === 'Enter') {
+            this.current_line++
+            this.message_lines[this.current_line][0].content === ""
+            this.current_span = 0
+        } else {
+            this.message_lines[this.current_line][0].content === ""
+        }
     }
 
     onSendMessage() {
