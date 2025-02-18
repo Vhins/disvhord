@@ -16,7 +16,7 @@ export class ChatService {
         this.setMyInfo()
     }
 
-    currentEditingMessageText$ = new BehaviorSubject<string>("")
+    currentEditingMessageText$ = new BehaviorSubject<{type: 'text' | 'link', content: string}[]>([{type: 'text', content: ''}])
 
     //todo:  !!!
     scrollDownNow = new BehaviorSubject<Boolean>(false)

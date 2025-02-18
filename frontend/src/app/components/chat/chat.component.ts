@@ -110,17 +110,18 @@ export class ChatComponent {
         this.typing = false
     }
 
-    convertMessageToBrowserFormat(content: string): string {
-        return content.
-            replace(/&lt;/g, '<')
-            .replace(/&gt;/g, '>')
-            .replace(/&quot;/g, '"')
-            .replace(/&#39;/g, "'")
-            .replace(/&amp;/g, '&')
-            .replace(/<br\s*\/?>/gi, '\n')
-            .replace(/&nbsp;/g, ' ')
-            .replace(/<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gi, '$1')
-            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    convertMessageToBrowserFormat(content: string): {type: 'text' | 'link', content: string}[] {
+        return [{type: 'text', content: ''}]
+        // return content.
+        //     replace(/&lt;/g, '<')
+        //     .replace(/&gt;/g, '>')
+        //     .replace(/&quot;/g, '"')
+        //     .replace(/&#39;/g, "'")
+        //     .replace(/&amp;/g, '&')
+        //     .replace(/<br\s*\/?>/gi, '\n')
+        //     .replace(/&nbsp;/g, ' ')
+        //     .replace(/<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gi, '$1')
+        //     .replace(/[\u200B-\u200D\uFEFF]/g, '')
     }
     
 
