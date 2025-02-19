@@ -3,7 +3,7 @@
     <div class="input-box">
         @if (chatService.editingMessageMode()) {
             <div class="modifing-message"> 
-                <span> stai modificando questo messaggio </span>
+                <!-- <span> stai modificando questo messaggio </span> -->
             </div>
         }
 
@@ -36,14 +36,12 @@
         </button>
 
         <span #input_zone class="input" (keydown)="onKeydown($event)">
-            @for (line of message_lines; track $index) {
-                <div class="input" contenteditable="true">
-                    @for (_line of line; track $index) {
-                        <span contenteditable="true"> {{ _line.content }} </span>
-                    }
-                </div>
+
+            @for (mess of newmessage; track $index) {
+                <div style="height: 200px !important;" [id]="mess" [innerHTML]="mess" contenteditable="true" class="input"></div>
+                <!-- <textarea #text_area [innerHTML]="mess" [id]="mess" (keydown)="onKeydown($event)" (submit)="onSendMessage()" contenteditable="true" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000"></textarea> -->
             }
-            <!-- <textarea #text_area (keydown)="onKeydown($event)" (submit)="onSendMessage()" contenteditable="true" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000"></textarea> -->
+            
         </span>
 
         <button class="input-button" (click)="onSendMessage()">

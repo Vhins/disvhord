@@ -13,16 +13,14 @@ import { MessagesService } from '../messages.service';
 })
 export class ChatInputComponent implements OnInit {
     private input_zone = viewChild.required<ElementRef<HTMLSpanElement>>('input_zone')
-    message_lines: {type: 'text' | 'link', content: string}[][] = [[{type: 'text', content: ''}]]
-    current_line: number = 0
-    current_span: number = 0
+    newmessage: string[] = ['test! <br> !tset']
 
     constructor(public chatService: ChatService, private messagesService: MessagesService, private renderer: Renderer2) {}
 
     ngOnInit() {
         this.chatService.currentEditingMessageText$.subscribe( value => {
-            console.log('currentEditingMessageText value:', value)
-            this.message_lines = [[{type: 'text', content: `${value}`}]]
+            this.newmessage.pop()
+            this.newmessage.push(value)
             if (value !== "") { 
                 setTimeout(() => this.adjustHeight())
             }
@@ -35,18 +33,12 @@ export class ChatInputComponent implements OnInit {
 
         if (event.key === 'Enter' && !event.shiftKey) {
             this.onSendMessage()
-        } else if(event.key === 'Enter') {
-            this.current_line++
-            this.message_lines[this.current_line][0].content === ""
-            this.current_span = 0
-        } else {
-            this.message_lines[this.current_line][0].content === ""
         }
     }
 
     onSendMessage() {
-        if (this.message_lines[0][0].content === "") return
-        const message = this.convertMessageToDatabaseFormat(this.message_lines)        
+        if (this.newmessage[0] === "") return
+        const message = this.convertMessageToDatabaseFormat(this.newmessage[0])        
 
         if (!this.chatService.editingMessageMode()) {
             this.messagesService.sendMessage(message)
@@ -71,18 +63,16 @@ export class ChatInputComponent implements OnInit {
     }
 
     onStopEditMessage() {
+        this.newmessage.pop()
         this.resetInput()
         this.chatService.editingMessageMode.set(false)
         this.adjustHeight()
     }
 
 
-    createNewDiv(type: string, content: string) {
-
-    }
-
     resetInput() {
-        this.message_lines = [[{type: 'text', content: ''}]]
+        this.newmessage.pop()
+        this.newmessage.push('')
     }
 
 
@@ -102,21 +92,19 @@ export class ChatInputComponent implements OnInit {
         }
     }
 
-    convertMessageToDatabaseFormat(content: {type: 'text' | 'link', content: string}[][]): string {
-        // todo
-        return '_test_'
-        // return content
-            // .replace(/&/g, '&amp;')
-            // .replace(/</g, '&lt;')
-            // .replace(/>/g, '&gt;')
-            // .replace(/"/g, '&quot;')
-            // .replace(/'/g, '&#39;')
-            // .replace(/\r\n|\r|\n/g, '<br>')
-            // .replace(/ /g, '&nbsp;')
-            // // .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+    convertMessageToDatabaseFormat(content: string): string {
+        return content
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/\r\n|\r|\n/g, '<br>')
+            .replace(/ /g, '&nbsp;')
             // .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-            // .replace(/https?:\/\/[^\s<>()\[\]{}]*(?=(?!.*&nbsp;)[\s|[^\w-]|$])/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-            // .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+            .replace(/https?:\/\/[^\s<>()\[\]{}]*(?=(?!.*&nbsp;)[\s|[^\w-]|$])/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
     }
     
     adjustHeight(): void {
