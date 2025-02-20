@@ -3,11 +3,16 @@
     width: 100%;
     font-size: 24px;
     border: none;
-    height: 60px;
+    min-height: 60px;
+    /* height: 60px; */
     overflow: hidden; 
     resize: none;
     box-sizing: border-box;
     line-height: 55px;
+}
+
+.input2 {
+    outline: none;
 }
 
 .input:focus {

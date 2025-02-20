@@ -13,6 +13,7 @@ import { MessagesService } from '../messages.service';
 })
 export class ChatInputComponent implements OnInit {
     private input_zone = viewChild.required<ElementRef<HTMLSpanElement>>('input_zone')
+    private text_area = viewChild.required<ElementRef<HTMLDivElement>>('text_area')
     newmessage: string[] = ['test! <br> !tset']
 
     constructor(public chatService: ChatService, private messagesService: MessagesService, private renderer: Renderer2) {}
@@ -20,6 +21,7 @@ export class ChatInputComponent implements OnInit {
     ngOnInit() {
         this.chatService.currentEditingMessageText$.subscribe( value => {
             this.newmessage.pop()
+            console.log('valuevaluevaluevaluevalue', value)
             this.newmessage.push(value)
             if (value !== "") { 
                 setTimeout(() => this.adjustHeight())
@@ -32,13 +34,15 @@ export class ChatInputComponent implements OnInit {
         console.log('KeyboardEvent', event)
 
         if (event.key === 'Enter' && !event.shiftKey) {
+            console.log('brtoo???!')
             this.onSendMessage()
         }
     }
 
     onSendMessage() {
-        if (this.newmessage[0] === "") return
-        const message = this.convertMessageToDatabaseFormat(this.newmessage[0])        
+        const text = this.text_area().nativeElement.innerHTML
+        if (text === "") return
+        const message = this.convertMessageToDatabaseFormat(text)        
 
         if (!this.chatService.editingMessageMode()) {
             this.messagesService.sendMessage(message)
@@ -95,11 +99,11 @@ export class ChatInputComponent implements OnInit {
     convertMessageToDatabaseFormat(content: string): string {
         return content
             .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
+            // .replace(/</g, '&lt;')
+            // .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;')
-            .replace(/\r\n|\r|\n/g, '<br>')
+            // .replace(/\r\n|\r|\n/g, '<br>')
             .replace(/ /g, '&nbsp;')
             // .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
             .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
@@ -108,6 +112,6 @@ export class ChatInputComponent implements OnInit {
     }
     
     adjustHeight(): void {
-
+        // this.input_zone().nativeElement.style.height = "200px"
     }
 }

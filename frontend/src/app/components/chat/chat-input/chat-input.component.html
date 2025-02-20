@@ -35,11 +35,10 @@
             <img class="input-icon" src="./assets/delete.svg">
         </button>
 
-        <span #input_zone class="input" (keydown)="onKeydown($event)">
+        <span #input_zone class="input">
 
             @for (mess of newmessage; track $index) {
-                <div style="height: 200px !important;" [id]="mess" [innerHTML]="mess" contenteditable="true" class="input"></div>
-                <!-- <textarea #text_area [innerHTML]="mess" [id]="mess" (keydown)="onKeydown($event)" (submit)="onSendMessage()" contenteditable="true" placeholder="Scrivi un messaggio.." class="input" name="text" rows="14" cols="10" wrap="soft" maxlength="1000"></textarea> -->
+                <div #text_area [innerHTML]="mess" (keydown)="onKeydown($event)" (submit)="onSendMessage()" contenteditable="true" class="input2" ></div>
             }
             
         </span>
