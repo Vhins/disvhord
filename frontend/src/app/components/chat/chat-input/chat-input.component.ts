@@ -21,7 +21,6 @@ export class ChatInputComponent implements OnInit {
     ngOnInit() {
         this.chatService.currentEditingMessageText$.subscribe( value => {
             this.newmessage.pop()
-            console.log('valuevaluevaluevaluevalue', value)
             this.newmessage.push(value)
             if (value !== "") { 
                 setTimeout(() => this.adjustHeight())
@@ -34,7 +33,7 @@ export class ChatInputComponent implements OnInit {
         console.log('KeyboardEvent', event)
 
         if (event.key === 'Enter' && !event.shiftKey) {
-            console.log('brtoo???!')
+            event.preventDefault()
             this.onSendMessage()
         }
     }
@@ -76,7 +75,7 @@ export class ChatInputComponent implements OnInit {
 
     resetInput() {
         this.newmessage.pop()
-        this.newmessage.push('')
+        this.newmessage.push('\0')
     }
 
 

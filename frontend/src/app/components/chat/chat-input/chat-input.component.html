@@ -38,7 +38,7 @@
         <span #input_zone class="input">
 
             @for (mess of newmessage; track $index) {
-                <div #text_area [innerHTML]="mess" (keydown)="onKeydown($event)" (submit)="onSendMessage()" contenteditable="true" class="input2" ></div>
+                <div #text_area [innerHTML]="mess" (keydown)="onKeydown($event)" contenteditable="true" class="input2" ></div>
             }
             
         </span>
