@@ -37,7 +37,7 @@ export class RegisterComponent {
         this.emailAlreadyInUse = false
         this.emailAlreadyInUse = false
 
-        const success = await this.authService.tryCreateAccount(this.registerform.value);
+        const success = await this.authService.tryCreateAccount(this.registerform.value)
         if (success.return) {
             this.router.navigate(['/login'])
         } else {

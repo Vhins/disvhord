@@ -17,18 +17,12 @@ export class ChatService {
     }
 
     currentEditingMessageText$ = new BehaviorSubject<string>('')
-
-    //todo:  !!!
-    scrollDownNow = new BehaviorSubject<Boolean>(false)
-    scrollDown(): void {
-        this.scrollDownNow.next(false)
-    }
     
-    callThisChat = new BehaviorSubject<Boolean>(false)
+    callThisChat$ = new BehaviorSubject<Boolean>(false)
     callThisChatNow(): void {
-        this.callThisChat.next(true)
+        this.callThisChat$.next(true)
     }
-    //!  !!!
+
 
     setMyInfo() {
         this.users_info[this.user_id] = {
@@ -57,12 +51,23 @@ export class ChatService {
     }
 
 
-    
     allegatingLink = signal<boolean>(false)
 
     private _allegatedLink: string = ""
     get allegatedLink() { return this._allegatedLink }
     set allegatedLink(newLink: string) {
         this._allegatedLink = newLink
+    }
+
+    linkType(url: string | null | undefined): string {
+        if (!!url && ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.bmp'].some(ext => url.endsWith(ext))) {
+            return 'image'
+        } else if(!!url && ['.mp3', '.ogg', '.wav', '.aac', '.flac'].some(ext => url.endsWith(ext))) {
+            return 'audio'
+        } else if(!!url && ['.mp4', '.webm', '.mov', '.mkv'].some(ext => url.endsWith(ext))) {
+            return 'video'
+        } else {
+            return 'link'
+        }
     }
 }

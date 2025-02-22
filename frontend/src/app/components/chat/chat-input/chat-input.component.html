@@ -3,13 +3,13 @@
     <div class="input-box">
         @if (chatService.editingMessageMode()) {
             <div class="modifing-message"> 
-                <!-- <span> stai modificando questo messaggio </span> -->
+                <span> stai modificando questo messaggio </span>
             </div>
         }
 
         @if (chatService.allegatedLink) {
-            <div class="link-wrapper">
-                @switch (linkType(chatService.allegatedLink)) {
+            <div #allegatedLink [ngStyle]="{'top': allegatedLinkHeight}" class="link-wrapper">
+                @switch (chatService.linkType(chatService.allegatedLink)) {
                     @case ('image') {
                         <img class="img_link" [src]="chatService.allegatedLink" alt="Image">
                     }

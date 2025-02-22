@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, Renderer2, viewChild, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, effect, ElementRef, OnInit, viewChild } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { FormsModule } from '@angular/forms';
 import { NgStyle } from '@angular/common';
@@ -11,27 +11,30 @@ import { MessagesService } from '../messages.service';
   templateUrl: './chat-input.component.html',
   styleUrl: './chat-input.component.css'
 })
-export class ChatInputComponent implements OnInit {
-    private input_zone = viewChild.required<ElementRef<HTMLSpanElement>>('input_zone')
+export class ChatInputComponent implements OnInit, AfterViewInit {
     private text_area = viewChild.required<ElementRef<HTMLDivElement>>('text_area')
-    newmessage: string[] = ['test! <br> !tset']
+    private allegatedLink = viewChild<ElementRef<HTMLDivElement>>('allegatedLink')
+    newmessage: string[] = ['']
 
-    constructor(public chatService: ChatService, private messagesService: MessagesService, private renderer: Renderer2) {}
+    constructor(public chatService: ChatService, private messagesService: MessagesService) {
+        effect(() => {
+            this.chatService.allegatingLink()
+            if (!this.allegatedLink()) return
+            setTimeout(()=> {
+                this.allegatedLinkHeight = `-${this.allegatedLink()?.nativeElement.clientHeight}px`
+            })
+        })
+    }
 
     ngOnInit() {
         this.chatService.currentEditingMessageText$.subscribe( value => {
             this.newmessage.pop()
             this.newmessage.push(value)
-            if (value !== "") { 
-                setTimeout(() => this.adjustHeight())
-            }
         })
     }
 
 
     onKeydown(event: KeyboardEvent) {
-        console.log('KeyboardEvent', event)
-
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
             this.onSendMessage()
@@ -41,7 +44,7 @@ export class ChatInputComponent implements OnInit {
     onSendMessage() {
         const text = this.text_area().nativeElement.innerHTML
         if (text === "") return
-        const message = this.convertMessageToDatabaseFormat(text)        
+        const message = this.convertMessageToDatabaseFormat(text)  
 
         if (!this.chatService.editingMessageMode()) {
             this.messagesService.sendMessage(message)
@@ -50,50 +53,37 @@ export class ChatInputComponent implements OnInit {
         }
 
         this.resetInput()
-        this.adjustHeight()
     }
 
     sendEditedMessage(inputValue: string) {
         if (this.chatService.currentIDMessageEditing === null) return
         this.messagesService.editMessage(this.chatService.currentIDMessageEditing, inputValue)
         this.resetInput()
-        this.adjustHeight()
     }
 
     onDeleteAllegatedLink() {
         this.chatService.allegatedLink = ""
-        this.adjustHeight()
     }
 
     onStopEditMessage() {
         this.newmessage.pop()
         this.resetInput()
         this.chatService.editingMessageMode.set(false)
-        this.adjustHeight()
     }
 
 
+    nosense = true
     resetInput() {
         this.newmessage.pop()
-        this.newmessage.push('\0')
+        this.newmessage.push(this.nosense ? '\0' : '')
+        this.nosense = !this.nosense
     }
 
 
     onAddLinkPopup() {
         this.chatService.allegatingLink.set(true)
     }
-
-    linkType(url: string | null | undefined): string {
-        if (!!url && ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.bmp'].some(ext => url.endsWith(ext))) {
-            return 'image'
-        } else if(!!url && ['.mp3', '.ogg', '.wav', '.aac', '.flac'].some(ext => url.endsWith(ext))) {
-            return 'audio'
-        } else if(!!url && ['.mp4', '.webm', '.mov', '.mkv'].some(ext => url.endsWith(ext))) {
-            return 'video'
-        } else {
-            return 'link'
-        }
-    }
+    
 
     convertMessageToDatabaseFormat(content: string): string {
         return content
@@ -109,8 +99,10 @@ export class ChatInputComponent implements OnInit {
             .replace(/https?:\/\/[^\s<>()\[\]{}]*(?=(?!.*&nbsp;)[\s|[^\w-]|$])/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
             .replace(/[\u200B-\u200D\uFEFF]/g, '')
     }
-    
-    adjustHeight(): void {
-        // this.input_zone().nativeElement.style.height = "200px"
+
+    allegatedLinkHeight: string = '0px'
+    ngAfterViewInit() {
+
     }
+
 }

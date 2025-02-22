@@ -35,7 +35,7 @@ export class AddLinkPopupComponent {
 
     resetValues(): void {
         this.inputlinkValue = ""
-        this.chatService.allegatedLink = ""
+        //? this.chatService.allegatedLink = ""
     }
 
 }

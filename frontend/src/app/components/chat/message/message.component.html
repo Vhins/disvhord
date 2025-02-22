@@ -2,28 +2,28 @@
 <div (mouseenter)="messageOption()" class="message-wrapper">
 
     <div class="message">
-        <img class="message-user_logo" [src]="chatService.users_info[messageData.sender].img" alt="User logo">
+        <img class="message-user_logo" [src]="chatService.users_info[messageData().sender].img" alt="User logo">
 
         <div class="message-stuff">
             <div class="message-stufff">
-                <div class="userdisplayname"> {{chatService.users_info[messageData.sender].name}} </div>
-                <div class="timestamp"> {{messageData.timestamp | date: 'dd/MM/yyyy HH:mm'}} </div>
+                <div class="userdisplayname"> {{chatService.users_info[messageData().sender].name}} </div>
+                <div class="timestamp"> {{messageData().timestamp | date: 'dd/MM/yyyy HH:mm'}} </div>
             </div>
-            <div class="content" [innerHTML]="messageData.content"> </div>
+            <div class="content" [innerHTML]="messageData().content"> </div>
 
-            @if (messageData.attachments !== null) {
-                @switch (linkType(messageData.attachments)) {
+            @if (messageData().attachments !== null) {
+                @switch (chatService.linkType(messageData().attachments)) {
                     @case ('image') {
-                        <img class="img_link" [src]="messageData.attachments" alt="Image">
+                        <img class="img_link" [src]="messageData().attachments" alt="Image">
                     }
                     @case ('audio') {
-                        <audio class="audio_link" [src]="messageData.attachments" controls></audio>
+                        <audio class="audio_link" [src]="messageData().attachments" controls></audio>
                     }
                     @case ('video') {
-                        <video class="video_link" width="500px" [src]="messageData.attachments" controls></video>
+                        <video class="video_link" width="500px" [src]="messageData().attachments" controls></video>
                     }
                     @case ('link') {
-                        <a class="a_link" [href]="messageData.attachments" target="_blank" class="content"> {{ messageData.attachments }} </a>
+                        <a class="a_link" [href]="messageData().attachments" target="_blank" class="content"> {{ messageData().attachments }} </a>
                     }
                 }
             }
