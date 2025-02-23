@@ -1,22 +1,24 @@
-<div style="position: absolute; margin-left: auto; width: 800px">
-    <h1 style="text-align: center;"> Chiamata </h1>
-    <hr>
+
+<div>
     <div style="display: flex; flex-direction: row;">
         <div style="display: flex; flex-direction: column; align-items: center;">
             <video style="border: 2px solid red;" width="400px" #localVideo autoplay muted></video>
             <h2> TU </h2>
-            <button (click)="requestVideoPermission()"> turn on camera </button>
-            <button (click)="turnOffCamera()"> turn off camera </button>
-            <button (click)="requestScreenSharePermission()"> turn on screen share </button>
-            <button (click)="turnOffVideoStreaming()"> turn off screen share </button>
         </div>
         <div style="display: flex; flex-direction: column; align-items: center;">
             <video style="border: 2px solid violet;" width="400px" #remoteVideo autoplay></video>
             <h2> ALTRO <span [hidden]="!this.other_user_has_connected"> E Connesso! </span> </h2>
         </div>
     </div>
-    <hr>
+    <div style="margin: auto; width: 300px;">
+        <div style="display: flex; justify-content: space-around;">
+            <button (click)="enterCall()"> <img src="./assets/video_off.svg"></button>
+            <button (click)="exitCall()"> <img src="./assets/video_off.svg"></button>
 
-    <button (click)="enterCall()"> enter call </button>
-    <button (click)="exitCall()"> exit call </button>
+            <button (click)="requestVideoPermission()"> <img src="./assets/video_on.svg"> </button>
+            <button (click)="turnOffCamera()"> <img src="./assets/video_off.svg"> </button>
+            <button (click)="requestScreenSharePermission()"> <img src="./assets/video_on.svg"> </button>
+            <button (click)="turnOffVideoStreaming()"> <img src="./assets/video_off.svg"></button>
+        </div>
+    </div>
 </div>

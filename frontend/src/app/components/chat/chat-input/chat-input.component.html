@@ -35,7 +35,7 @@
             <img class="input-icon" src="./assets/delete.svg">
         </button>
 
-        <span #input_zone class="input">
+        <span #input_zone class="input userselection">
 
             @for (mess of newmessage; track $index) {
                 <div #text_area [innerHTML]="mess" (keydown)="onKeydown($event)" contenteditable="true" class="input2" ></div>

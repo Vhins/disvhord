@@ -55,7 +55,7 @@ export class MessagesService {
             if (data.content) {
                 if (this.messages === null) {return}
                 const index = this.messages.findIndex(message => message.message_id === data.message_id)
-                this.messages[index].content = data.content
+                this.messages[index].content = this.convertMessageToBrowserFormat(data.content)
 
                 this.scrollDownChat$.next(false)
             }
@@ -64,8 +64,8 @@ export class MessagesService {
 
     listenForChatChanges(): void {}
 
-    async getMessages(chat_id: number) {
-        const responseData: api_ChatInfoMessages = await this.apiChatService.get_ChatInfoMessages(chat_id)
+    async getMessages(chat_id: number, loadMessage: number) {
+        const responseData: api_ChatInfoMessages = await this.apiChatService.get_ChatInfoMessages(chat_id, loadMessage)
         const messages: Messages[] = responseData.chatMessages
 
         messages.map(message => {
@@ -96,21 +96,29 @@ export class MessagesService {
     }
 
     editMessage(message_id: number, content: string) {
-        this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id, "content": this.convertMessageToBrowserFormat(content) } as MessageData)
+        this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id, "content": content } as MessageData)
         this.chatService.editingMessageMode.set(false)
+    }
+
+    convertMessageToDatabaseFormat(content: string): string {
+        return content
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
     }
 
     convertMessageToBrowserFormat(content: string): string {
         return content
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;br&gt;/gi, '<br>')
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
             .replace(/&quot;/g, '"')
             .replace(/&#39;/g, "'")
-            .replace(/&amp;/g, '&')
-            // .replace(/<br\s*\/?>/gi, '\n')
-            // .replace(/&nbsp;/g, ' ')
-            //?  .replace(/<a\s+href="([^"]+)"[^>]*>[^<]*<\/a>/gi, '$1')
-            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace(/https?:\/\/[^\s<>()\[\]{}&]+(?=\s|[^\w-]|$|&nbsp;)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
     }
 
 }

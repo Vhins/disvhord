@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Signal, viewChild, ViewChild, viewChildren } from '@angular/core';
+import { AfterViewInit, Component, contentChild, ElementRef, viewChild, ViewChild } from '@angular/core';
 import { ChatService } from './chat.service';
 import { ActivatedRoute } from '@angular/router';
 import { WebSocketService } from '../../web-socket.service';
@@ -16,8 +16,8 @@ import { MessagesService } from './messages.service';
   styleUrl: './chat.component.css'
 })
 export class ChatComponent implements AfterViewInit {
-    private scrollContainer = viewChild.required<ElementRef>('scrollContainer')
-    // private callComponent = viewChildren<Signal<CallComponent>>('callComponent')
+    private scrollContainer = viewChild.required<ElementRef<HTMLDivElement>>('scrollContainer')
+    // private callComponent = contentChild.required<ElementRef<CallComponent>>('callComponent')
     @ViewChild(CallComponent) callComponent!: CallComponent
     newChat: boolean = false
 
@@ -27,7 +27,7 @@ export class ChatComponent implements AfterViewInit {
         this.activatedRoute.paramMap.subscribe(async param => {
             this.newChat = true
             this.chatService.setThisChatID(Number(param.get('chat_id')))
-            this.messagesService.getMessages(Number(param.get('chat_id')))
+            this.messagesService.getMessages(Number(param.get('chat_id')), 1)
             this.chatService.allegatingLink.set(false)
             this.chatService.allegatedLink = ""
             this.chatService.editingMessageMode.set(false)
@@ -35,7 +35,6 @@ export class ChatComponent implements AfterViewInit {
         })
 
         this.webSocketService.on("personal_call_started").subscribe(async data => {
-            console.log('giuasto??')
             this.aCallHasStarted = true
             this.callComponent.infoCall = {call_id: data.call_id, user_id: data.sender, chat_user_id: data.receiver}
             this.callComponent.callid = data.call_id
@@ -51,13 +50,32 @@ export class ChatComponent implements AfterViewInit {
         })
     }
 
+    times = 1
+    oneTime = false
+    onScroll() {
+        if (this.oneTime) return
+        const container = this.scrollContainer().nativeElement as HTMLDivElement   
+        if (container.scrollTop - 300 <= 0) {
+            this.times++
+            let before = container.scrollHeight
+            this.messagesService.getMessages(this.chatService.chat_id, this.times)
+            this.oneTime = true
+            setTimeout(() => {
+                requestAnimationFrame(() => {
+                    container.scrollTop = container.scrollHeight - before + 300
+                    this.oneTime = false
+                })
+            }, 50)
+        }
+    }
+
     async ngAfterViewInit() {
         const element = this.scrollContainer().nativeElement
-
+        
         this.messagesService.scrollDownChat$.subscribe((forceScroll) => {
             const firstRender = this.messagesService.firstRender
             if (firstRender && !forceScroll) return
-
+            
             if (forceScroll || element.scrollTop + element.clientHeight >= element.scrollHeight - 190) {
                 setTimeout(() => {
                     if (!firstRender) {
@@ -68,6 +86,8 @@ export class ChatComponent implements AfterViewInit {
                 })
             }
         })
+
+        element.addEventListener('scroll', () => this.onScroll())
     }
 
 
@@ -81,7 +101,7 @@ export class ChatComponent implements AfterViewInit {
 
         if (Date.now() - Number(message.timestamp)  > 10 * 60 * 1000) return
 
-        const processed_message_content = this.messagesService.convertMessageToBrowserFormat(message.content)
+        const processed_message_content = message.content
         this.chatService.currentEditingMessageText$.next(processed_message_content)
 
         this.chatService.currentIDMessageEditing = message_id

@@ -12,11 +12,13 @@
     overflow: hidden; 
     resize: none;
     box-sizing: border-box;
-    line-height: 55px;
+    /* line-height: 55px; */
 }
 
 .input2 {
     outline: none;
+    line-height: 36px;
+    padding: 12px 10px;
 }
 
 .input:focus {
@@ -58,7 +60,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    /* gap: 10px; */
     position: relative;
 }
 

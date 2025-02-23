@@ -18,7 +18,8 @@ export class WebSocketService {
     }
   
     emit(eventName: string, data: any): void {
-        this.socket.emit(eventName, data)
+        const socketEvent = this.socket.emit(eventName, data)
+        //todo: show error message  --  socketEvent.connected
     }
   
     on(eventName: string): Observable<any> {

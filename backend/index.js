@@ -461,7 +461,7 @@ async function handleApi_basicUserInterfaceData(req, res){
 
 
 async function handleApi_ChatInfoMessages(req, res) {
-    const { chat_id } = req.body
+    const { chat_id, loadMessage } = req.body
     const JWTdata = req.JWTdata
 
     if (chat_id === null || chat_id === undefined) {
@@ -469,8 +469,8 @@ async function handleApi_ChatInfoMessages(req, res) {
         return
     }
 
-    const chat_info = await db.collection('chats').findOne({ chat_id: chat_id }, { projection: { messages: { $slice: -50 } } })
-
+    const loadMoreMessages = -50 * loadMessage
+    const chat_info = await db.collection('chats').findOne({ chat_id: chat_id }, { projection: { messages: { $slice: loadMoreMessages } } })
     let user_chat_info
 
     if (Number(JWTdata.user_id) === Number(chat_info.users_id[1])) {

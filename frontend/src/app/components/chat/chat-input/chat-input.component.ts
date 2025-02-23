@@ -1,8 +1,10 @@
-import { AfterViewInit, Component, effect, ElementRef, OnInit, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, OnInit, viewChild } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { FormsModule } from '@angular/forms';
 import { NgStyle } from '@angular/common';
 import { MessagesService } from '../messages.service';
+
+type PxString = `${number}px` | `-${number}px`
 
 @Component({
   selector: 'app-chat-input',
@@ -11,25 +13,24 @@ import { MessagesService } from '../messages.service';
   templateUrl: './chat-input.component.html',
   styleUrl: './chat-input.component.css'
 })
-export class ChatInputComponent implements OnInit, AfterViewInit {
+export class ChatInputComponent implements OnInit {
     private text_area = viewChild.required<ElementRef<HTMLDivElement>>('text_area')
     private allegatedLink = viewChild<ElementRef<HTMLDivElement>>('allegatedLink')
     newmessage: string[] = ['']
+    allegatedLinkHeight: PxString = '0px'
 
     constructor(public chatService: ChatService, private messagesService: MessagesService) {
         effect(() => {
             this.chatService.allegatingLink()
             if (!this.allegatedLink()) return
-            setTimeout(()=> {
-                this.allegatedLinkHeight = `-${this.allegatedLink()?.nativeElement.clientHeight}px`
-            })
+            this.adjustAllegatedLinkHeight()
         })
     }
 
     ngOnInit() {
         this.chatService.currentEditingMessageText$.subscribe( value => {
             this.newmessage.pop()
-            this.newmessage.push(value)
+            this.newmessage.push(value.replace(/<a[^>]*>(.*?)<\/a>/gi, '$1'))
         })
     }
 
@@ -44,7 +45,7 @@ export class ChatInputComponent implements OnInit, AfterViewInit {
     onSendMessage() {
         const text = this.text_area().nativeElement.innerHTML
         if (text === "") return
-        const message = this.convertMessageToDatabaseFormat(text)  
+        const message = this.messagesService.convertMessageToDatabaseFormat(text)  
 
         if (!this.chatService.editingMessageMode()) {
             this.messagesService.sendMessage(message)
@@ -83,26 +84,16 @@ export class ChatInputComponent implements OnInit, AfterViewInit {
     onAddLinkPopup() {
         this.chatService.allegatingLink.set(true)
     }
-    
 
-    convertMessageToDatabaseFormat(content: string): string {
-        return content
-            .replace(/&/g, '&amp;')
-            // .replace(/</g, '&lt;')
-            // .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;')
-            // .replace(/\r\n|\r|\n/g, '<br>')
-            .replace(/ /g, '&nbsp;')
-            // .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-            .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-            .replace(/https?:\/\/[^\s<>()\[\]{}]*(?=(?!.*&nbsp;)[\s|[^\w-]|$])/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-            .replace(/[\u200B-\u200D\uFEFF]/g, '')
-    }
-
-    allegatedLinkHeight: string = '0px'
-    ngAfterViewInit() {
-
+    adjustAllegatedLinkHeight() { //!
+        setTimeout( async ()=> {
+        const allegatedLinkHeight = this.allegatedLink()?.nativeElement.clientHeight
+            if (allegatedLinkHeight && this.chatService.allegatedLink) {
+                fetch(this.chatService.allegatedLink).then(()=>{
+                    this.allegatedLinkHeight = `-${allegatedLinkHeight}px`
+                })
+            }
+        })
     }
 
 }

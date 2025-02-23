@@ -7,7 +7,7 @@ import { api_ChatInfoMessages, Messages } from './chat.model';
 })
 export class ApiChatService {
 
-    async get_ChatInfoMessages(chat_id: number): Promise<api_ChatInfoMessages> {
+    async get_ChatInfoMessages(chat_id: number, loadMessage: number): Promise<api_ChatInfoMessages> {
         if (chat_id == null) throw new Error('[chat_id] was not found as an argument in [ApiChatService:get_ChatInfoMessages]')
 
         try {
@@ -18,7 +18,7 @@ export class ApiChatService {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('privateToken') || ''}`
                 },
-                body: JSON.stringify( {"chat_id": chat_id} )
+                body: JSON.stringify( {"chat_id": chat_id, "loadMessage": loadMessage} )
             }
 
             const response = await fetch(apiURL, request)
