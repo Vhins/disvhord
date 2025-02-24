@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { AfterContentChecked, Component } from '@angular/core';
 import { ChatService } from '../chat/chat.service';
-import { MessagesService } from '../chat/messages.service';
 
 @Component({
   selector: 'app-side-bar-chat',
@@ -9,11 +8,11 @@ import { MessagesService } from '../chat/messages.service';
   templateUrl: './side-bar-chat.component.html',
   styleUrl: './side-bar-chat.component.css'
 })
-export class SideBarChatComponent {
+export class SideBarChatComponent implements AfterContentChecked{
     user_chat_name!: string
     user_chat_logo!: string
 
-    constructor(private chatService: ChatService, private messagesService: MessagesService){}
+    constructor(private chatService: ChatService){}
 
     ngAfterContentChecked() {
         this.user_chat_name = this.chatService.users_info[this.chatService.chat_user_id]?.name

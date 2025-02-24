@@ -1,0 +1,19 @@
+:host {
+    width: 100%;
+    min-width: 200px;
+    height: calc(100dvh - 30px);
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.messages-container {
+    flex: 1 1 auto;
+    /* height: calc(100% - 102px); */
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 20px;
+}

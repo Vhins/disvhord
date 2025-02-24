@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, contentChild, ElementRef, viewChild, ViewChild } from '@angular/core';
-import { ChatService } from './chat.service';
+import { ChatService } from '../chat.service';
 import { ActivatedRoute } from '@angular/router';
-import { WebSocketService } from '../../web-socket.service';
-import { CallComponent } from '../call/call.component';
-import { MessageComponent } from "./message/message.component";
-import { AddLinkPopupComponent } from "./add-link-popup/add-link-popup.component";
-import { ChatInputComponent } from "./chat-input/chat-input.component";
-import { MessagesService } from './messages.service';
+import { WebSocketService } from '../../../web-socket.service';
+import { CallComponent } from '../../call/call.component';
+import { MessageComponent } from "../message/message.component";
+import { AddLinkPopupComponent } from "../add-link-popup/add-link-popup.component";
+import { ChatInputComponent } from "../chat-input/chat-input.component";
+import { MessagesService } from '../messages.service';
 
 @Component({
   selector: 'app-chat',
@@ -73,21 +73,25 @@ export class ChatComponent implements AfterViewInit {
         const element = this.scrollContainer().nativeElement
         
         this.messagesService.scrollDownChat$.subscribe((forceScroll) => {
-            const firstRender = this.messagesService.firstRender
-            if (firstRender && !forceScroll) return
-            
-            if (forceScroll || element.scrollTop + element.clientHeight >= element.scrollHeight - 190) {
-                setTimeout(() => {
-                    if (!firstRender) {
-                        element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' })
-                    } else {
-                        element.scrollTop = element.scrollHeight
-                    }
-                })
-            }
+            this.scrollDownChat(forceScroll, element)
         })
 
         element.addEventListener('scroll', () => this.onScroll())
+    }
+
+    scrollDownChat(forceScroll: boolean, element: HTMLDivElement) {
+        const firstRender = this.messagesService.firstRender
+        if (firstRender && !forceScroll) return
+
+        if (forceScroll || element.scrollTop + element.clientHeight >= element.scrollHeight - 190) {
+            setTimeout(() => {
+                if (!firstRender) {
+                    element.scrollTo({ top: element.scrollHeight, behavior: 'smooth' })
+                } else {
+                    element.scrollTop = element.scrollHeight
+                }
+            })
+        }
     }
 
 

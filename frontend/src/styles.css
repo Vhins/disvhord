@@ -5,7 +5,9 @@
     font-family: "Inter", serif;
     font-weight: 400;
     font-style: normal;
-    user-select: none;
+    user-select: none; /* Standard syntax */
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
 }
 
 body {
@@ -31,4 +33,6 @@ body {
 
 .userselection {
     user-select: text;
+    -webkit-user-select: text; /* Safari */
+    -ms-user-select: text; /* IE 10 and IE 11 */
 }

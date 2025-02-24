@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterContentChecked, Component } from '@angular/core';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 
 @Component({
@@ -8,11 +8,11 @@ import { InitializeAppApiService } from '../../initialize-app-api.service';
   templateUrl: './side-bar.component.html',
   styleUrl: './side-bar.component.css'
 })
-export class SideBarComponent {
+export class SideBarComponent implements AfterContentChecked{
     user_chat_name!: string
     user_chat_logo!: string
 
-    friend_request!: any
+    friend_request: any
 
     constructor(public initializeAppService: InitializeAppApiService) {
         this.friend_request = this.initializeAppService.user_interface.notifications.friend_request

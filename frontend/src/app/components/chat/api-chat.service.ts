@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { api_ChatInfoMessages, Messages } from './chat.model';
+import { api_ChatInfoMessages } from './chat.model';
 
 @Injectable({
   providedIn: 'root'

@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
 export class ServerListComponent {
     constructor(private initializeAppApiService: InitializeAppApiService) {}
 
-    getJoinedServers () {
+    getJoinedServers() {
         return this.initializeAppApiService.user_interface.servers_joined
     }
 }

@@ -6,7 +6,7 @@ import { DataResolver } from './data-resolver.service';
 import { MainSiteComponent } from './main-site/main-site.component';
 import { DisvhordAppComponent } from './disvhord-app/disvhord-app.component';
 import { authGuard } from './auth/auth.guard';
-import { ChatComponent } from './components/chat/chat.component';
+import { ChatComponent } from './components/chat/chat-component/chat.component';
 import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 

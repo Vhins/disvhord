@@ -15,14 +15,14 @@ import { ControlsBarComponent } from "../controls-bar/controls-bar.component";
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-    location: Location;
+    location: Location
+    
     constructor(location: Location) {
-        this.location = location;
+        this.location = location
     }
 
     showorhide(): boolean {
-        // console.debg('this.location.path', this.location.path())
-        return this.location.path() === '/app/home/me';
+        return this.location.path() === '/app/home/me'
     }
 
 }
