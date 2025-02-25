@@ -7,6 +7,7 @@ import { MessageComponent } from "../message/message.component";
 import { AddLinkPopupComponent } from "../add-link-popup/add-link-popup.component";
 import { ChatInputComponent } from "../chat-input/chat-input.component";
 import { MessagesService } from '../messages.service';
+import { PeerService } from '../../../peer.service';
 
 @Component({
   selector: 'app-chat',
@@ -17,12 +18,10 @@ import { MessagesService } from '../messages.service';
 })
 export class ChatComponent implements AfterViewInit {
     private scrollContainer = viewChild.required<ElementRef<HTMLDivElement>>('scrollContainer')
-    // private callComponent = contentChild.required<ElementRef<CallComponent>>('callComponent')
-    @ViewChild(CallComponent) callComponent!: CallComponent
     newChat: boolean = false
+    _callsID: Record<number, string> = this.peerService.callsID
 
-
-    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute, private webSocketService: WebSocketService, public messagesService: MessagesService) {
+    constructor (public chatService: ChatService, private activatedRoute: ActivatedRoute, public messagesService: MessagesService, private peerService: PeerService) {
         this.newChat = true
         this.activatedRoute.paramMap.subscribe(async param => {
             this.newChat = true
@@ -34,18 +33,16 @@ export class ChatComponent implements AfterViewInit {
             this.messagesService.firstRender = true
         })
 
-        this.webSocketService.on("personal_call_started").subscribe(async data => {
-            this.aCallHasStarted = true
-            this.callComponent.infoCall = {call_id: data.call_id, user_id: data.sender, chat_user_id: data.receiver}
-            this.callComponent.callid = data.call_id
-
-            const status = await this.callComponent.requestPermission()
-            if (!status) { console.debug('status', status); return }
-        })
-
-        this.chatService.callThisChat$.subscribe((callNow)=> {
+        this.chatService.callThisChat$.subscribe((callNow) => {
             if (callNow) {
                 this.callThisChat()
+            }
+        })
+
+        this.peerService.callsID$.subscribe((callsID) => {
+            this._callsID = callsID
+            if (this._callsID[this.chatService.chat_id]) {
+                this.aCallHasStarted = true
             }
         })
     }
@@ -119,11 +116,14 @@ export class ChatComponent implements AfterViewInit {
         console.debug('callThisChat')
         this.aCallHasStarted = true
         
-        const status = await this.callComponent.requestPermission()
+        const status = await this.peerService.requestVideoAudioPermission()
         if (!status) { console.debug('status', status); return }
 
-        const status2 = await this.callComponent.startConnectionToPeerServerAndStartCall(this.chatService.user_id, this.chatService.chat_user_id)
+        const status2 = this.peerService.connectToPeerServer()
         if (!status2) { console.debug('status2', status2); return }
+
+        const status3 = this.peerService.startCall(this.chatService.chat_user_id)
+        if (!status3) { console.debug('status3', status3); return }
     }
 
 }

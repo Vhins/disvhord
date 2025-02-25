@@ -1,69 +1,36 @@
 import { Injectable } from "@angular/core";
 import { Peer } from 'peerjs'
-import { CallComponent } from "./components/call/call.component";
 import { WebSocketService } from "./web-socket.service";
+import { BehaviorSubject } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
 export class PeerService {
-    peer!: Peer
-    callComponent!: CallComponent
+    peer: Peer | null = null
+    permissionObtained: boolean = false
+    originalMediaDevices: MediaStream | null = null
 
-    localStream!: MediaStream
-    videoEnabled: boolean = true
-    audioEnabled: boolean = true
-    currentCall!: any
+    localStream: MediaStream | null = null
+    videoEnabled: boolean = false
+    audioEnabled: boolean = false
+    screenshareEnabled: boolean = false
 
-    callID!: string
+    callsID: Record<number, string> = {}
+    callsID$ = new BehaviorSubject<Record<number, string>>({})
+    currentCall: any | null = null
+    infoCall: {call_id: string, user_id: number, chat_user_id: number} | null = null
 
-    constructor(private webSocketService: WebSocketService) {}
+    remoteStream$ = new BehaviorSubject<any>(null)
 
-
-    async requestVideoAudioPermission(component: CallComponent): Promise<boolean> {
-        this.callComponent = component
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-
-        this.localStream = new MediaStream([stream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
-        return true
-    }
-
-    async requestVideoPermission() {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        let videoTrack = stream.getVideoTracks()[0]
-        videoTrack.onended = () => { this.turnOffCamera() }
-        this.sendNewVideoTrack(stream)
-    }
-
-    async requestScreenSharePermission() {
-        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
-        let videoTrack = stream.getVideoTracks()[0]
-        videoTrack.onended = () => { this.turnOffVideoStreaming() }
-        this.sendNewVideoTrack(stream)
-    }
-
-    sendNewVideoTrack(stream: MediaStream) {
-        this.currentCall.peerConnection.getSenders().forEach((sender: { track: { kind: string }; replaceTrack: (arg0: any) => void }) => {
-            if (sender.track.kind == "video") { 
-                sender.replaceTrack(stream.getVideoTracks()[0])
-                this.localStream = stream
-            }
+    constructor(private webSocketService: WebSocketService) {
+        this.webSocketService.on("personal_call_started").subscribe(async data => {
+            this.addIncomingCall(data.sender, data.call_id)
+            //todo: notification
         })
-
-        this.callComponent.localStreamHTML.srcObject = stream
     }
 
-    turnOffVideoStreaming() {
-        this.localStream = new MediaStream([this.localStream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
-        this.sendNewVideoTrack(this.localStream)
-    }
-
-    async turnOffCamera() { //! non funziona, quello sopra si, funziona solo dopo una combinazione
-        this.localStream = new MediaStream([this.localStream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
-        this.sendNewVideoTrack(this.localStream)
-    }
-
-    connectToServer(): boolean {
+    connectToPeerServer(): boolean {
         try {
             this.peer = new Peer('', { host: 'localhost', port: 3331, path: 'peerjs', secure: false }) // port: 443  secure: true  host: server_ip
             return true
@@ -73,63 +40,129 @@ export class PeerService {
         }
     }
 
-    setupYourStream() {
-        if (this.callComponent.localStreamHTML) {
-            this.callComponent.localStreamHTML.srcObject = this.localStream
-            this.callComponent.localStreamHTML.muted = true
-            this.callComponent.localStreamHTML.play()
+
+    async requestVideoAudioPermission(): Promise<boolean> {
+        try {
+            this.originalMediaDevices = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            this.permissionObtained = true
+            return true
+        } catch {
+            this.permissionObtained = false
+            return false
         }
     }
 
-    startConnectionToPeerServerAndStartCall(user_id: number, chat_user_id: number) {
-        if (!this.connectToServer()) return false
+    setFakeAudioAndStream() {
+        this.localStream = new MediaStream([this.createEmptyAudioTrack(), this.createEmptyVideoTrack({ width: 640, height: 480 })])
+    }
 
-        this.peer.on('open', id => {
-            this.callID = id
+    async setAudio() {
+        const stream = this.originalMediaDevices
+        if (stream) {
+            this.localStream = new MediaStream([stream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
+            this.audioEnabled = true
+        }
+    }
 
-            this.setupYourStream()
+    async setVideo() {
+        const stream = this.originalMediaDevices
+        if (stream) {
+            this.localStream = this.originalMediaDevices
+            this.videoEnabled = true
+            if (this.currentCall) {
+                this.sendNewVideoTrack()
+            }
+        }
+    }
 
-            this.webSocketService.emit("start_personal_call", { sender: user_id, receiver: chat_user_id, call_id: id })
+    async setScreenshare() {
+        const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
+        if (stream) {
+            this.localStream = stream
+            this.screenshareEnabled = true
+            if (this.currentCall) {
+                this.sendNewVideoTrack()
+            }
+        }
+    }
 
-            this.peer.on('call', call => {
-                this.currentCall = call
+    async turnOffCamera() {
+        if (!this.localStream) return
+        this.localStream = new MediaStream([this.localStream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
+        this.sendNewVideoTrack()
+    }
 
-                call.on('error', error => { console.error('error', error) })
+    async turnOffScreenshare() {
+        if (!this.localStream) return
+        this.localStream = new MediaStream([this.localStream.getAudioTracks()[0], this.createEmptyVideoTrack({ width: 640, height: 480 })])
+        this.sendNewVideoTrack()
+    }
 
-                call.answer(this.localStream)
+    sendNewVideoTrack() {
+        if (!this.currentCall || !this.currentCall.peerConnection) return
 
-                call.on('stream', remoteStream => {
-                    remoteStream.getVideoTracks().forEach(track => {
-                        track.onended = () => {console.debug('Il video track remoto è terminato')} //*
-                    })
-                    this.callComponent.remoteStreamHTML.srcObject = remoteStream
-                })
-
-
-                this.callComponent.other_user_has_connected = true
-            })
+        this.currentCall.peerConnection.getSenders().forEach((sender: RTCRtpSender) => {
+            if (sender.track?.kind === "video" && this.localStream) { 
+                sender.replaceTrack(this.localStream.getVideoTracks()[0])
+            }
         })
+    }
 
+    addIncomingCall(user_id: number, call_id: string) {
+        this.callsID[user_id] = call_id
+        this.callsID$.next(this.callsID)
+        console.debug('chiamata da questo utente!', user_id)
+    }
+
+    removeOutgoingCall(user_id: number) {
+        delete this.callsID[user_id]
+        this.callsID$.next(this.callsID)
+        console.debug('rimossa chiamata da utente!', user_id)
+    }
+
+    startCall(chat_user_id: number) {
+        if (!this.peer) return false
+
+        this.webSocketService.emit('start_personal_call', {receiver: chat_user_id})
+
+        this.setFakeAudioAndStream()
+
+        if (!this.localStream) return false
+        
+        const call = this.peer.call(chat_user_id.toString(), this.localStream)
+        this.currentCall = call
+
+        call.on('stream', (remoteStream) => {
+            this.remoteStream$.next(remoteStream)
+        })
+  
+        call.on('close', () => {
+            console.debug('chiamata terminata')
+        })
 
         return true
     }
 
-    startConnectionToPeerServerAndEnterCall(call_id: string): boolean {
-        if (!this.connectToServer()) return false
+    enterCall(user_id: number): boolean {
 
-        this.peer.on('open', () => {
-            this.setupYourStream()
+        // se gia in un altra chiamata uscire dalla corrente e spostarsi in questa
 
-            const call = this.peer.call(call_id, this.localStream)
-            this.currentCall = call
+        const call_id = this.callsID[user_id]
+        if(!this.peer || !call_id) return false
 
-            call.on('error', error => { console.error('error', error) })
-            call.on('stream', remoteStream => {
-                remoteStream.getVideoTracks().forEach(track => {
-                    track.onended = () => {console.debug('Il video track remoto è terminato')} //*
-                })
-                this.callComponent.remoteStreamHTML.srcObject = remoteStream
-            })
+        this.setFakeAudioAndStream()
+
+        if (!this.localStream) return false
+        
+        const call = this.peer.call(call_id, this.localStream)
+        this.currentCall = call
+
+        call.on('stream', (remoteStream) => {
+            this.remoteStream$.next(remoteStream)
+        })
+  
+        call.on('close', () => {
+            console.debug('chiamata terminata')
         })
 
         return true
@@ -139,8 +172,6 @@ export class PeerService {
         if (this.currentCall) {
             this.currentCall.close()
             this.currentCall = null
-            this.callComponent.remoteStreamHTML.srcObject = null
-            this.callComponent.localStreamHTML.srcObject = null
         }
     }
 
@@ -153,6 +184,17 @@ export class PeerService {
         const videoTrack = canvas.captureStream().getVideoTracks()[0]
 
         return Object.assign(videoTrack, { enabled: false })
+    }
+
+    createEmptyAudioTrack() {
+        const ctx = new AudioContext()
+        const oscillator = ctx.createOscillator()
+        const destination = ctx.createMediaStreamDestination()
+        oscillator.connect(destination)
+        oscillator.start()
+    
+        const audioTrack = destination.stream.getAudioTracks()[0]
+        return Object.assign(audioTrack, { enabled: false })
     }
 
 }

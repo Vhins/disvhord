@@ -1,5 +1,5 @@
 
-@if (this.aCallHasStarted) { <app-call/> }
+@if (this.aCallHasStarted) { <app-call [chat_user_id]="chatService.chat_user_id"/> }
 
 <div #scrollContainer class="messages-container">
     @for (message of messagesService.messages; track $index) {

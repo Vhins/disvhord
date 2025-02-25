@@ -1,4 +1,4 @@
-import { Component, ElementRef, Injectable, ViewChild } from '@angular/core';
+import { Component, ElementRef, Injectable, input, viewChild } from '@angular/core';
 import { PeerService } from '../../peer.service';
 
 @Injectable({
@@ -12,33 +12,24 @@ import { PeerService } from '../../peer.service';
   styleUrl: './call.component.css'
 })
 export class CallComponent {
-    @ViewChild('localVideo', {static: true}) refLocalVideo!: ElementRef
-    @ViewChild('remoteVideo',{static: true}) refRemoteVideo!: ElementRef
-
-    ngAfterViewInit() {
-        this.localStreamHTML = this.refLocalVideo.nativeElement as HTMLVideoElement
-        this.remoteStreamHTML = this.refRemoteVideo.nativeElement as HTMLVideoElement
-    }
-
-    callid!: string
+    private refLocalVideo = viewChild.required<ElementRef<HTMLVideoElement>>('localVideo')
+    private refRemoteVideo = viewChild.required<ElementRef<HTMLVideoElement>>('localVideo')
+    chat_user_id = input.required<number>()
 
     constructor(private peerService: PeerService) {}
-
-    localStreamHTML!: HTMLVideoElement
-    remoteStreamHTML!: HTMLVideoElement
 
     other_user_has_connected: boolean = false
 
     async requestPermission(): Promise<boolean> {
-        return await this.peerService.requestVideoAudioPermission(this)
+        return await this.peerService.requestVideoAudioPermission()
     }
 
-    async requestVideoPermission() {
-        this.peerService.requestVideoPermission()
+    async enterCall() {
+        this.peerService.enterCall(this.chat_user_id())
     }
 
-    async requestScreenSharePermission() {
-        this.peerService.requestScreenSharePermission()
+    exitCall() {
+        this.peerService.ExitCall()
     }
 
     turnOffCamera() {
@@ -46,25 +37,7 @@ export class CallComponent {
     }
 
     turnOffVideoStreaming() {
-        this.peerService.turnOffVideoStreaming()
+        this.peerService.turnOffScreenshare()
     }
-
-    async startConnectionToPeerServerAndStartCall(user_id: number, chat_user_id: number): Promise<boolean> {
-        return this.peerService.startConnectionToPeerServerAndStartCall(user_id,chat_user_id)
-    }
-
-    async enterCall(): Promise<boolean> {
-        if (this.callid) {
-            return this.peerService.startConnectionToPeerServerAndEnterCall(this.callid)
-        } else {
-            return false
-        }
-    }
-
-    infoCall!: {call_id: string, user_id: number, chat_user_id: number}
-
-    exitCall() {
-        this.peerService.ExitCall()
-    }
-
+    
 }
