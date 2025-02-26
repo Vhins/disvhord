@@ -1,7 +1,6 @@
-import { AfterViewInit, Component, contentChild, ElementRef, viewChild, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, viewChild } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { ActivatedRoute } from '@angular/router';
-import { WebSocketService } from '../../../web-socket.service';
 import { CallComponent } from '../../call/call.component';
 import { MessageComponent } from "../message/message.component";
 import { AddLinkPopupComponent } from "../add-link-popup/add-link-popup.component";
@@ -41,7 +40,7 @@ export class ChatComponent implements AfterViewInit {
 
         this.peerService.callsID$.subscribe((callsID) => {
             this._callsID = callsID
-            if (this._callsID[this.chatService.chat_id]) {
+            if (this._callsID[this.chatService.chat_user_id]) {
                 this.aCallHasStarted = true
             }
         })
@@ -113,7 +112,6 @@ export class ChatComponent implements AfterViewInit {
     aCallHasStarted: boolean = false
 
     async callThisChat() {
-        console.debug('callThisChat')
         this.aCallHasStarted = true
         
         const status = await this.peerService.requestVideoAudioPermission()
