@@ -149,9 +149,11 @@ async function startServer(PORT){
             })
 
             socket.on('start_personal_call', async (data) => {
-                console.log('started call', data)
                 const receiverSocketId = users[data.receiver]
-                io.to(receiverSocketId).emit('personal_call_started', data)
+
+                if (receiverSocketId !== undefined) {
+                    io.to(receiverSocketId).emit('personal_call_started', data)
+                }
             })
 
             socket.on('disconnect', () => {

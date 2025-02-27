@@ -30,6 +30,12 @@ export class ChatComponent implements AfterViewInit {
             this.chatService.allegatedLink = ""
             this.chatService.editingMessageMode.set(false)
             this.messagesService.firstRender = true
+            this._callsID = this.peerService.callsID
+            if (this._callsID[this.chatService.chat_user_id]) {
+                this.aCallHasStarted = true
+            } else {
+                this.aCallHasStarted = false
+            }
         })
 
         this.chatService.callThisChat$.subscribe((callNow) => {

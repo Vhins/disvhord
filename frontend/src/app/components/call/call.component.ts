@@ -20,10 +20,6 @@ export class CallComponent implements OnInit {
 
     other_user_has_connected: boolean = false
 
-    tezt() {
-        this.peerService.setAudioVideo()
-    }
-
     ngOnInit() {
         this.peerService.localStream$.subscribe(localStream => {
             if (!localStream) return
@@ -54,24 +50,17 @@ export class CallComponent implements OnInit {
         this.peerService.enterCall(this.chat_user_id())
     }
 
+    toggleCamera(toggle: boolean) {
+        this.peerService.toggleCamera(toggle)
+    }
+    toggleAudio(toggle: boolean) {
+        this.peerService.toggleAudio(toggle)
+    }
+    // toggleScreenshare(toggle: boolean) {
+    //     this.peerService.toggleScreenshare(toggle)
+    // }
+    
     exitCall() {
         this.peerService.ExitCall()
     }
-
-    turnOnCamera() {
-        this.peerService.setVideo()
-    }
-
-    turnOffCamera() {
-        this.peerService.turnOffCamera()
-    }
-
-    turnOffVideoStreaming() {
-        this.peerService.turnOffScreenshare()
-    }
-
-    turnOnScreenshare() {
-        this.peerService.setScreenshare()
-    }
-    
 }

@@ -1,10 +1,18 @@
 
-<div style="display: flex; flex-direction: row; width: 100dvw; height: max-content">
-
-    <div style="width: 107px; height: calc(100dvh - 30px); margin-top: 30px; display: flex; flex-direction: column; align-items: start; margin-left: 15px;">
-        <app-server-list></app-server-list>
-    </div>
-
-    <router-outlet></router-outlet>
+@if (dataResolved === true) {
+    <div style="display: flex; flex-direction: row; width: 100dvw; height: max-content">
     
-</div>
+        <div style="width: 107px; height: calc(100dvh - 30px); margin-top: 30px; display: flex; flex-direction: column; align-items: start; margin-left: 15px;">
+            <app-server-list></app-server-list>
+        </div>
+    
+        <router-outlet></router-outlet>
+        
+        <app-notification></app-notification>
+    </div>
+} @else {
+    <div style="width: 100dvw; height: 100dvh; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white;">
+        <img src="favicon.ico" width="48px">
+        <h2> Disvhord é stato creato da Vhins! </h2>
+    </div>
+}

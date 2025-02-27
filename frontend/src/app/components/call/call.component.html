@@ -12,13 +12,15 @@
     </div>
     <div style="margin: auto; width: 300px;">
         <div style="display: flex; justify-content: space-around;">
-            <button (click)="enterCall()"> <img src="./assets/video_off.svg"></button>
-            <button (click)="exitCall()"> <img src="./assets/video_off.svg"></button>
+            <button (click)="enterCall()"> enter <img src="./assets/video_off.svg"></button>
+            <button (click)="exitCall()"> exit <img src="./assets/video_off.svg"></button>
 
-            <button (click)="turnOnCamera()"> <img src="./assets/video_on.svg"> </button>
-            <button (click)="turnOffCamera()"> <img src="./assets/video_off.svg"> </button>
-            <button (click)="turnOnScreenshare()"> <img src="./assets/video_on.svg"> </button>
-            <button (click)="tezt()"> <img src="./assets/video_off.svg"></button>
+            <button (click)="toggleCamera(true)"> camera on <img src="./assets/video_on.svg"> </button>
+            <button (click)="toggleCamera(false)"> camera off <img src="./assets/video_off.svg"> </button>
+            <button (click)="toggleAudio(true)"> audio on <img src="./assets/video_off.svg"></button>
+            <button (click)="toggleAudio(false)"> audio off <img src="./assets/video_off.svg"></button>
+            <!-- <button (click)="toggleScreenshare(true)"> sreensh on <img src="./assets/video_on.svg"> </button>
+            <button (click)="toggleScreenshare(false)"> sreensh off <img src="./assets/video_on.svg"> </button> -->
         </div>
     </div>
 </div>

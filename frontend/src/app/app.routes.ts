@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { DataResolver } from './data-resolver.service';
 
 import { MainSiteComponent } from './main-site/main-site.component';
 import { DisvhordAppComponent } from './disvhord-app/disvhord-app.component';
@@ -12,7 +11,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 
 export const routes: Routes = [
     { path: '', component: MainSiteComponent },
-    { path: 'app', canActivate: [authGuard], component: DisvhordAppComponent, resolve: { data: DataResolver }, children: [
+    { path: 'app', canActivate: [authGuard], component: DisvhordAppComponent, children: [
         { path: 'home', component: HomeComponent, children: [
             { path: 'me', component: NavbarComponent },
             { path: 'chat/:chat_id', component: ChatComponent},
