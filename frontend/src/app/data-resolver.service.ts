@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { InitializeAppApiService } from './initialize-app-api.service';
 import { WebSocketService } from './web-socket.service';
 import { Router } from '@angular/router';
-import { PeerService } from './peer.service';
 import { NotificationsService } from './notifications.service';
 
 @Injectable({
@@ -18,7 +17,7 @@ export class DataResolver {
         return this.startServices(RESULT) // RANDOM_DELAY
     }
 
-    private startServices(result: boolean, radommDelay: number = 200): Promise<boolean> {
+    private startServices(result: boolean, radommDelay: number = 20): Promise<boolean> {
         return new Promise<boolean>(resolve => {
             setTimeout(() => {
 
