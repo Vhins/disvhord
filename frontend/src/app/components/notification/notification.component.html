@@ -1,6 +1,21 @@
 
-@if (notificationType === "message") {
-    <p> new message </p>
-} @else if (notificationType === "call") {
-    <p> call incoming </p>
+@if (notificationData !== null) {
+    <div class="notification-body">
+        <img [src]="notificationData.image">
+
+        @switch (notificationData.type) {
+            @case ("message") {
+                <p> {{notificationData.name}} : ti ha inviato un messaggio </p>
+            }
+            @case ("call") {
+                <p> {{notificationData.name}} : ti sta chiamando </p>
+            }
+            @case ("friend_req") {
+                <p> {{notificationData.name}} : ti ha inviato una richiesta di amicizia </p>
+            }
+            @case ("server_invite") {
+                <p> {{notificationData.name}} : ti ha invitato ad un server </p>
+            }
+        }
+    </div>
 }

@@ -1,7 +1,8 @@
-:host {
+
+.notification-body {
     position: absolute;
-    bottom: 50px;
-    right: 30px;
+    bottom: 20px;
+    right: 20px;
     width: 300px;
     height: 80px;
     font-size: 30px;
@@ -10,4 +11,6 @@
     border: 2px solid white;
     border-radius: 10px;
     font-weight: 500;
+    display: flex;
+    gap: 20px;
 }
