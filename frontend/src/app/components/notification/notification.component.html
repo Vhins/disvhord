@@ -1,7 +1,7 @@
 
 @if (notificationData !== null) {
     <div class="notification-body">
-        <img [src]="notificationData.image">
+        <img class="image" [src]="notificationData.image">
 
         @switch (notificationData.type) {
             @case ("message") {
