@@ -219,7 +219,7 @@ async function handleApi_userCreateAccount(req, res){
         "servers_joined": [],
         "servers_owned": [],
         "posts": [],
-        "notifications": []
+        "notifications": {}
     }
 
     const op = await db.collection('users_info').insertOne(user_info_doc)

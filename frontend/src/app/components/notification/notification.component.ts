@@ -39,4 +39,8 @@ export class NotificationComponent {
             }, 50000)
         })
     }
+
+    closeNotification() {
+        this.notificationData = null
+    }
 }
