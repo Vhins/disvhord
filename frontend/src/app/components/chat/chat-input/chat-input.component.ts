@@ -1,31 +1,22 @@
-import { Component, effect, ElementRef, OnInit, viewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, viewChild } from '@angular/core';
 import { ChatService } from '../chat.service';
 import { FormsModule } from '@angular/forms';
-import { NgStyle } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 import { MessagesService } from '../messages.service';
 
-type PxString = `${number}px` | `-${number}px`
 
 @Component({
   selector: 'app-chat-input',
   standalone: true,
-  imports: [FormsModule, NgStyle],
+  imports: [FormsModule, NgStyle, NgClass],
   templateUrl: './chat-input.component.html',
   styleUrl: './chat-input.component.css'
 })
 export class ChatInputComponent implements OnInit {
     private text_area = viewChild.required<ElementRef<HTMLDivElement>>('text_area')
-    private allegatedLink = viewChild<ElementRef<HTMLDivElement>>('allegatedLink')
     newmessage: string[] = ['']
-    allegatedLinkHeight: PxString = '0px'
 
-    constructor(public chatService: ChatService, private messagesService: MessagesService) {
-        effect(() => {
-            this.chatService.allegatingLink()
-            if (!this.allegatedLink()) return
-            this.adjustAllegatedLinkHeight()
-        })
-    }
+    constructor(public chatService: ChatService, private messagesService: MessagesService) {}
 
     ngOnInit() {
         this.chatService.currentEditingMessageText$.subscribe( value => {
@@ -81,19 +72,8 @@ export class ChatInputComponent implements OnInit {
     }
 
 
-    onAddLinkPopup() {
+    onOpenAddLinkPopup() {
         this.chatService.allegatingLink.set(true)
-    }
-
-    adjustAllegatedLinkHeight() { //!
-        setTimeout( async ()=> {
-        const allegatedLinkHeight = this.allegatedLink()?.nativeElement.clientHeight
-            if (allegatedLinkHeight && this.chatService.allegatedLink) {
-                fetch(this.chatService.allegatedLink).then(()=>{
-                    this.allegatedLinkHeight = `-${allegatedLinkHeight}px`
-                })
-            }
-        })
     }
 
 }

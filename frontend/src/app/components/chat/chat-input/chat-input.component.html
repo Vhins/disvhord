@@ -1,6 +1,6 @@
 
 <div class="input-container">
-    <div class="input-box">
+    <div [ngStyle]="{'border-radius': !chatService.allegatedLink ? '5px' : '0px 5px 5px 5px'}" class="input-box">
         @if (chatService.editingMessageMode()) {
             <div class="modifing-message"> 
                 <span> stai modificando questo messaggio </span>
@@ -8,7 +8,8 @@
         }
 
         @if (chatService.allegatedLink) {
-            <div #allegatedLink [ngStyle]="{'top': allegatedLinkHeight}" class="link-wrapper">
+            <div #allegatedLink class="link-wrapper" [ngClass]="{'link-wrapper-type_audio': chatService.linkType(chatService.allegatedLink) === 'audio', 'link-wrapper-type_link': chatService.linkType(chatService.allegatedLink) === 'link'}">
+                <span class="link-div-wrapper">
                 @switch (chatService.linkType(chatService.allegatedLink)) {
                     @case ('image') {
                         <img class="img_link" [src]="chatService.allegatedLink" alt="Image">
@@ -17,18 +18,19 @@
                         <audio class="audio_link" [src]="chatService.allegatedLink" controls></audio>
                     }
                     @case ('video') {
-                        <video class="video_link" width="500px" [src]="chatService.allegatedLink" controls></video>
+                        <video class="video_link" [src]="chatService.allegatedLink" controls></video>
                     }
                     @case ('link') {
                         <a class="a_link" [href]="chatService.allegatedLink" target="_blank" class="content"> {{ chatService.allegatedLink }} </a>
                     }
                 }
 
-                <button (click)="onDeleteAllegatedLink()"> X </button>
+                <button (click)="onDeleteAllegatedLink()"> <img style="width: 14px; height: 14px;" src="./assets/delete.svg"> </button>
+                </span>
             </div>
         }
 
-        <button [hidden]="chatService.editingMessageMode() === true" (click)="onAddLinkPopup()" class="input-button">
+        <button [hidden]="chatService.editingMessageMode() === true" (click)="onOpenAddLinkPopup()" class="input-button">
             <img class="input-icon" src="./assets/attachment.svg">
         </button>
         <button [hidden]="chatService.editingMessageMode() === false" (click)="onStopEditMessage()" class="input-button">

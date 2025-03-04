@@ -76,26 +76,51 @@
     color: rgb(19, 77, 184)
 }
 .img_link {
-    max-width: 500px; 
-    margin-top: 5px; 
+    height: 100%;
     border-radius: 10px;
 }
 .audio_link {
-    margin-top: 5px;
+    border-radius: 10px;
 }
 .video_link {
-    max-width: 500px; 
-    margin-top: 5px; 
+    height: 100%;
     border-radius: 10px;
 }
 
 .link-wrapper {
     position: absolute; 
     left: 0; 
+    top: -175px;
+    min-width: 170px;
+    height: 170px;
     background-color: white; 
-    border-radius: 5px 5px 0px 5px; 
-    border-bottom: 1px solid black; 
-    padding: 0px 5px 0px 5px;
+    border-radius: 5px 5px 0px 0px; 
+    padding: 5px 5px 0px 5px;
+}
+.link-wrapper-type_audio {
+    top: -64px;
+    height: 59px;
+}
+.link-wrapper-type_link {
+    top: -35px;
+    height: 30px;
+}
+.link-div-wrapper {
+    display: block;
+    width: 100%;
+    height: calc(100% - 5px);
+    border-bottom: 1px solid #727272; 
+    padding-bottom: 5px;
+}
+.link-div-wrapper button {
+    min-width: 14px;
+    min-height: 14px;
+    border-radius: 10px;
+    border: 2px solid black;
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    cursor: pointer;
 }
 
 .modifing-message {
