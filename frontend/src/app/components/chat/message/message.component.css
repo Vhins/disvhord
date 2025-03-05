@@ -56,7 +56,8 @@
 .timestamp {
     width: max-content;
     font-size: 10px;
-    font-weight: 200;
+    font-weight: 400;
+    color: rgb(118, 118, 118);
     margin-top: auto;
     transform: translateY(-3px);
     margin-left: 5px;

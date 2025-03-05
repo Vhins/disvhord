@@ -64,8 +64,11 @@ export class MessagesService {
 
     listenForChatChanges(): void {}
 
-    async getMessages(chat_id: number, loadMessage: number) {
-        const responseData: api_ChatInfoMessages = await this.apiChatService.get_ChatInfoMessages(chat_id, loadMessage)
+    async getMessages(chat_id: number, loadMessage: number): Promise<boolean> {
+        const responseData: api_ChatInfoMessages | "max_loaded" = await this.apiChatService.get_ChatInfoMessages(chat_id, loadMessage)
+
+        if (responseData === "max_loaded") return false
+
         const messages: Messages[] = responseData.chatMessages
 
         messages.map(message => {
@@ -76,6 +79,7 @@ export class MessagesService {
         this.chat_id = chat_id
         this.chat_user_id = responseData.chatInfo.user_id
         this.chatService.users_info[responseData.chatInfo.user_id] = {id: responseData.chatInfo.user_id , name: responseData.chatInfo.user_displayName, img: responseData.chatInfo.user_logo}
+        return true
     }
 
     sendMessage(content: string) {

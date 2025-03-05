@@ -31,6 +31,7 @@ export class PeerService {
 
     readonly localStream$ = new BehaviorSubject<MediaStream | null>(null)
     readonly remoteStream$ = new BehaviorSubject<MediaStream | null>(null)
+    readonly closeCall$ = new BehaviorSubject<boolean | null>(null)
     
     constructor(private webSocketService: WebSocketService, private initalizeAppService: InitializeAppApiService, private notificationsService: NotificationsService) {
         this.notificationsService.incomingCall$.subscribe( data => {
@@ -195,10 +196,15 @@ export class PeerService {
         this.currentCall.on('error', error => { console.error('error', error) })    
         this.currentCall.on('stream', remoteStream => { this.remoteStream$.next(remoteStream) })
         this.currentCall.on('close', () => { console.debug('chiamata terminata') })
+
+        this.webSocketService.on('closed_personal_call').subscribe(call => {
+            this.closeCall$.next(true)
+        })
     }
 
     ExitCall() {
         if (this.currentCall) {
+            this.webSocketService.emit('close_personal_call', this.infoCall?.chat_user_id)
             this.currentCall.close()
             this.currentCall = null
         }

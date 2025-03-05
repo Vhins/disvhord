@@ -3,21 +3,23 @@
     <div class="notification-body">
         <img class="image" [src]="notificationData.image">
 
+        <span class="wrapper">
         @switch (notificationData.type) {
             @case ("message") {
-                <p class="name"> {{notificationData.name}} </p>
-                <p> Ti ha inviato una richiesta di amicizia </p>
+                    <p class="name"> {{notificationData.name}} </p>
+                    <p> Ti ha inviato un messaggio </p>
             }
             @case ("call") {
                 <p> {{notificationData.name}} <br> Ti sta chiamando </p>
             }
             @case ("friend_req") {
-                <p> {{notificationData.name}} <br> Ti ha inviato un messaggio </p>
+                <p> {{notificationData.name}} <br> Ti ha inviato una richiesta di amicizia </p>
             }
             @case ("server_invite") {
                 <p> {{notificationData.name}} <br> Ti ha invitato ad un server </p>
             }
         }
+        </span>
 
         <button (click)="closeNotification()"> X </button>
     </div>

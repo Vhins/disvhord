@@ -6,8 +6,9 @@ import { api_ChatInfoMessages } from './chat.model';
   providedIn: 'root'
 })
 export class ApiChatService {
+    chat_messages_length!: number
 
-    async get_ChatInfoMessages(chat_id: number, loadMessage: number): Promise<api_ChatInfoMessages> {
+    async get_ChatInfoMessages(chat_id: number, loadMessage: number): Promise<api_ChatInfoMessages | "max_loaded" > {
         if (chat_id == null) throw new Error('[chat_id] was not found as an argument in [ApiChatService:get_ChatInfoMessages]')
 
         try {
@@ -27,6 +28,9 @@ export class ApiChatService {
             if (!response.ok) {
                 throw new Error(responseData?.message || `Request error, ${response.status}`)
             }
+
+            if (responseData.chatMessages?.length === this.chat_messages_length) return "max_loaded"
+            this.chat_messages_length = responseData.chatMessages.length
 
             return responseData
         } catch (error) {

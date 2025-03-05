@@ -1,13 +1,13 @@
 
-<div>
-    <div style="display: flex; flex-direction: row;">
-        <div style="display: flex; flex-direction: column; align-items: center;">
-            <video style="border: 2px solid red;" width="400px" #localVideo autoplay muted></video>
-            <h2> TU </h2>
+<div style="display: flex; align-items: center; flex-direction: column; border: 1px solid white;">
+    <div style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 50px;">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 50%;">
+            <video style="border: 2px solid red; border-radius: 10px;" width="100%" #localVideo autoplay muted></video>
+            <img src="./assets/home.svg" style="width: 50px; height: 50px; position: absolute" alt="">
         </div>
-        <div style="display: flex; flex-direction: column; align-items: center;">
-            <video style="border: 2px solid violet;" width="400px" #remoteVideo autoplay></video>
-            <h2> ALTRO <span [hidden]="!this.other_user_has_connected"> E Connesso! </span> </h2>
+        <div style="display: flex; flex-direction: column; align-items: center; width: 50%;">
+            <video style="border: 2px solid violet; ; border-radius: 10px;" width="100%" #remoteVideo autoplay></video>
+            <h2> ALTRO <span [hidden]="!this.other_user_is_connected"> E Connesso! </span> </h2>
         </div>
     </div>
     <div style="margin: auto; width: 300px;">

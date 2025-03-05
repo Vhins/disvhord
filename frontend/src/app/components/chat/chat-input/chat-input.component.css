@@ -73,7 +73,8 @@
 
 .a_link {
     text-decoration: underline;
-    color: rgb(19, 77, 184)
+    color: rgb(19, 77, 184);
+    text-overflow: clip;
 }
 .img_link {
     height: 100%;
@@ -92,18 +93,20 @@
     left: 0; 
     top: -175px;
     min-width: 170px;
+    max-width: 90%;
     height: 170px;
     background-color: white; 
     border-radius: 5px 5px 0px 0px; 
     padding: 5px 5px 0px 5px;
 }
 .link-wrapper-type_audio {
-    top: -64px;
-    height: 59px;
+    top: -64px !important;
+    height: 59px !important;
 }
 .link-wrapper-type_link {
-    top: -35px;
-    height: 30px;
+    top: -35px !important;
+    max-height: 30px !important;
+    line-height: 30px;
 }
 .link-div-wrapper {
     display: block;

@@ -54,20 +54,25 @@ export class ChatComponent implements AfterViewInit {
 
     times = 1
     oneTime = false
-    onScroll() {
-        if (this.oneTime) return
+    loadedAllChatMessage = false
+    async onScroll() {
+        if (this.oneTime || this.loadedAllChatMessage) return
         const container = this.scrollContainer().nativeElement as HTMLDivElement   
         if (container.scrollTop - 300 <= 0) {
             this.times++
             let before = container.scrollHeight
-            this.messagesService.getMessages(this.chatService.chat_id, this.times)
-            this.oneTime = true
-            setTimeout(() => {
-                requestAnimationFrame(() => {
-                    container.scrollTop = container.scrollHeight - before + 300
-                    this.oneTime = false
-                })
-            }, 50)
+            const has_loaded_more_msg = await this.messagesService.getMessages(this.chatService.chat_id, this.times)
+            if (!has_loaded_more_msg) {
+                this.loadedAllChatMessage = true
+            } else {
+                this.oneTime = true
+                setTimeout(() => {
+                    requestAnimationFrame(() => {
+                        container.scrollTop = container.scrollHeight - before + 300
+                        this.oneTime = false
+                    })
+                }, 50)
+            }
         }
     }
 

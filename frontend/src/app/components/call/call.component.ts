@@ -18,7 +18,7 @@ export class CallComponent implements OnInit {
 
     constructor(private peerService: PeerService) {}
 
-    other_user_has_connected: boolean = false
+    other_user_is_connected: boolean = false
 
     ngOnInit() {
         this.peerService.localStream$.subscribe(localStream => {
@@ -32,11 +32,18 @@ export class CallComponent implements OnInit {
         let remoteStreamCache: MediaStream
         this.peerService.remoteStream$.subscribe(remoteStream => {
             if (!remoteStream || remoteStreamCache === remoteStream) return
+            this.other_user_is_connected = true
 
             remoteStreamCache = remoteStream
             this.refRemoteVideo().nativeElement.srcObject = remoteStream
             this.refRemoteVideo().nativeElement.muted = false
             this.refRemoteVideo().nativeElement.play()
+        })
+
+        this.peerService.closeCall$.subscribe(closeCall => {
+            if (!closeCall) return
+            this.other_user_is_connected = false
+            this.exitCall()
         })
     }
 
@@ -61,6 +68,7 @@ export class CallComponent implements OnInit {
     // }
     
     exitCall() {
+        this.other_user_is_connected = false
         this.peerService.ExitCall()
     }
 }
