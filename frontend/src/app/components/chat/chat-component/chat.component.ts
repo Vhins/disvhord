@@ -31,11 +31,18 @@ export class ChatComponent implements AfterViewInit {
             this.chatService.editingMessageMode.set(false)
             this.messagesService.firstRender = true
             this._callsID = this.peerService.callsID
+            this.loadedAllChatMessage = false
+            this.oneTime = false
             if (this._callsID[this.chatService.chat_user_id]) {
                 this.aCallHasStarted = true
             } else {
                 this.aCallHasStarted = false
             }
+            try {
+                const element = this.scrollContainer().nativeElement
+                this.scrollDownChat(false, element)
+            } catch{}
+            
         })
 
         this.chatService.callThisChat$.subscribe((callNow) => {
@@ -59,13 +66,13 @@ export class ChatComponent implements AfterViewInit {
         if (this.oneTime || this.loadedAllChatMessage) return
         const container = this.scrollContainer().nativeElement as HTMLDivElement   
         if (container.scrollTop - 300 <= 0) {
+            this.oneTime = true
             this.times++
             let before = container.scrollHeight
             const has_loaded_more_msg = await this.messagesService.getMessages(this.chatService.chat_id, this.times)
             if (!has_loaded_more_msg) {
                 this.loadedAllChatMessage = true
             } else {
-                this.oneTime = true
                 setTimeout(() => {
                     requestAnimationFrame(() => {
                         container.scrollTop = container.scrollHeight - before + 300
@@ -83,7 +90,7 @@ export class ChatComponent implements AfterViewInit {
             this.scrollDownChat(forceScroll, element)
         })
 
-        element.addEventListener('scroll', () => this.onScroll())
+        element.addEventListener('scroll', () => this.onScroll(), {passive: true})
     }
 
     scrollDownChat(forceScroll: boolean, element: HTMLDivElement) {

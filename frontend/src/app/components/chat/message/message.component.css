@@ -114,6 +114,8 @@
     max-width: 500px; 
     margin-top: 5px; 
     border-radius: 10px;
+    height: auto; 
+    object-fit: cover;
 }
 .audio_link {
     margin-top: 5px;

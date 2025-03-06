@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { CallOption, MediaConnection, Peer } from 'peerjs'
+import { MediaConnection, Peer } from 'peerjs'
 import { WebSocketService } from "./web-socket.service";
 import { BehaviorSubject } from "rxjs";
 import { InitializeAppApiService } from "./initialize-app-api.service";

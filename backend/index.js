@@ -52,6 +52,10 @@ async function startServer(PORT){
 
             socket.on('personal_message', async (data) => {
                 if (users[data.receiver] !== null) {
+
+                    data.content = sanitizeMessage(data.content)
+                    data.content.replace(/javascript:/g, '').replace(/on\w+="[^"]*"/g, '')
+
                     const message = {
                         "message_id": await generateID(),
                         "content": data.content,
@@ -89,6 +93,8 @@ async function startServer(PORT){
             socket.on('delete_message', async (data) => {
 
                 if (users[data.message_id] !== null) {
+
+                    data.content = sanitizeMessage(data.content)
 
                     let op = await db.collection('chats').findOne( { chat_id: data.chat_id }, { projection: { messages: { $elemMatch: { message_id: data.message_id } } } })
                     if (op == null) {
@@ -604,4 +610,15 @@ async function handleApi_deleteFriendRequest(req, res) {
         return
     }
     res.status(200)
+}
+
+function sanitizeMessage(message) {
+    return message
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .replace(/on\w+="[^"]*"/g, '')
 }

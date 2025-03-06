@@ -59,13 +59,13 @@ export class ChatService {
         this._allegatedLink = newLink
     }
 
-    linkType(url: string | null | undefined): string {
+    linkType(url: string | null | undefined): 'image' | 'video' | 'audio' | 'link' {
         if (!!url && ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.bmp'].some(ext => url.endsWith(ext))) {
             return 'image'
-        } else if(!!url && ['.mp3', '.ogg', '.wav', '.aac', '.flac'].some(ext => url.endsWith(ext))) {
-            return 'audio'
         } else if(!!url && ['.mp4', '.webm', '.mov', '.mkv'].some(ext => url.endsWith(ext))) {
             return 'video'
+        } else if(!!url && ['.mp3', '.ogg', '.wav', '.aac', '.flac'].some(ext => url.endsWith(ext))) {
+            return 'audio'
         } else {
             return 'link'
         }

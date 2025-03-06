@@ -22,8 +22,14 @@ export class AddLinkPopupComponent {
 
     constructor(private chatService: ChatService) {}
 
-    onConfirmAllegateFile(): void {
-        if (!this.linkRegExp.test(this.inputlinkValue)) return 
+    async onConfirmAllegateFile() {
+        if (!this.linkRegExp.test(this.inputlinkValue)) return
+
+        const linkType = this.chatService.linkType(this.inputlinkValue)
+        if (linkType !== "link"){
+            if (!await this.checkMediaValidity(this.inputlinkValue, linkType)) return
+        }
+
         this.chatService.allegatingLink.set(false)
         this.chatService.allegatedLink = this.inputlinkValue
     }
@@ -36,6 +42,24 @@ export class AddLinkPopupComponent {
     resetValues(): void {
         this.inputlinkValue = ""
         //? this.chatService.allegatedLink = ""
+    }
+
+    checkMediaValidity(url: string, type: 'image' | 'video' | 'audio'): Promise<boolean> {
+        return new Promise((resolve) => {
+            let media: HTMLImageElement | HTMLVideoElement | HTMLAudioElement
+    
+            if (type === "image") {
+                media = new Image()
+                media.onload = () => resolve(true)
+            } else {
+                media = document.createElement(type)
+                media.onloadedmetadata = () => resolve(true)
+                ;(media as HTMLVideoElement | HTMLAudioElement).load()
+            }
+
+            media.onerror = () => resolve(false)
+            media.src = url
+        })
     }
 
 }
