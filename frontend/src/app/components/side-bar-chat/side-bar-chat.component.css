@@ -1,6 +1,10 @@
+
 :host {
-    min-width: 300px;
-    margin-left: 90px;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin-left: 91px; /* 90px  61 */
+    margin-right: 29px; /* 30px */
     margin-top: 30px;
 }
 

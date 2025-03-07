@@ -2,9 +2,8 @@ import { Component } from '@angular/core';
 import { ChatsComponent } from '../chats/chats.component';
 import { RapidControlsComponent } from '../rapid-controls/rapid-controls.component';
 import { SideBarChatComponent } from '../side-bar-chat/side-bar-chat.component';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { SideBarComponent } from "../side-bar/side-bar.component";
-import { Location } from '@angular/common';
 import { ControlsBarComponent } from "../controls-bar/controls-bar.component";
 
 @Component({
@@ -15,14 +14,16 @@ import { ControlsBarComponent } from "../controls-bar/controls-bar.component";
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-    location: Location
+    pathLocation: string
     
-    constructor(location: Location) {
-        this.location = location
-    }
-
-    showorhide(): boolean {
-        return this.location.path() === '/app/home/me'
+    constructor(private router: Router) {
+        this.pathLocation = this.router.url
+    
+        this.router.events.subscribe(event => {
+            if (event instanceof NavigationEnd) {
+                this.pathLocation = event.urlAfterRedirects
+            }
+        })
     }
 
 }

@@ -6,8 +6,11 @@
 
 <router-outlet></router-outlet>
 
-<div style="min-width: 300px; margin-left: 91px; /* 90px  61 */ margin-right: 29px; margin-top: 30px;">
-    <app-side-bar [hidden]="!showorhide()" ></app-side-bar>
-    <app-side-bar-chat [hidden]="showorhide()"></app-side-bar-chat>
-    <app-controls-bar></app-controls-bar>
+<div>
+    @if (pathLocation === '/app/home/me') {
+        <app-side-bar/>
+    } @else {
+        <app-side-bar-chat/>
+    }
+    <app-controls-bar/>
 </div>

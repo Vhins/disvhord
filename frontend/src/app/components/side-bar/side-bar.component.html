@@ -6,24 +6,6 @@
 </div>
 
 <div class="chat">
-    <h1 style="margin: 0; padding-top: 10px;"> Notifiche </h1>
-    @if (!this.friend_request) {
-        Non hai nessuna notifica
-    } @else {
-        <div class="notifications">
-            <div class="chat_request">
-                @for (notification of this.friend_request; track $index) {
-                    <div class="aaa">
-                        <!-- <img class="user_logo_request" [src]="notification.user_logo"> -->
-                        <span class="user_name_request"> <u><b> {{notification.user_handle}} </b></u> ti ha inviato una richiesta di amicizia, {{notification.timestamp}} </span>
-                    </div>
-                    <div class="aaa">
-                        <span class="user_name">  </span>
-                        <button (click)="acceptFriendRequest(notification.user_id)"> Accetta </button>
-                        <button (click)="deleteFriendRequest(notification.user_id)"> Rifiuta </button>
-                    </div>
-                }
-            </div>
-        </div>
-    }
+    <h1 style="margin: 0;"> Notifiche </h1>
+    <app-notifications/>
 </div>

@@ -1,5 +1,7 @@
 :host {
-    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    width: 300px;
     margin-left: 91px; /* 90px  61 */
     margin-right: 29px;
     margin-top: 30px;
@@ -9,7 +11,7 @@
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 5px;
     
-    padding: 15px;
+    padding: 25px 15px 15px 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -36,30 +38,4 @@
     padding: 15px;
     border: 2px solid white;
     border-radius: 10px;
-}
-
-.user_logo_request {
-    width: 40px;
-    height: 40px;
-    border-radius: 100%;
-}
-
-.user_name_request {
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.aaa {
-    display: flex;
-    flex-direction: row;
-}
-
-.aaa > button {
-    width: 44%;
-    margin: 3%;
-}
-
-.notifications {
-    width: 95%;
-    background-color: white;
 }

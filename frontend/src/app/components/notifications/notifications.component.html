@@ -1,0 +1,20 @@
+
+@if (!this.friend_request) {
+    Non hai nessuna notifica
+} @else {
+    <div class="notifications">
+        <div class="friend_request_notification">
+            @for (notification of this.friend_request; track $index) {
+                <div class="aaa">
+                    <img class="user_logo_request" [src]="notification.user_logo">
+                    <span class="user_name_request"> <u><b> {{notification.user_handle}} </b></u> ti ha inviato una richiesta di amicizia, {{notification.timestamp}} </span>
+                </div>
+                <div class="aaa" style="gap: 20px">
+                    <span class="user_name">  </span>
+                    <button style="width: 50%; border-radius: 5px; background-image: linear-gradient(135deg, #4B4A4A 0%, #262525 100%); border: none; color: white; font-weight: 600; padding: 8px; cursor: pointer;" (click)="acceptFriendRequest(notification.user_id)"> Accetta </button>
+                    <button style="width: 50%; border-radius: 5px; background-image: linear-gradient(135deg, #4B4A4A 0%, #262525 100%); border: none; color: white; font-weight: 600; padding: 8px; cursor: pointer;" (click)="deleteFriendRequest(notification.user_id)"> Rifiuta </button>
+                </div>
+            }
+        </div>
+    </div>
+}
