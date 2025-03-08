@@ -54,7 +54,8 @@ async function startServer(PORT){
                 if (users[data.receiver] !== null) {
 
                     data.content = sanitizeMessage(data.content)
-                    data.content.replace(/javascript:/g, '').replace(/on\w+="[^"]*"/g, '')
+                    // data.content.replace(/javascript:/g, '').replace(/on\w+="[^"]*"/g, '')
+                    // data.attachments.replace(/javascript:/g, '').replace(/on\w+="[^"]*"/g, '') //!
 
                     const message = {
                         "message_id": await generateID(),

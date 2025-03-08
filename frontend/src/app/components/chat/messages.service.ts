@@ -112,7 +112,7 @@ export class MessagesService {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;')
             .replace(/[\u200B-\u200D\uFEFF]/g, '')
-            .replace(/on\w+="[^"]*"/g, '')
+            // .replace(/on\w+="[^"]*"/g, '')
     }
 
     convertMessageToBrowserFormat(content: string): string {
@@ -124,7 +124,7 @@ export class MessagesService {
             .replace(/&quot;/g, '"')
             .replace(/&#39;/g, "'")
             .replace(/https?:\/\/[^\s<>()\[\]{}&]+(?=\s|[^\w-]|$|&nbsp;)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-            .replace(/on\w+="[^"]*"/g, '')
+            // .replace(/on\w+="[^"]*"/g, '')
     }
 
 }

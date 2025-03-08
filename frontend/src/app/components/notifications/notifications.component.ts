@@ -1,20 +1,22 @@
 import { Component } from '@angular/core';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
+import { RelativeTimePipe } from '../../relative-time.pipe';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [],
+  imports: [RelativeTimePipe, DatePipe],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.css'
 })
 export class NotificationsComponent {
-    friend_request: {user_id: number, user_handle: string, user_logo: string, timestamp: string}[]
-
+    friend_request: {user_id: number, user_handle: string, user_logo: string, timestamp: number}[]
+    showTooltip = false 
     constructor(public initializeAppService: InitializeAppApiService) {
         const friend_request = this.initializeAppService.user_interface.notifications.friend_request
         if (friend_request !== undefined) {
-            this.friend_request = friend_request.map( ({timestamp, ...arr}) => ({...arr, timestamp: this.formatRelativeTime(timestamp)}) )
+            this.friend_request = friend_request
         } else {
             this.friend_request = []
         }
@@ -54,29 +56,6 @@ export class NotificationsComponent {
         })
     }
 
-    formatRelativeTime(timestamp: string | number) {
-        const now: number = new Date().getTime()
-        const then: number = new Date(timestamp).getTime()
-    
-        const diffInSeconds = Math.floor((now - then) / 1000)
-        const rtf = new Intl.RelativeTimeFormat('it', { numeric: 'auto' })
-    
-        if (diffInSeconds < 60) return rtf.format(-diffInSeconds, 'second')
-    
-        const diffInMinutes = Math.floor(diffInSeconds / 60)
-        if (diffInMinutes < 60) return rtf.format(-diffInMinutes, 'minute')
-    
-        const diffInHours = Math.floor(diffInMinutes / 60)
-        if (diffInHours < 24) return rtf.format(-diffInHours, 'hour')
-    
-        const diffInDays = Math.floor(diffInHours / 24)
-        if (diffInDays < 30) return rtf.format(-diffInDays, 'day')
-    
-        const diffInMonths = Math.floor(diffInDays / 30)
-        if (diffInMonths < 12) return rtf.format(-diffInMonths, 'month')
-    
-        const diffInYears = Math.floor(diffInMonths / 12)
-        return rtf.format(-diffInYears, 'year')
-    }
+
 
 }

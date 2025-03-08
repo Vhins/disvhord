@@ -36,3 +36,23 @@ body {
     -webkit-user-select: text; /* Safari */
     -ms-user-select: text; /* IE 10 and IE 11 */
 }
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip {
+    position: absolute;
+    background-color: #444444;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 8px 12px;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    pointer-events: none;
+}
