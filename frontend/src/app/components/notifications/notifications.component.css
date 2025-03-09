@@ -1,37 +1,26 @@
 
-.user_logo_request {
-    width: 40px;
-    height: 40px;
-    border-radius: 100%;
-}
-
-.user_name_request {
-    font-size: 16px;
-    font-weight: 400;
-}
-
-.aaa {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.aaa > button {
-    width: 44%;
-    margin: 3%;
-}
-
-.notifications {
-    width: 95%
-}
-
-.friend_request_notification {
+.notification {
     width: calc(100% - 20px);
     background-color: white;
     padding: 10px;
+    border-radius: 5px;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
-    border-radius: 5px
+    gap: 15px;
+}
+
+.buttons_section {
+    display: flex;
+    justify-content: space-between;
+}
+
+button {
+    width: 45%;
+    border-radius: 5px; 
+    background-image: linear-gradient(135deg, #4B4A4A 0%, #262525 100%); 
+    border: none; 
+    color: white; 
+    font-weight: 600; 
+    padding: 8px 12px; 
+    cursor: pointer;
 }

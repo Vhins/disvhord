@@ -56,3 +56,7 @@ body {
     white-space: nowrap;
     pointer-events: none;
 }
+
+p {
+    margin: 0;
+}
