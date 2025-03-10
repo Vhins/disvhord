@@ -8,6 +8,7 @@ import { authGuard } from './auth/auth.guard';
 import { ChatComponent } from './components/chat/chat-component/chat.component';
 import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { SettingsComponent } from './settings/settings.component';
 
 export const routes: Routes = [
     { path: '', component: MainSiteComponent },
@@ -16,11 +17,12 @@ export const routes: Routes = [
             { path: 'me', component: NavbarComponent },
             { path: 'chat/:chat_id', component: ChatComponent},
         ]},
-        { path: 'server', component: ChatComponent}
+        { path: 'server', component: ChatComponent},
     ]
     },
     { path: 'login', loadComponent: () => import('./auth/login/login.component').then(c => c.LoginComponent) },
     { path: 'register', loadComponent: () => import('./auth/register/register.component').then(c => c.RegisterComponent) },
+    { path: 'settings', component: SettingsComponent },
     { path: '**', redirectTo: '' },
 ]
 

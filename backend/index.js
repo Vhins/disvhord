@@ -54,8 +54,10 @@ async function startServer(PORT){
                 if (users[data.receiver] !== null) {
 
                     data.content = sanitizeMessage(data.content)
-                    // data.content.replace(/javascript:/g, '').replace(/on\w+="[^"]*"/g, '')
-                    // data.attachments.replace(/javascript:/g, '').replace(/on\w+="[^"]*"/g, '') //!
+                    if (!data.attachments) {
+                        data.attachments = sanitizeMessage(data.attachments)
+                        data.attachments.replace(/javascript:/g, '')
+                    }
 
                     const message = {
                         "message_id": await generateID(),
@@ -95,8 +97,6 @@ async function startServer(PORT){
 
                 if (users[data.message_id] !== null) {
 
-                    data.content = sanitizeMessage(data.content)
-
                     let op = await db.collection('chats').findOne( { chat_id: data.chat_id }, { projection: { messages: { $elemMatch: { message_id: data.message_id } } } })
                     if (op == null) {
                         return
@@ -130,6 +130,8 @@ async function startServer(PORT){
             socket.on('edit_message', async (data) => {
 
                 if (users[data.message_id] !== null) {
+
+                    data.content = sanitizeMessage(data.content)
 
                     let op = await db.collection('chats').findOne( { chat_id: data.chat_id }, { projection: { messages: { $elemMatch: { message_id: data.message_id } } } })
                     if (op == null) {
@@ -622,4 +624,5 @@ function sanitizeMessage(message) {
     .replace(/'/g, '&#39;')
     .replace(/[\u200B-\u200D\uFEFF]/g, '')
     .replace(/on\w+="[^"]*"/g, '')
+    .replace(/javascript:/g, '')
 }

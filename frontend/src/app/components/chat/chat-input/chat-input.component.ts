@@ -36,12 +36,11 @@ export class ChatInputComponent implements OnInit {
     onSendMessage() {
         const text = this.text_area().nativeElement.innerHTML
         if (text === "") return
-        const message = this.messagesService.convertMessageToDatabaseFormat(text)  
 
         if (!this.chatService.editingMessageMode()) {
-            this.messagesService.sendMessage(message)
+            this.messagesService.sendMessage(text)
         } else {
-            this.sendEditedMessage(message)
+            this.sendEditedMessage(text)
         }
 
         this.resetInput()

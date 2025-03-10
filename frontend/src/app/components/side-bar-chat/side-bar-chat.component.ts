@@ -1,4 +1,4 @@
-import { AfterContentChecked, Component } from '@angular/core';
+import { AfterContentChecked, Component, inject } from '@angular/core';
 import { ChatService } from '../chat/chat.service';
 
 @Component({
@@ -12,7 +12,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     user_chat_name!: string
     user_chat_logo!: string
 
-    constructor(private chatService: ChatService){}
+    chatService = inject(ChatService)
 
     ngAfterContentChecked() {
         this.user_chat_name = this.chatService.users_info[this.chatService.chat_user_id]?.name

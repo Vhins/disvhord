@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, viewChild } from '@angular/core';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { Router } from '@angular/router';
 import { ChatService } from '../chat/chat.service';
@@ -11,7 +11,7 @@ import { ChatService } from '../chat/chat.service';
   styleUrl: './friend-list.component.css'
 })
 export class FriendListComponent {
-    @ViewChild('input') input!: ElementRef
+    input = viewChild.required<ElementRef<HTMLInputElement>>('input')
 
     constructor(private initializeAppApiService: InitializeAppApiService, private router: Router, private chatService: ChatService) {}
 
@@ -32,13 +32,14 @@ export class FriendListComponent {
         }
     }
 
-    sendFriendRequest(event: Event | null) {
+    sendFriendRequest(event?: Event) {
         event?.preventDefault()
 
-        const input = this.input.nativeElement as HTMLInputElement
+        const input = this.input().nativeElement as HTMLInputElement
+        console.log('input.value', input.value, String(this.initializeAppApiService.user_interface.user_handle))
 
-        if (String(this.initializeAppApiService.user_interface.user_handle) == input.value) {
-            this.statusFriendRequest = 6
+        if (String(this.initializeAppApiService.user_interface.user_handle) == input.value || input.value === "") {
+            this.statusFriendRequest = 0
             return
         }
 
