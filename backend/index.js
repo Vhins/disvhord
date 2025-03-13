@@ -54,7 +54,7 @@ async function startServer(PORT){
                 if (users[data.receiver] !== null) {
 
                     data.content = sanitizeMessage(data.content)
-                    if (!data.attachments) {
+                    if (data.attachments) {
                         data.attachments = sanitizeMessage(data.attachments)
                         data.attachments.replace(/javascript:/g, '')
                     }

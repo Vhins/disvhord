@@ -12,20 +12,22 @@
             <div class="content userselection" [innerHTML]="messageData().content"> </div>
 
             @if (messageData().attachments !== null) {
-                @switch (chatService.linkType(messageData().attachments)) {
-                    @case ('image') {
-                        <img class="img_link userselection" [src]="messageData().attachments" alt="Image">
+                <a [href]="messageData().attachments" target="_blank">
+                    @switch (chatService.linkType(messageData().attachments)) {
+                        @case ('image') {
+                            <img class="img_link userselection" [src]="messageData().attachments" alt="Image" >
+                        }
+                        @case ('audio') {
+                            <audio class="audio_link userselection" [src]="messageData().attachments" controls></audio>
+                        }
+                        @case ('video') {
+                            <video class="video_link userselection" width="500px" [src]="messageData().attachments" controls></video>
+                        }
+                        @case ('link') {
+                            <span class="content"> {{ messageData().attachments }} </span>
+                        }
                     }
-                    @case ('audio') {
-                        <audio class="audio_link userselection" [src]="messageData().attachments" controls></audio>
-                    }
-                    @case ('video') {
-                        <video class="video_link userselection" width="500px" [src]="messageData().attachments" controls></video>
-                    }
-                    @case ('link') {
-                        <a class="a_link userselection" [href]="messageData().attachments" target="_blank" class="content"> {{ messageData().attachments }} </a>
-                    }
-                }
+                </a>
             }
         </div>
 
