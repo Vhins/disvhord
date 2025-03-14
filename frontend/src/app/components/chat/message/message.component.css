@@ -111,11 +111,13 @@
     color: rgb(19, 77, 184)
 }
 .img_link {
+    width: min-content;
     max-width: 500px; 
     margin-top: 5px; 
     border-radius: 10px;
     height: auto; 
     object-fit: cover;
+    cursor: pointer;
 }
 .audio_link {
     margin-top: 5px;

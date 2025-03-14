@@ -55,4 +55,9 @@ export class MessageComponent implements OnInit {
         this.messagesService.deleteMessage(this.messageData().message_id)
     }
       
+    openImagePageLink() {
+        const link = this.messageData().attachments
+        if (!link) return
+        window.open(link, '_blank')
+    }
 }
