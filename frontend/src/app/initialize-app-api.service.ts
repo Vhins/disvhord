@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth/auth.service';
+import { environment } from '../environments/environment';
 
 interface user_interface {
     user_id: number,
@@ -27,7 +28,7 @@ export class InitializeAppApiService {
 
 
     async get_basicUserInterfaceData(): Promise<boolean>{
-        const apiURL = `http://${this.IP}/basicUserInterfaceData`
+        const apiURL = `http://${environment.IP}/basicUserInterfaceData`
         const request = {
             method: 'POST',
             headers: {

@@ -1,6 +1,7 @@
 .container {
     color: black;
     text-align: center;
+    word-break: break-all;
 }
 
 .main {
@@ -10,7 +11,7 @@
     padding: 25px;
     background-color: #DEDEDE;
     border-radius: 30px;
-    margin-top: 60px;
+    margin-top: 3%;
     -webkit-box-shadow: 10px -10px 40px 0px #ffffff41, -5px 5px 20px 0px #00000041; 
     box-shadow: 10px -10px 40px 0px #ffffff41, -5px 5px 20px 0px #00000041;
 }
@@ -99,14 +100,6 @@ label {
     border: 1px solid rgb(0, 0, 0);
 }
 
-.checkbox > input[type="checkbox"] {
-    width: 50px;
-    height: 50px;
-    margin: 0px;
-    opacity: 0;
-    cursor: pointer;
-}
-
 .terms {
     display: flex;
     flex-direction: column;
@@ -119,16 +112,14 @@ label {
 .terms > label {
     font-size: 20px;
     font-weight: 600;
-    font-size: 20px;
     margin: 0px;
 }
 
 .terms > a {
-    font-size: 12px !important;
+    font-size: 12px;
     color: #1F31FE;
     font-weight: medium;
     font-weight: 600;
-    font-size: 20px;
 }
 
 .submit {
