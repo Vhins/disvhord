@@ -1,7 +1,7 @@
 .container {
     color: black;
     text-align: center;
-    word-break: break-all;
+    margin: 3% 0%;
 }
 
 .main {
@@ -11,7 +11,6 @@
     padding: 25px;
     background-color: #DEDEDE;
     border-radius: 30px;
-    margin-top: 3%;
     -webkit-box-shadow: 10px -10px 40px 0px #ffffff41, -5px 5px 20px 0px #00000041; 
     box-shadow: 10px -10px 40px 0px #ffffff41, -5px 5px 20px 0px #00000041;
 }
@@ -125,8 +124,8 @@ label {
 .submit {
     max-width: 300px;
     width: 80%;
-    height: 50px;
     font-size: 22px;
+    padding: 10px 0px;
     font-weight: 800;
     border-radius: 10px;
     border: 0px;
