@@ -1,14 +1,15 @@
-
-<div [routerLink]="['/app/home/me']" class="home-container">
-    <div class="server home">
-        <img class="home-icon" src="./assets/home.svg">
-    </div>
-</div>
-
-<div class="server-container">
-    @for (server of getJoinedServers(); track $index) {
-        <div id="server.server_id" class="server"> 
-            <img class="server-icon" [src]="server.logo">
+<div class="main">
+    <div [routerLink]="['/app/home/me']" class="home-container">
+        <div class="server home">
+            <img class="home-icon" src="./assets/home.svg">
         </div>
-    }
+    </div>
+    
+    <div class="server-container">
+        @for (server of getJoinedServers(); track $index) {
+            <div id="server.server_id" class="server"> 
+                <img class="server-icon" [src]="server.logo">
+            </div>
+        }
+    </div>
 </div>

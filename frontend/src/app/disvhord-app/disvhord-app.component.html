@@ -1,14 +1,11 @@
 
 @if (dataResolved === true) {
-    <div style="display: flex; flex-direction: row; width: 100dvw; height: max-content">
-    
-        <div style="width: 107px; height: calc(100dvh - 30px); margin-top: 30px; display: flex; flex-direction: column; align-items: start; margin-left: 15px;">
-            <app-server-list></app-server-list>
-        </div>
-    
-        <router-outlet></router-outlet>
+    <div style="width: 100dvw; display: flex; flex-direction: row; height: max-content">
+        <app-server-list/>
+
+        <router-outlet/>
         
-        <app-notification></app-notification>
+        <app-notification/>
     </div>
 } @else {
     <div style="width: 100dvw; height: 100dvh; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white;">
