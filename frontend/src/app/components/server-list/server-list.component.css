@@ -37,12 +37,12 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    /* width: 60px; */
+    width: 60px;
     padding-left: 12px;
     height: calc(100% - 96px);
     overflow-y: auto; 
     flex-shrink: 0;
-    direction: rtl;
+    direction: rtl; /*? */
 }
 
 .server {
