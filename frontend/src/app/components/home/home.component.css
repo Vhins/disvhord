@@ -4,3 +4,12 @@
     height: 100%;
     display: flex;
 }
+
+.chats-section-container {
+    width: 265px;
+    height: calc(100dvh - 30px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 90px;
+}

@@ -11,7 +11,7 @@ import { ChatService } from '../chat/chat.service';
 export class SideBarChatComponent implements AfterContentChecked{
     user_chat_name!: string
     user_chat_logo!: string
-
+    
     chatService = inject(ChatService)
 
     ngAfterContentChecked() {

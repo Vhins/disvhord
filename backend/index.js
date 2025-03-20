@@ -388,7 +388,7 @@ async function handleApi_basicUserInterfaceData(req, res){
         return
     }
     delete user_interfaceDB._id
-    delete user_interfaceDB.blocked
+    // delete user_interfaceDB.blocked
     delete user_interfaceDB.servers_owned
 
 

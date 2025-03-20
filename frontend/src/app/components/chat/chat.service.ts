@@ -1,4 +1,4 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, Signal, signal } from "@angular/core";
 import { InitializeAppApiService } from "../../initialize-app-api.service";
 import { BehaviorSubject } from "rxjs";
 
@@ -9,6 +9,8 @@ export class ChatService {
     user_id: number //* personal userid
     chat_id!: number
     chat_user_id!: number
+    chat_user_isFriend!: boolean
+    chat_user_isBlocked!: boolean
     users_info: {[key: number]: {id: number, name: string, img: string}} = {}
 
     constructor(private initializeAppApiService: InitializeAppApiService) {
@@ -36,6 +38,18 @@ export class ChatService {
         if (typeof chat_id === "number") {
             this.chat_id = chat_id
             this.chat_user_id = this.initializeAppApiService.user_interface.chats.find(chat => chat.chat_id == this.chat_id)!.chat_user_id
+            
+            if (this.initializeAppApiService.user_interface.friends.find(user => user.user_id === this.chat_user_id)) {
+                this.chat_user_isFriend = true
+            } else {
+                this.chat_user_isFriend = false
+            }
+
+            if (this.initializeAppApiService.user_interface.blocked.find(user => user === this.chat_user_id)) {
+                this.chat_user_isBlocked = true
+            } else {
+                this.chat_user_isBlocked = false
+            }
         } else {
             console.debug('chat personale')
         }

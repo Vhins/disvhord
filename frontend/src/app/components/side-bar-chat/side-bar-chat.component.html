@@ -1,18 +1,28 @@
 
-<div class="chat">
+<div class="wrapper">
     <img class="user_logo" [src]="user_chat_logo">
     <span class="user_name"> {{user_chat_name}} </span>
 </div>
 
-<div class="chat" style="margin-top: 10px;">
+<button>
     <span class="user_name" (click)="callThisChat()"> Chiama </span>
-</div>
-<div class="chat" style="margin-top: 10px;">
-    <span class="user_name"> Aggiungi agli amici </span>
-</div>
-<div class="chat" style="margin-top: 10px;">
-    <span class="user_name"> Rimuovi amicizia </span>
-</div>
-<div class="chat" style="margin-top: 10px;">
-    <span class="user_name"> Blokka billy </span>
-</div>
+</button>
+
+@if (chatService.chat_user_isFriend) {
+    <button>
+        <span class="user_name"> Rimuovi amicizia </span>
+    </button>
+} @else {
+    <button>
+        <span class="user_name"> Aggiungi agli amici </span>
+    </button>
+}
+@if (!chatService.chat_user_isBlocked) {
+    <button>
+        <span class="user_name"> Blocca </span>
+    </button>
+} @else {
+    <button>
+        <span class="user_name"> Sblocca </span>
+    </button>
+}

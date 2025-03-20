@@ -3,12 +3,10 @@
     display: flex;
     flex-direction: column;
     width: 300px;
-    margin-left: 91px; /* 90px  61 */
-    margin-right: 29px; /* 30px */
-    margin-top: 30px;
+    margin-left: 90px;
 }
 
-.chat {
+.wrapper, button {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 5px;
     
@@ -17,6 +15,7 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
+    border: none;
 }
 
 .user_logo {
@@ -28,4 +27,9 @@
 .user_name {
     font-size: 20px;
     font-weight: 600;
+}
+
+button {
+    cursor: pointer;
+    margin-top: 10px;
 }

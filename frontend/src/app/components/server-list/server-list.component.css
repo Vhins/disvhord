@@ -1,33 +1,22 @@
 :host {
-    margin-right: 27px;
-    height: calc(100dvh - 30px); 
-    margin-top: 30px;
+    height: calc(100dvh - 30px);
+    width: 70px;
+    margin-left: -10px;
     display: flex;
     flex-direction: column;
     align-items: start;
-    margin-left: 15px;
-}
-
-.main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-}
-
-.home-container {
-    margin-bottom: 36px;
+    margin-right: 40px;
 }
 
 .home {
     background-image: linear-gradient(90deg, #CE3FCC 0%, #43C2DE 100%);
-    margin-left: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.3s ease-in-out;
 }
 
-.home-icon {
+.home > img {
     width: 35px;
     height: 35px;
 }
@@ -37,15 +26,15 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
-    width: 60px;
-    padding-left: 12px;
     height: calc(100% - 96px);
+    margin-top: 36px;
     overflow-y: auto; 
     flex-shrink: 0;
-    direction: rtl; /*? */
+    direction: rtl;
+    padding-left: 10px;
 }
 
-.server {
+.server-icon-wrapper {
     width: 60px;
     min-height: 60px;
     border-radius: 10px;
@@ -57,9 +46,10 @@
     height: 60px;
     border-radius: 10px;
     opacity: 0.85;
+    transition: all 0.5s ease-in-out;
 }
 
-.server-icon:hover {
+.home:hover, .server-icon:hover {
     border-radius: 15px;
     opacity: 1;
 }

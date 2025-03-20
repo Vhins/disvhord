@@ -1,5 +1,6 @@
 import { Component, ElementRef, Injectable, input, OnInit, viewChild } from '@angular/core';
 import { PeerService } from '../../peer.service';
+import { NgStyle } from '@angular/common';
 
 @Injectable({
     providedIn: 'root'
@@ -7,7 +8,7 @@ import { PeerService } from '../../peer.service';
 @Component({
   selector: 'app-call',
   standalone: true,
-  imports: [],
+  imports: [NgStyle],
   templateUrl: './call.component.html',
   styleUrl: './call.component.css'
 })
@@ -18,7 +19,9 @@ export class CallComponent implements OnInit {
 
     constructor(private peerService: PeerService) {}
 
-    other_user_is_connected: boolean = false
+    localVideoOn = false
+    remoteVideoOn = false
+    other_user_is_connected = false
 
     ngOnInit() {
         this.peerService.localStream$.subscribe(localStream => {
@@ -27,6 +30,7 @@ export class CallComponent implements OnInit {
             this.refLocalVideo().nativeElement.srcObject = localStream
             this.refLocalVideo().nativeElement.muted = true
             this.refLocalVideo().nativeElement.play()
+            this.localVideoOn = true
         })
         
         let remoteStreamCache: MediaStream
@@ -38,6 +42,7 @@ export class CallComponent implements OnInit {
             this.refRemoteVideo().nativeElement.srcObject = remoteStream
             this.refRemoteVideo().nativeElement.muted = false
             this.refRemoteVideo().nativeElement.play()
+            this.remoteVideoOn = true
         })
 
         this.peerService.closeCall$.subscribe(closeCall => {

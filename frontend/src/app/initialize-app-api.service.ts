@@ -9,6 +9,7 @@ interface user_interface {
     user_logo: string,
     friends: Array<{user_id: number, user_displayName: string, user_logo: string}>,
     pending_friend_requests: Array<number>,
+    blocked: Array<number>,
     chats: Array<{chat_id: number, chat_user_id: number, user_displayName: string, user_logo: string}>,
     servers_joined: Array<{server_id: number, name: string, logo: string}>,
     posts: Array<number>,

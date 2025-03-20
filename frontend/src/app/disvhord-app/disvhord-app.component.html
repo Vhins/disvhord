@@ -1,6 +1,6 @@
 
 @if (dataResolved === true) {
-    <div style="width: 100dvw; display: flex; flex-direction: row; height: max-content">
+    <div class="main">
         <app-server-list/>
 
         <router-outlet/>
@@ -8,7 +8,7 @@
         <app-notification/>
     </div>
 } @else {
-    <div style="width: 100dvw; height: 100dvh; display: flex; justify-content: center; align-items: center; flex-direction: column; color: white;">
+    <div class="loadingscreen">
         <img src="favicon.ico" width="48px">
         <h2> Disvhord é stato creato da Vhins! </h2>
     </div>
