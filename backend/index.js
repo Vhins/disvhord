@@ -40,6 +40,9 @@ async function startServer(PORT){
         app.post('/tryToSendFriendRequest', verifyJWT, (req, res) => { handleApi_tryToSendFriendRequest(req, res) })
         app.post('/acceptFriendRequest', verifyJWT, (req, res) => { handleApi_acceptFriendRequest(req, res) })
         app.post('/deleteFriendRequest', verifyJWT, (req, res) => { handleApi_deleteFriendRequest(req, res) })
+        app.post('/removeFriend', verifyJWT, (req, res) => { handleApi_removeFriend(req, res) })
+        app.post('/blockUser', verifyJWT, (req, res) => { handleApi_blockUser(req, res) })
+        app.post('/removeBlockFromUser', verifyJWT, (req, res) => { handleApi_removeBlockFromUser(req, res) })
 
 
         //* Socket.io
@@ -607,8 +610,44 @@ async function handleApi_deleteFriendRequest(req, res) {
     const { friend_user_id } = req.body
     const JWTdata = req.JWTdata
 
-    let succesDeletingRequest = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
-    if (!succesDeletingRequest) {
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+    if (!success) {
+        res.status(404)
+        return
+    }
+    res.status(200)
+}
+
+async function handleApi_removeFriend(req, res) {
+    const { friend_user_id } = req.body
+    const JWTdata = req.JWTdata
+
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friends": {user_id: friend_user_id}} } )
+    if (!success) {
+        res.status(404)
+        return
+    }
+    res.status(200)
+}
+
+async function handleApi_blockUser(req, res) {
+    const { user_id } = req.body
+    const JWTdata = req.JWTdata
+
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $push: { "blocked": {user_id: user_id}} } )
+    if (!success) {
+        res.status(404)
+        return
+    }
+    res.status(200)
+}
+
+async function handleApi_removeBlockFromUser(req, res) {
+    const { user_id } = req.body
+    const JWTdata = req.JWTdata
+
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "blocked": {user_id: user_id}} } )
+    if (!success) {
         res.status(404)
         return
     }
