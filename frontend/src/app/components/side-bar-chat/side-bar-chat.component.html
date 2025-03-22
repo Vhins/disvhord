@@ -19,10 +19,10 @@
 }
 @if (!chatService.chat_user_isBlocked) {
     <button>
-        <span class="user_name"> Blocca </span>
+        <span class="user_name" (click)="blockUser()"> Blocca </span>
     </button>
 } @else {
     <button>
-        <span class="user_name"> Sblocca </span>
+        <span class="user_name" (click)="removeBlockFromUser()"> Sblocca </span>
     </button>
 }
