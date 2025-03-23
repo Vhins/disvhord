@@ -36,7 +36,6 @@ export class FriendListComponent {
         event?.preventDefault()
 
         const input = this.input().nativeElement as HTMLInputElement
-        console.log('input.value', input.value, String(this.initializeAppApiService.user_interface.user_handle))
 
         if (String(this.initializeAppApiService.user_interface.user_handle) == input.value || input.value === "") {
             this.statusFriendRequest = 0

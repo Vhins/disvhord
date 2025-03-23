@@ -25,6 +25,7 @@ export class DataResolver {
                     const STARTED = this.webSocketService.start()
                     if (STARTED === true) {
                         this.notificationsService.listenForNotifications()
+                        this.initializeAppApiService.listenForUserInterfaceChanges()
                         resolve(true)
                     } 
                 } else {

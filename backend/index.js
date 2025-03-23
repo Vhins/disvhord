@@ -174,6 +174,18 @@ async function startServer(PORT){
                 }
             })
 
+            // socket.on('blockUser', async () => {
+            //     const receiverSocketId = users[data.receiver]
+            //     const senderSocketId = users[data.sender]
+
+            //     if (receiverSocketId !== undefined && senderSocketId !== undefined) {
+            //         await db.collection('chats').updateOne( { chat_id: data.chat_id, "messages.message_id": data.message_id }, { $set: { "messages.$.content": data.content }} )
+
+            //         io.to(receiverSocketId).emit('userInterface', {'type': "blocked_user", 'user_id': data.receiver})
+            //     }
+            // })
+
+
         })
 
     }catch(error){
@@ -189,20 +201,17 @@ async function handleApi_userCreateAccount(req, res){
     const { user_email, user_password, user_handle, user_displayName } = req.body
 
     if (!isValidEmail(user_email) || !isValidHandle(user_handle) || !isValidDisplayName(user_displayName)) {
-        res.status(400).json({ message: 'Account non creato, email / handle / displayname non valid' })
-        return
+        return res.sendStatus(400).json({ message: 'Account non creato, email / handle / displayname non valid' })
     }
     
     let isHandleAlredyTakenDB = await db.collection('users_info').findOne({ user_handle: user_handle })
     if (isHandleAlredyTakenDB !== null){
-        res.status(400).json({ message: 'account non creato, handle gia usato'})
-        return
+        return res.sendStatus(400).json({ message: 'account non creato, handle gia usato'})
     }
     
     let isEmailAlredyPresentDB = await db.collection('users_info').findOne({ user_email: user_email })
     if (isEmailAlredyPresentDB !== null){
-        res.status(400).json({ message: 'account non creato, email gia registrata'})
-        return
+        return res.sendStatus(400).json({ message: 'account non creato, email gia registrata'})
     }
 
 
@@ -238,12 +247,10 @@ async function handleApi_userCreateAccount(req, res){
     const op2 = await db.collection('users_interface').insertOne(user_interface_doc)
 
     if(op.acknowledged == false || op == null && op2.acknowledged == false || op2 == null){
-        res.status(404).json({ message: 'Errore del server, account non creato'})
-        return
+        return res.status(404).json({ message: 'Errore del server, account non creato'})
     }
 
     res.status(201).json({ message: 'account creato correttamente', token: new_token, id: new_user_id})
-    
 }
 
 
@@ -255,14 +262,12 @@ async function handleApi_userLogin(req, res){
     const { email, password } = req.body
 
     if(password == null || password == null){
-        res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
-        return
+        return res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
     }
 
     const userDB = await db.collection('users_info').findOne({ user_email: email })
     if(userDB == null){
-        res.status(400).json({ message: 'Dati inviati nulli' })
-        return
+        return res.status(400).json({ message: 'Dati inviati nulli' })
     }
 
     let comparePassword = await compare(password, userDB.user_password)
@@ -272,9 +277,9 @@ async function handleApi_userLogin(req, res){
 
         await db.collection('users_info').updateOne({ user_id: userDB.user_id }, {$set: {token: newToken}})
 
-        res.status(200).json({ message: 'Loggato con successo!', token: newToken, id: userDB.user_id})
+        return res.status(200).json({ message: 'Loggato con successo!', token: newToken, id: userDB.user_id})
     }else{
-        res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
+        return res.status(401).json({ message: 'Credenziali errate/ Utente inesistente' })
     }
 
 }
@@ -282,13 +287,18 @@ async function handleApi_userLogin(req, res){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const cacheJWT = {}
 
 async function verifyJWT(req, res, next){
     const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: "Token non fornito o malformato!" })
+    }
+    const token = authHeader.split(' ')[1]
 
-    if (!token) {
-        return res.status(401).json({ error: "Token non fornito!" })
+    if (cacheJWT[token]) {
+        req.JWTdata = cacheJWT[token]
+        return next()
     }
 
     try {
@@ -298,19 +308,20 @@ async function verifyJWT(req, res, next){
         const user_info = await db.collection('users_info').findOne({user_id: Number(decoded.user_id)})
 
         if (user_info === null){
-            res.status(404).json({ message: 'Utente non trovato' })
-            return
+            return res.status(404).json({ message: 'Utente non trovato' })
         }
     
-        if (user_info.token === token){
-            next()
+        if (user_info.token !== token){
+            return res.status(401).json({ message: 'Token non valido' })
         } else {
-            res.status(401).json({ message: 'Token non valido' })
-            return
+            cacheJWT[token] = decoded
+            return next()
         }
+
     } catch (error) {
         return res.status(403).json({ error: "Token non valido!" })
     }
+
 }
 
 
@@ -322,8 +333,7 @@ async function handleApi_checkUserTokenValidity(req, res){
     const user_info = await db.collection('users_info').findOne({user_id: Number(user_id)})
     
     if (user_info === null){
-        res.status(404).json({ message: 'Utente non trovato' })
-        return
+        return res.status(404).json({ message: 'Utente non trovato' })
     }
 
     if (user_info.token === privateToken){
@@ -381,14 +391,12 @@ async function handleApi_basicUserInterfaceData(req, res){
     const { user_id } = req.body
 
     if (user_id === null) {
-        res.status(404).json({ message: 'nessun id fornito' })
-        return
+        return res.status(404).json({ message: 'nessun id fornito' })
     }
 
     const user_interfaceDB = await db.collection('users_interface').findOne({ user_id: Number(user_id) })
     if (user_interfaceDB === null) {
-        res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
-        return
+        return res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
     }
     delete user_interfaceDB._id
     // delete user_interfaceDB.blocked
@@ -466,7 +474,6 @@ async function handleApi_basicUserInterfaceData(req, res){
         res.status(200).json({ message: 'user esistente dati_interface ottenuti', user_interfaceDB: user_interfaceDB })
     }else{
         res.status(401).json({ message: 'user non esistente nel database' })
-        return
     }
 }
 
@@ -479,8 +486,7 @@ async function handleApi_ChatInfoMessages(req, res) {
     const JWTdata = req.JWTdata
 
     if (chat_id === null || chat_id === undefined) {
-        res.status(404).json({ message: 'chat_id non fornito' })
-        return
+        return res.status(404).json({ message: 'chat_id non fornito' })
     }
 
     const loadMoreMessages = -50 * loadMessage
@@ -497,7 +503,6 @@ async function handleApi_ChatInfoMessages(req, res) {
         chatMessages: chat_info.messages, 
         chatInfo: {user_id: user_chat_info.user_id, user_displayName: user_chat_info.user_displayName, user_logo: user_chat_info.user_logo}}
     )
-    return
 }
 
 
@@ -511,13 +516,11 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
     const friend_user = await db.collection('users_info').findOne({ user_handle: friend_user_handle })
     
     if (!friend_user) {
-        res.status(404).json({ statusFriendRequest: 2 })
-        return
+        return res.status(404).json({ statusFriendRequest: 2 })
     }
 
     if (JWTdata.user_id == friend_user.user_id) {
-        res.status(403).json({ statusFriendRequest: 6 })
-        return
+        return res.status(403).json({ statusFriendRequest: 6 })
     }
 
     const friend_user_interface = await db.collection('users_interface').findOne({ user_handle: friend_user_handle })
@@ -525,8 +528,7 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
     if (friend_user_interface.friends) {
         for(let friend of friend_user_interface.friends) {
             if (friend == JWTdata.user_id) {
-                res.status(402).json({ statusFriendRequest: 4 })
-                return
+                return res.status(402).json({ statusFriendRequest: 4 })
             }
         }
     }
@@ -535,8 +537,7 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
         if (friend_user_interface.notifications.friend_request) {
             for(let {user_id} of friend_user_interface.notifications.friend_request) {
                 if (user_id == JWTdata.user_id) {
-                    res.status(401).json({ statusFriendRequest: 3 })
-                    return
+                    return res.status(401).json({ statusFriendRequest: 3 })
                 }
             }
         }
@@ -546,8 +547,7 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
         if (friend_user_interface.blocked) {
             for(let user_id of friend_user_interface.blocked) {
                 if (user_id == JWTdata.user_id) {
-                    res.status(405).json({ statusFriendRequest: 5 })
-                    return
+                    return res.status(405).json({ statusFriendRequest: 5 })
                 }
             }
         }
@@ -559,12 +559,10 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
     )
 
     if (!sendRequest) {
-        res.status(500).json({ statusFriendRequest: 0 })
-        return
+        return res.status(500).json({ statusFriendRequest: 0 })
     }
 
     res.status(200).json({ statusFriendRequest: 1 })
-    return
 }
 
 
@@ -603,7 +601,6 @@ async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requ
 
 
     res.status(200).json( {user_id: friend_user_interface.user_id, user_displayName: friend_user_interface.displayName, user_logo: friend_user_interface.user_logo} )
-    return
 }
 
 async function handleApi_deleteFriendRequest(req, res) {
@@ -612,10 +609,9 @@ async function handleApi_deleteFriendRequest(req, res) {
 
     let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
     if (!success) {
-        res.status(404)
-        return
+        return res.sendStatus(404)
     }
-    res.status(200)
+    res.sendStatus(200)
 }
 
 async function handleApi_removeFriend(req, res) {
@@ -623,35 +619,43 @@ async function handleApi_removeFriend(req, res) {
     const JWTdata = req.JWTdata
 
     let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friends": {user_id: friend_user_id}} } )
-    if (!success) {
-        res.status(404)
-        return
+    if (!success.acknowledged) {
+        return res.sendStatus(404)
     }
-    res.status(200)
+
+    res.sendStatus(200)
 }
 
 async function handleApi_blockUser(req, res) {
     const { user_id } = req.body
     const JWTdata = req.JWTdata
+    console.log('aa', JWTdata)
 
-    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $push: { "blocked": {user_id: user_id}} } )
-    if (!success) {
-        res.status(404)
-        return
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $push: { "blocked": user_id } } )
+    if (!success.acknowledged) {
+        return res.sendStatus(404)
     }
-    res.status(200)
+    
+    const senderSocketId = users[JWTdata.user_id]
+    if (senderSocketId !== undefined) {
+        console.log('senderSocketId', senderSocketId, user_id)
+        io.to(senderSocketId).emit('userInterface', {'type': "blocked_user", 'user_id': user_id})
+        return res.sendStatus(200)
+    }
+
+    res.sendStatus(500)
 }
 
 async function handleApi_removeBlockFromUser(req, res) {
     const { user_id } = req.body
     const JWTdata = req.JWTdata
 
-    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "blocked": {user_id: user_id}} } )
-    if (!success) {
-        res.status(404)
-        return
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "blocked": user_id } } )
+    if (!success.acknowledged) {
+        return res.sendStatus(404)
     }
-    res.status(200)
+
+    res.sendStatus(200)
 }
 
 function sanitizeMessage(message) {

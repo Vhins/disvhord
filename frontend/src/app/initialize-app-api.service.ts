@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth/auth.service';
 import { environment } from '../environments/environment';
+import { WebSocketService } from './web-socket.service';
 
 interface user_interface {
     user_id: number,
@@ -22,7 +23,7 @@ interface user_interface {
 export class InitializeAppApiService {
     IP: string = "localhost:3333"  
 
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService, private webSocketService: WebSocketService) {}
 
     private _user_interface!: user_interface
     get user_interface(): user_interface { return this._user_interface }
@@ -53,6 +54,26 @@ export class InitializeAppApiService {
         .catch(error =>{
             console.error(error)
             return false
+        })
+    }
+
+    listenForUserInterfaceChanges() {
+        this.webSocketService.on("userInterface").subscribe(data => {
+            console.debug('userInterface', data)
+            switch(data.type) {
+                case 'friends':
+
+                    break
+                case 'pending_friend_requests':
+
+                    break
+                case 'blocked_user':
+                    this._user_interface.blocked.push(data.user_id)
+                    break
+                case 'unblocked_user':
+                    this._user_interface.blocked.filter(user_id => user_id !== data.user_id)
+                    break
+            }
         })
     }
 

@@ -36,12 +36,12 @@ export class SideBarChatComponent implements AfterContentChecked{
                 'user_id': this.user_id
             })
         }).then( res => {
-            console.debug(res.ok)
+            this.chatService.chat_user_isBlocked = true
         })
     }
 
     removeBlockFromUser() {
-        fetch('http://localhost:3333/removeBlockUser', {
+        fetch('http://localhost:3333/removeBlockFromUser', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export class SideBarChatComponent implements AfterContentChecked{
                 'user_id': this.user_id
             })
         }).then( res => {
-            console.debug(res.ok)
+            this.chatService.chat_user_isBlocked = false
         })
     }
 }
