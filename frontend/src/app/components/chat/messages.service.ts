@@ -14,7 +14,7 @@ export class MessagesService {
     get messages () { return this._messages }
     set messages (new_messages) { this._messages = new_messages}
 
-    user_id: number = this.initializeAppApiService.user_interface.user_id //* personal userid
+    user_id: number = this.initializeAppApiService.user_interface.user_id
     chat_id!: number
     chat_user_id!: number
 
