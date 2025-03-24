@@ -615,21 +615,29 @@ async function handleApi_deleteFriendRequest(req, res) {
 }
 
 async function handleApi_removeFriend(req, res) {
-    const { friend_user_id } = req.body
+    const { user_id } = req.body
     const JWTdata = req.JWTdata
 
-    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friends": {user_id: friend_user_id}} } )
-    if (!success.acknowledged) {
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friends": user_id } } )
+    let success2 = await db.collection('users_interface').updateOne( { user_id: user_id }, { $pull: { "friends": JWTdata.user_id } } )
+    if (!success.acknowledged && !success2.acknowledged) {
         return res.sendStatus(404)
     }
 
-    res.sendStatus(200)
+    const senderSocketId = users[JWTdata.user_id]
+    const receiverSocketId = users[user_id]
+    if (senderSocketId !== undefined || receiverSocketId !== undefined) {
+        io.to(senderSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': user_id})
+        io.to(receiverSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': JWTdata.user_id})
+        return res.sendStatus(200)
+    }
+
+    res.sendStatus(500)
 }
 
 async function handleApi_blockUser(req, res) {
     const { user_id } = req.body
     const JWTdata = req.JWTdata
-    console.log('aa', JWTdata)
 
     let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $push: { "blocked": user_id } } )
     if (!success.acknowledged) {
@@ -638,7 +646,6 @@ async function handleApi_blockUser(req, res) {
     
     const senderSocketId = users[JWTdata.user_id]
     if (senderSocketId !== undefined) {
-        console.log('senderSocketId', senderSocketId, user_id)
         io.to(senderSocketId).emit('userInterface', {'type': "blocked_user", 'user_id': user_id})
         return res.sendStatus(200)
     }
@@ -655,7 +662,13 @@ async function handleApi_removeBlockFromUser(req, res) {
         return res.sendStatus(404)
     }
 
-    res.sendStatus(200)
+    const senderSocketId = users[JWTdata.user_id]
+    if (senderSocketId !== undefined) {
+        io.to(senderSocketId).emit('userInterface', {'type': "unblocked_user", 'user_id': user_id})
+        return res.sendStatus(200)
+    }
+
+    res.sendStatus(500)
 }
 
 function sanitizeMessage(message) {

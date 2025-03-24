@@ -61,8 +61,11 @@ export class InitializeAppApiService {
         this.webSocketService.on("userInterface").subscribe(data => {
             console.debug('userInterface', data)
             switch(data.type) {
-                case 'friends':
-
+                case 'added_friend':
+                    this._user_interface.friends.push(data.user_id)
+                    break
+                case 'removed_friend':
+                    this._user_interface.friends = this._user_interface.friends.filter(user_id => user_id.user_id !== Number(data.user_id))
                     break
                 case 'pending_friend_requests':
 
@@ -71,7 +74,7 @@ export class InitializeAppApiService {
                     this._user_interface.blocked.push(data.user_id)
                     break
                 case 'unblocked_user':
-                    this._user_interface.blocked.filter(user_id => user_id !== data.user_id)
+                    this._user_interface.blocked = this._user_interface.blocked.filter(user_id => user_id !== Number(data.user_id))
                     break
             }
         })

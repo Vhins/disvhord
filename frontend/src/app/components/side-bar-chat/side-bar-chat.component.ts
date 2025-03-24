@@ -15,6 +15,8 @@ export class SideBarChatComponent implements AfterContentChecked{
     
     chatService = inject(ChatService)
 
+    friendRequestSend = false
+
     ngAfterContentChecked() {
         this.user_chat_name = this.chatService.users_info[this.chatService.chat_user_id]?.name
         this.user_chat_logo = this.chatService.users_info[this.chatService.chat_user_id]?.img
@@ -53,5 +55,39 @@ export class SideBarChatComponent implements AfterContentChecked{
         }).then( res => {
             this.chatService.chat_user_isBlocked = false
         })
+    }
+
+    removeFriend() {
+        fetch('http://localhost:3333/removeFriend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
+            },
+            body: JSON.stringify({
+                'friend_user_handle': this.user_id
+            })
+        }).then( res => {
+            this.chatService.chat_user_isFriend = false
+        })
+    }
+
+    sendFriendRequest() {
+        fetch('http://localhost:3333/tryToSendFriendRequest', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
+            },
+            body: JSON.stringify({
+                'friend_user_handle': this.user_id
+            })
+        }).then( res => {
+            this.friendRequestSend = true
+        })
+    }
+
+    removeFriendRequest() {
+        this.friendRequestSend = false
     }
 }
