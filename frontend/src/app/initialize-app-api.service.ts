@@ -61,7 +61,7 @@ export class InitializeAppApiService {
         this.webSocketService.on("userInterface").subscribe(data => {
             console.debug('userInterface', data)
             switch(data.type) {
-                case 'added_friend':
+                case 'add_friend':
                     this._user_interface.friends.push(data.user_id)
                     break
                 case 'removed_friend':

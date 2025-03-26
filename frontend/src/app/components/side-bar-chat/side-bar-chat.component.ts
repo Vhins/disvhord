@@ -73,6 +73,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     }
 
     sendFriendRequest() {
+        console.log('this.user_idthis.user_id', this.user_id)
         fetch('http://localhost:3333/tryToSendFriendRequest', {
             method: 'POST',
             headers: {
@@ -80,7 +81,7 @@ export class SideBarChatComponent implements AfterContentChecked{
                 'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
             },
             body: JSON.stringify({
-                'friend_user_handle': this.user_id
+                'friend_user_handle': this.user_chat_name
             })
         }).then( res => {
             this.friendRequestSend = true

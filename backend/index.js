@@ -174,18 +174,6 @@ async function startServer(PORT){
                 }
             })
 
-            // socket.on('blockUser', async () => {
-            //     const receiverSocketId = users[data.receiver]
-            //     const senderSocketId = users[data.sender]
-
-            //     if (receiverSocketId !== undefined && senderSocketId !== undefined) {
-            //         await db.collection('chats').updateOne( { chat_id: data.chat_id, "messages.message_id": data.message_id }, { $set: { "messages.$.content": data.content }} )
-
-            //         io.to(receiverSocketId).emit('userInterface', {'type': "blocked_user", 'user_id': data.receiver})
-            //     }
-            // })
-
-
         })
 
     }catch(error){
@@ -599,6 +587,16 @@ async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requ
     await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $set: { friends:  my_user_interface.friends }} )
     await db.collection('users_interface').updateOne( { user_id: friend_user_id}, { $set: { friends:  friend_user_interface.friends }} )
 
+    const senderSocketId = users[JWTdata.user_id]
+    const receiverSocketId = users[friend_user_id]
+    if (receiverSocketId !== undefined) {        
+        io.to(receiverSocketId).emit('userInterface', {'type': "add_friend", 'user_id': JWTdata.user_id})
+    }
+    if (senderSocketId !== undefined) {
+        io.to(senderSocketId).emit('userInterface', {'type': "add_friend", 'user_id': friend_user_id})
+        return res.sendStatus(200)
+    }
+
 
     res.status(200).json( {user_id: friend_user_interface.user_id, user_displayName: friend_user_interface.displayName, user_logo: friend_user_interface.user_logo} )
 }
@@ -626,14 +624,18 @@ async function handleApi_removeFriend(req, res) {
 
     const senderSocketId = users[JWTdata.user_id]
     const receiverSocketId = users[user_id]
-    if (senderSocketId !== undefined || receiverSocketId !== undefined) {
-        io.to(senderSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': user_id})
+    if (receiverSocketId !== undefined) {        
         io.to(receiverSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': JWTdata.user_id})
+    }
+    if (senderSocketId !== undefined) {
+        io.to(senderSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': user_id})
         return res.sendStatus(200)
     }
 
     res.sendStatus(500)
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function handleApi_blockUser(req, res) {
     const { user_id } = req.body
@@ -658,7 +660,8 @@ async function handleApi_removeBlockFromUser(req, res) {
     const JWTdata = req.JWTdata
 
     let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "blocked": user_id } } )
-    if (!success.acknowledged) {
+    let success2 = await db.collection('users_interface').updateOne( { user_id: user_id }, { $pull: { "blocked": JWTdata.user_id  } } )
+    if (!success.acknowledged && !success2.acknowledged) {
         return res.sendStatus(404)
     }
 
@@ -670,6 +673,8 @@ async function handleApi_removeBlockFromUser(req, res) {
 
     res.sendStatus(500)
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function sanitizeMessage(message) {
     return message
