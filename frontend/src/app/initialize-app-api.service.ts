@@ -68,7 +68,7 @@ export class InitializeAppApiService {
                     this._user_interface.friends = this._user_interface.friends.filter(user_id => user_id.user_id !== Number(data.user_id))
                     break
                 case 'pending_friend_requests':
-
+                    // this._user_interface.notifications = this._user_interface.notifications.friend_request.push()
                     break
                 case 'blocked_user':
                     this._user_interface.blocked.push(data.user_id)
