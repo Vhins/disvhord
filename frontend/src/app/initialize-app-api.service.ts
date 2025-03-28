@@ -62,13 +62,14 @@ export class InitializeAppApiService {
             console.debug('userInterface', data)
             switch(data.type) {
                 case 'add_friend':
-                    this._user_interface.friends.push(data.user_id)
+                    this._user_interface.friends.push({user_id: data.user_id, user_displayName: data.user_displayName, user_logo: data.user_logo})
                     break
                 case 'removed_friend':
                     this._user_interface.friends = this._user_interface.friends.filter(user_id => user_id.user_id !== Number(data.user_id))
                     break
                 case 'pending_friend_requests':
-                    // this._user_interface.notifications = this._user_interface.notifications.friend_request.push()
+                    const friend_requests = { user_id: data.user_id, user_handle: data.user_handle, user_logo: data.user_logo, timestamp: data.timestamp }
+                    this._user_interface.notifications.friend_request.push(friend_requests)
                     break
                 case 'blocked_user':
                     this._user_interface.blocked.push(data.user_id)

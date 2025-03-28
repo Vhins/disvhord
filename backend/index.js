@@ -541,13 +541,23 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
         }
     }
 
+    const timestamp = new Date()
+
     const sendRequest = await db.collection('users_interface').updateOne(
         {user_id: friend_user.user_id}, 
-        { $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: new Date() } }} 
+        { $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: timestamp } }} 
     )
 
     if (!sendRequest) {
         return res.status(500).json({ statusFriendRequest: 0 })
+    }
+
+    const receiverSocketId = users[friend_user.user_id]
+    if (receiverSocketId !== undefined) {       
+        const user_interface = await db.collection('users_interface').findOne({ user_id: Number(JWTdata.user_id) }) 
+        io.to(receiverSocketId).emit('userInterface', {'type': "pending_friend_requests", 
+            'user_id': JWTdata.user_id, 'user_handle': user_interface.user_handle, 'user_logo': user_interface.user_logo, 'timestamp': timestamp 
+        })
     }
 
     res.status(200).json({ statusFriendRequest: 1 })
@@ -590,15 +600,19 @@ async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requ
     const senderSocketId = users[JWTdata.user_id]
     const receiverSocketId = users[friend_user_id]
     if (receiverSocketId !== undefined) {        
-        io.to(receiverSocketId).emit('userInterface', {'type': "add_friend", 'user_id': JWTdata.user_id})
+        io.to(receiverSocketId).emit('userInterface', {'type': "add_friend", 
+            'user_id': JWTdata.user_id, 'user_displayName': my_user_interface.user_displayName, 'user_logo': my_user_interface.user_logo
+        })
     }
     if (senderSocketId !== undefined) {
-        io.to(senderSocketId).emit('userInterface', {'type': "add_friend", 'user_id': friend_user_id})
+        io.to(receiverSocketId).emit('userInterface', {'type': "add_friend", 
+            'user_id': friend_user_id, 'user_displayName': friend_user_interface.user_displayName, 'user_logo': friend_user_interface.user_logo
+        })
         return res.sendStatus(200)
     }
 
 
-    res.status(200).json( {user_id: friend_user_interface.user_id, user_displayName: friend_user_interface.displayName, user_logo: friend_user_interface.user_logo} )
+    res.status(200).json( {user_id: friend_user_interface.user_id, user_displayName: friend_user_interface.user_displayName, user_logo: friend_user_interface.user_logo} )
 }
 
 async function handleApi_deleteFriendRequest(req, res) {
@@ -613,22 +627,22 @@ async function handleApi_deleteFriendRequest(req, res) {
 }
 
 async function handleApi_removeFriend(req, res) {
-    const { user_id } = req.body
+    const { friend_user_handle } = req.body
     const JWTdata = req.JWTdata
 
-    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friends": user_id } } )
-    let success2 = await db.collection('users_interface').updateOne( { user_id: user_id }, { $pull: { "friends": JWTdata.user_id } } )
+    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friends": friend_user_handle } } )
+    let success2 = await db.collection('users_interface').updateOne( { user_id: friend_user_handle }, { $pull: { "friends": JWTdata.user_id } } )
     if (!success.acknowledged && !success2.acknowledged) {
         return res.sendStatus(404)
     }
 
     const senderSocketId = users[JWTdata.user_id]
-    const receiverSocketId = users[user_id]
+    const receiverSocketId = users[friend_user_handle]
     if (receiverSocketId !== undefined) {        
         io.to(receiverSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': JWTdata.user_id})
     }
     if (senderSocketId !== undefined) {
-        io.to(senderSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': user_id})
+        io.to(senderSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': friend_user_handle})
         return res.sendStatus(200)
     }
 
