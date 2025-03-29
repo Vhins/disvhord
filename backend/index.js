@@ -544,8 +544,8 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
     const timestamp = new Date()
 
     const sendRequest = await db.collection('users_interface').updateOne(
-        {user_id: friend_user.user_id}, 
-        { $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: timestamp } }} 
+        { user_id: friend_user.user_id }, 
+        { $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: timestamp, user_handle: 'prova', user_logo: ''} }} 
     )
 
     if (!sendRequest) {
