@@ -68,12 +68,11 @@ export class SideBarChatComponent implements AfterContentChecked{
                 'friend_user_handle': this.user_id
             })
         }).then( res => {
-            this.chatService.chat_user_isFriend = false
+            this.chatService.chat_user_isFriend.set(false)
         })
     }
 
     sendFriendRequest() {
-        console.log('this.user_idthis.user_id', this.user_id)
         fetch('http://localhost:3333/tryToSendFriendRequest', {
             method: 'POST',
             headers: {

@@ -11,6 +11,8 @@ export type NotificationType = "call" | "message" | "friend_req" | "server_invit
 export class NotificationsService {
     readonly showNotification$ = new BehaviorSubject<{type: NotificationType, sender: number} | null>(null)
     readonly incomingCall$ = new BehaviorSubject<any | null>(null)
+    readonly FriendAdded$ = new BehaviorSubject<number | null>(null)
+    readonly FriendRemoved$ = new BehaviorSubject<number | null>(null)
 
     private webSocketService = inject(WebSocketService)
     user_id = Number(localStorage.getItem("user_id"))
@@ -24,6 +26,19 @@ export class NotificationsService {
         this.webSocketService.on("personal_call_started").subscribe(data => {
             this.incomingCall$.next(data)
             this.showNotification$.next({type: "call", sender: data.sender})
+        })
+        this.webSocketService.on("userInterface").subscribe(data => {
+            switch(data.type) {
+                case 'add_friend':
+                    this.FriendAdded$.next(data.user_id)
+                    break
+                case 'removed_friend':
+                    this.FriendRemoved$.next(data.user_id)
+                    break
+                case 'pending_friend_requests':
+                    
+                    break
+            }
         })
     }
   

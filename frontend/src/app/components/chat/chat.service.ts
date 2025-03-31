@@ -1,6 +1,7 @@
 import { Injectable, Signal, signal } from "@angular/core";
 import { InitializeAppApiService } from "../../initialize-app-api.service";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, single } from "rxjs";
+import { NotificationsService } from "../../notifications.service";
 
 @Injectable({
     providedIn: 'root'
@@ -9,13 +10,26 @@ export class ChatService {
     user_id: number //* personal userid
     chat_id!: number
     chat_user_id!: number
-    chat_user_isFriend!: boolean
+    chat_user_isFriend = signal<boolean | null>(null)
     chat_user_isBlocked!: boolean
     users_info: {[key: number]: {id: number, name: string, img: string}} = {}
 
-    constructor(private initializeAppApiService: InitializeAppApiService) {
+    constructor(private initializeAppApiService: InitializeAppApiService, private notificationsService: NotificationsService) {
         this.user_id = this.initializeAppApiService.user_interface.user_id
         this.setMyInfo()
+
+        this.notificationsService.FriendAdded$.subscribe( data => {
+            if (!data) return
+            else if (data === this.chat_user_id) {
+                this.chat_user_isFriend.set(true)
+            }
+        })
+        this.notificationsService.FriendRemoved$.subscribe( data => {
+            if (!data) return
+            else if (data === this.chat_user_id) {
+                this.chat_user_isFriend.set(false)
+            }
+        })
     }
 
     currentEditingMessageText$ = new BehaviorSubject<string>('')
@@ -40,9 +54,9 @@ export class ChatService {
             this.chat_user_id = this.initializeAppApiService.user_interface.chats.find(chat => chat.chat_id == this.chat_id)!.chat_user_id
             
             if (this.initializeAppApiService.user_interface.friends.find(user => user.user_id === this.chat_user_id)) {
-                this.chat_user_isFriend = true
+                this.chat_user_isFriend.set(true)
             } else {
-                this.chat_user_isFriend = false
+                this.chat_user_isFriend.set(false)
             }
 
             if (this.initializeAppApiService.user_interface.blocked.find(user => user === this.chat_user_id)) {

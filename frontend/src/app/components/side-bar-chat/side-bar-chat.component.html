@@ -8,12 +8,12 @@
     <span class="user_name"> Chiama </span>
 </button>
 
-@if (chatService.chat_user_isFriend && !friendRequestSend) {
+@if (chatService.chat_user_isFriend() && !friendRequestSend) {
     <button (click)="removeFriend()">
         <span class="user_name"> Rimuovi amicizia </span>
     </button>
 }
-@if (!chatService.chat_user_isFriend && !friendRequestSend){
+@if (!chatService.chat_user_isFriend() && !friendRequestSend){
     <button (click)="sendFriendRequest()">
         <span class="user_name"> Aggiungi agli amici </span>
     </button>
