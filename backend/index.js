@@ -228,7 +228,8 @@ async function handleApi_userCreateAccount(req, res){
         "servers_joined": [],
         "servers_owned": [],
         "posts": [],
-        "notifications": {}
+        "notifications": {},
+        "friend_requests_sent": []
     }
 
     const op = await db.collection('users_info').insertOne(user_info_doc)
@@ -545,10 +546,14 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
 
     const sendRequest = await db.collection('users_interface').updateOne(
         { user_id: friend_user.user_id }, 
-        { $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: timestamp, user_handle: 'prova', user_logo: ''} }} 
+        {  $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: timestamp, user_handle: 'prova', user_logo: ''} } } 
+    )
+    const recognizeRequest = await db.collection('users_interface').updateOne(
+        { user_id: JWTdata.user_id }, 
+        { $push: {"friend_requests_sent": friend_user.user_id } } 
     )
 
-    if (!sendRequest) {
+    if (!sendRequest || !recognizeRequest) {
         return res.status(500).json({ statusFriendRequest: 0 })
     }
 
@@ -593,10 +598,12 @@ async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requ
     my_user_interface.friends.push(Number(friend_user_id))
 
     await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
-
+    
     await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $set: { friends:  my_user_interface.friends }} )
     await db.collection('users_interface').updateOne( { user_id: friend_user_id}, { $set: { friends:  friend_user_interface.friends }} )
 
+    await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "friend_requests_sent": JWTdata.user_id } } )
+    
     const senderSocketId = users[JWTdata.user_id]
     const receiverSocketId = users[friend_user_id]
     if (receiverSocketId !== undefined) {        

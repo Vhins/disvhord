@@ -12,6 +12,8 @@ export class ChatService {
     chat_user_id!: number
     chat_user_isFriend = signal<boolean | null>(null)
     chat_user_isBlocked!: boolean
+    chat_user_friendRequestSend!: boolean
+    chat_user_friendRequestSendAcceptOrDecline!: boolean
     users_info: {[key: number]: {id: number, name: string, img: string}} = {}
 
     constructor(private initializeAppApiService: InitializeAppApiService, private notificationsService: NotificationsService) {
@@ -21,13 +23,16 @@ export class ChatService {
         this.notificationsService.FriendAdded$.subscribe( data => {
             if (!data) return
             else if (data === this.chat_user_id) {
+                this.chat_user_friendRequestSend = false
                 this.chat_user_isFriend.set(true)
+                console.log('truerueuutueer')
             }
         })
         this.notificationsService.FriendRemoved$.subscribe( data => {
             if (!data) return
             else if (data === this.chat_user_id) {
                 this.chat_user_isFriend.set(false)
+                console.log('faklzlzleeeasee')
             }
         })
     }
@@ -63,6 +68,18 @@ export class ChatService {
                 this.chat_user_isBlocked = true
             } else {
                 this.chat_user_isBlocked = false
+            }
+            
+            if (this.initializeAppApiService.user_interface.friend_requests_sent.find(user => user === this.chat_user_id)) {
+                this.chat_user_friendRequestSend = true
+            } else {
+                this.chat_user_friendRequestSend = false
+            }
+            
+            if (this.initializeAppApiService.user_interface.notifications.friend_request.find(user => user.user_id === this.chat_user_id)) {
+                this.chat_user_friendRequestSendAcceptOrDecline = true
+            } else {
+                this.chat_user_friendRequestSendAcceptOrDecline = false
             }
         } else {
             console.debug('chat personale')
