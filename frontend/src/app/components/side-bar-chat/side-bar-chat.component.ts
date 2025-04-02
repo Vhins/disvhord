@@ -12,7 +12,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     user_chat_name!: string
     user_chat_logo!: string
     user_id!: number
-    
+
     chatService = inject(ChatService)
 
     ngAfterContentChecked() {
@@ -24,7 +24,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     async callThisChat() {
         this.chatService.callThisChatNow()
     }
-    
+
     blockUser() {
         fetch('http://localhost:3333/blockUser', {
             method: 'POST',
