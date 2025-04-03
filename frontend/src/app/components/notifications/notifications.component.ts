@@ -53,6 +53,8 @@ export class NotificationsComponent {
             })
         }).then( () => {
             console.debug('tolta richiesta amicizia!')
+            const filtered = this.initializeAppService.user_interface.notifications.friend_request.filter(user => user.user_id !== friend_user_id)
+            this.initializeAppService.user_interface.notifications.friend_request = filtered
         })
     }
 
