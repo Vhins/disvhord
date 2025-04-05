@@ -25,14 +25,12 @@ export class ChatService {
             else if (data === this.chat_user_id) {
                 this.chat_user_friendRequestSend = false
                 this.chat_user_isFriend.set(true)
-                console.log('truerueuutueer')
             }
         })
         this.notificationsService.FriendRemoved$.subscribe( data => {
             if (!data) return
             else if (data === this.chat_user_id) {
                 this.chat_user_isFriend.set(false)
-                console.log('faklzlzleeeasee')
             }
         })
     }

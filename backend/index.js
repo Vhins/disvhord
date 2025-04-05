@@ -615,7 +615,6 @@ async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requ
         io.to(senderSocketId).emit('userInterface', {'type': "add_friend", 
             'user_id': friend_user_id, 'user_displayName': friend_user_interface.user_displayName, 'user_logo': friend_user_interface.user_logo
         })
-        return res.sendStatus(200)
     }
 
 

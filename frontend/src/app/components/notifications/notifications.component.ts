@@ -35,8 +35,9 @@ export class NotificationsComponent {
         }).then( res => {
             res.json().then( resjson => {
                 this.initializeAppService.user_interface.friends.push(
-                    {user_id: resjson.friendInfo.user_id, user_displayName: resjson.friendInfo.displayName, user_logo: resjson.friendInfo.user_logo}
+                    {user_id: resjson.user_id, user_displayName: resjson.displayName, user_logo: resjson.user_logo}
                 )
+                this.removeFriendRequestNotification(friend_user_id)
             })
         })
     }
@@ -52,13 +53,15 @@ export class NotificationsComponent {
                 'friend_user_id': friend_user_id
             })
         }).then( () => {
-            console.debug('tolta richiesta amicizia!')
-            const filtered = this.initializeAppService.user_interface.notifications.friend_request.filter(user => user.user_id !== friend_user_id)
-            this.initializeAppService.user_interface.notifications.friend_request = filtered
-            this.friend_request = filtered
+            this.removeFriendRequestNotification(friend_user_id)
         })
     }
 
+    removeFriendRequestNotification(friend_user_id: number) {
+        const filtered = this.initializeAppService.user_interface.notifications.friend_request.filter(user => user.user_id !== friend_user_id)
+        this.initializeAppService.user_interface.notifications.friend_request = filtered
+        this.friend_request = filtered
+    }
 
 
 }
