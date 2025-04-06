@@ -13,6 +13,7 @@ export class NotificationsService {
     readonly incomingCall$ = new BehaviorSubject<any | null>(null)
     readonly FriendAdded$ = new BehaviorSubject<number | null>(null)
     readonly FriendRemoved$ = new BehaviorSubject<number | null>(null)
+    readonly NewFriendRequest$ = new BehaviorSubject<number | null>(null)
 
     private webSocketService = inject(WebSocketService)
     user_id = Number(localStorage.getItem("user_id"))
@@ -36,7 +37,8 @@ export class NotificationsService {
                     this.FriendRemoved$.next(data.user_id)
                     break
                 case 'pending_friend_requests':
-                    
+                    this.NewFriendRequest$.next(data.user_handle)
+                    this.showNotification$.next({type: "call", sender: data.sender})
                     break
             }
         })
