@@ -22,10 +22,14 @@ async function startServer(PORT){
         const peerServer = PeerServer({ path: '/peerjs', port: 3331, secure: false, allow_discovery: true })
         app.listen(PORT, ()=>{ console.debug(`‎ \n Server backend avviato | Port: ${PORT} \n ---------------------------------------------------------`) })
 
+        const limiter = rateLimit({ windowMs: 1000 * 60, limit: 30, standardHeaders: 'draft-8', legacyHeaders: false })
+        app.use(limiter)
+        
         app.use((req, res, next) => {        
             res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200')
             res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
             res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Body')
+            rateLimit
             next()
         })
 
