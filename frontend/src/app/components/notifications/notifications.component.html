@@ -1,5 +1,5 @@
 
-@if (!this.friend_request) {
+@if (!this.friend_request || !this.friend_request.length) {
     <p> Non hai nessuna notifica </p>
 } @else {
     <div class="notification">
