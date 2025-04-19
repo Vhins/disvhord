@@ -8,6 +8,7 @@ import rateLimit from 'express-rate-limit'
 import { compare, hash, genSalt } from 'bcrypt'
 import { PeerServer } from 'peer'
 const secretJWT = "90628be6876cdbed544203e26c89ce931b10e1ca4163d41f7b6f4131b2c77bae0f9998d6fefa65d4570effdc12a36fce2bdf87ad3821714d1326798eff1d85ad"
+import { sanitizeMessage } from './utility.js'
 
 startServer(3333)
 
@@ -589,7 +590,6 @@ async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requ
         for(let user_id of friend_user_interface.blocked) {
             if (Number(user_id) === Number(JWTdata.user_id)) {
                 await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
-                //* ti ha blokato billy
                 return
             }
         }
@@ -700,14 +700,3 @@ async function handleApi_removeBlockFromUser(req, res) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function sanitizeMessage(message) {
-    return message
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-    .replace(/[\u200B-\u200D\uFEFF]/g, '')
-    .replace(/on\w+="[^"]*"/g, '')
-    .replace(/javascript:/g, '')
-}
