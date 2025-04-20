@@ -3,12 +3,9 @@ import http from "http"; const server = http.createServer(app);
 import { Server } from "socket.io"; 
 const io = new Server(server, { cors: { origin: "http://localhost:4200", methods: ["GET", "POST"]}});
 import { connectToDatabase } from "./db.js"; let db
-import jwt from 'jsonwebtoken'; const { sign } = jwt;
 import rateLimit from 'express-rate-limit'
-import { compare, hash, genSalt } from 'bcrypt'
 import { PeerServer } from 'peer'
-const secretJWT = "90628be6876cdbed544203e26c89ce931b10e1ca4163d41f7b6f4131b2c77bae0f9998d6fefa65d4570effdc12a36fce2bdf87ad3821714d1326798eff1d85ad"
-import { sanitizeMessage } from './utility.js'
+import * as UTILS from './utility.js'
 
 startServer(3333)
 
@@ -40,35 +37,35 @@ async function startServer(PORT){
         app.post('/userLogin', (req, res) => { handleApi_userLogin(req, res) })
         app.post('/checkUserTokenValidity', (req, res) => { handleApi_checkUserTokenValidity(req, res) })
 
-        app.post('/basicUserInterfaceData', verifyJWT, (req, res) => { handleApi_basicUserInterfaceData(req, res) })
-        app.post('/ChatInfoMessages', verifyJWT, (req, res) => { handleApi_ChatInfoMessages(req, res) })
-        app.post('/tryToSendFriendRequest', verifyJWT, (req, res) => { handleApi_tryToSendFriendRequest(req, res) })
-        app.post('/acceptFriendRequest', verifyJWT, (req, res) => { handleApi_acceptFriendRequest(req, res) })
-        app.post('/deleteFriendRequest', verifyJWT, (req, res) => { handleApi_deleteFriendRequest(req, res) })
-        app.post('/removeFriend', verifyJWT, (req, res) => { handleApi_removeFriend(req, res) })
-        app.post('/blockUser', verifyJWT, (req, res) => { handleApi_blockUser(req, res) })
-        app.post('/removeBlockFromUser', verifyJWT, (req, res) => { handleApi_removeBlockFromUser(req, res) })
+        app.post('/basicUserInterfaceData', UTILS.verifyJWT, (req, res) => { handleApi_basicUserInterfaceData(req, res) })
+        app.post('/ChatInfoMessages', UTILS.verifyJWT, (req, res) => { handleApi_ChatInfoMessages(req, res) })
+        app.post('/tryToSendFriendRequest', UTILS.verifyJWT, (req, res) => { handleApi_tryToSendFriendRequest(req, res) })
+        app.post('/acceptFriendRequest', UTILS.verifyJWT, (req, res) => { handleApi_acceptFriendRequest(req, res) })
+        app.post('/deleteFriendRequest', UTILS.verifyJWT, (req, res) => { handleApi_deleteFriendRequest(req, res) })
+        app.post('/removeFriend', UTILS.verifyJWT, (req, res) => { handleApi_removeFriend(req, res) })
+        app.post('/blockUser', UTILS.verifyJWT, (req, res) => { handleApi_blockUser(req, res) })
+        app.post('/removeBlockFromUser', UTILS.verifyJWT, (req, res) => { handleApi_removeBlockFromUser(req, res) })
 
 
         //* Socket.io
         io.on('connection', (socket) => {
 
             socket.on('connected', (token) => {
-                const decoded = jwt.verify(token, secretJWT)
+                const decoded = UTILS.compareVerifyJWT(token)
                 users[decoded.user_id] = socket.id
             })
 
             socket.on('personal_message', async (data) => {
                 if (users[data.receiver] !== null) {
 
-                    data.content = sanitizeMessage(data.content)
+                    data.content = UTILS.sanitizeMessage(data.content)
                     if (data.attachments) {
-                        data.attachments = sanitizeMessage(data.attachments)
+                        data.attachments = UTILS.sanitizeMessage(data.attachments)
                         data.attachments.replace(/javascript:/g, '')
                     }
 
                     const message = {
-                        "message_id": await generateID(),
+                        "message_id": await UTILS.generateID(),
                         "content": data.content,
                         "attachments": null,
                         "sender": data.sender,
@@ -139,7 +136,7 @@ async function startServer(PORT){
 
                 if (users[data.message_id] !== null) {
 
-                    data.content = sanitizeMessage(data.content)
+                    data.content = UTILS.sanitizeMessage(data.content)
 
                     let op = await db.collection('chats').findOne( { chat_id: data.chat_id }, { projection: { messages: { $elemMatch: { message_id: data.message_id } } } })
                     if (op == null) {
@@ -193,7 +190,7 @@ async function startServer(PORT){
 async function handleApi_userCreateAccount(req, res){
     const { user_email, user_password, user_handle, user_displayName } = req.body
 
-    if (!isValidEmail(user_email) || !isValidHandle(user_handle) || !isValidDisplayName(user_displayName)) {
+    if (!UTILS.isValidEmail(user_email) || !UTILS.isValidHandle(user_handle) || !UTILS.isValidDisplayName(user_displayName)) {
         return res.sendStatus(400).json({ message: 'Account non creato, email / handle / displayname non valid' })
     }
     
@@ -208,10 +205,10 @@ async function handleApi_userCreateAccount(req, res){
     }
 
 
-    let saltHashedPassword = await generaSaltHashedPassword(user_password)
+    let saltHashedPassword = await UTILS.generaSaltHashedPassword(user_password)
     
-    const new_user_id = await generateID()
-    const new_token = generaTokenJWT(new_user_id)
+    const new_user_id = await UTILS.generateID()
+    const new_token = UTILS.generaTokenJWT(new_user_id)
 
     const user_info_doc = {
         "user_id": new_user_id,
@@ -264,10 +261,10 @@ async function handleApi_userLogin(req, res){
         return res.status(400).json({ message: 'Dati inviati nulli' })
     }
 
-    let comparePassword = await compare(password, userDB.user_password)
+    let comparePassword = await UTILS.comparePassword(password, userDB.user_password)
 
     if(comparePassword){
-        const newToken = generaTokenJWT(userDB.user_id)
+        const newToken = UTILS.generaTokenJWT(userDB.user_id)
 
         await db.collection('users_info').updateOne({ user_id: userDB.user_id }, {$set: {token: newToken}})
 
@@ -280,43 +277,6 @@ async function handleApi_userLogin(req, res){
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const cacheJWT = {}
-
-async function verifyJWT(req, res, next){
-    const authHeader = req.headers['authorization']
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Token non fornito o malformato!" })
-    }
-    const token = authHeader.split(' ')[1]
-
-    if (cacheJWT[token]) {
-        req.JWTdata = cacheJWT[token]
-        return next()
-    }
-
-    try {
-        const decoded = jwt.verify(token, secretJWT)
-        req.JWTdata = decoded
-
-        const user_info = await db.collection('users_info').findOne({user_id: Number(decoded.user_id)})
-
-        if (user_info === null){
-            return res.status(404).json({ message: 'Utente non trovato' })
-        }
-    
-        if (user_info.token !== token){
-            return res.status(401).json({ message: 'Token non valido' })
-        } else {
-            cacheJWT[token] = decoded
-            return next()
-        }
-
-    } catch (error) {
-        return res.status(403).json({ error: "Token non valido!" })
-    }
-
-}
 
 
 async function handleApi_checkUserTokenValidity(req, res){
@@ -337,46 +297,6 @@ async function handleApi_checkUserTokenValidity(req, res){
     }
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-async function generaSaltHashedPassword(user_password){
-    return await hash(user_password, await genSalt())
-}
-
-let lastCreatedID = null
-
-async function generateID(){
-    if(lastCreatedID != null){
-        lastCreatedID += 1
-        await db.collection('general_info').updateOne({unique: 'unique'}, {$set: {lastCreatedID: lastCreatedID}})
-        return lastCreatedID
-    }else{
-        const dbGeneral = await db.collection('general_info').findOne({unique: 'unique'})
-        lastCreatedID = dbGeneral.lastCreatedID + 1
-        await db.collection('general_info').updateOne({unique: 'unique'}, {$set: {lastCreatedID: lastCreatedID}})
-        return lastCreatedID
-    }
-}
-
-function generaTokenJWT(user_id){
-    return sign({ user_id: user_id, timestamp: new Date().getTime()}, secretJWT)
-}
-
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-}
-
-function isValidHandle(name) {
-    const nameRegex = /^[a-zA-Z0-9_.-]*$/
-    return nameRegex.test(name)
-}
-
-function isValidDisplayName(name) {
-    const nameRegex = /^[a-zA-Z0-9_.-]+( [a-zA-Z0-9_.-]+)*$/
-    return nameRegex.test(name)
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
