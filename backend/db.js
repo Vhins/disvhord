@@ -14,4 +14,8 @@ async function connectToDatabase(){
     }
 }
 
-export { connectToDatabase }
+function getDatabaseConnection() {
+    return client.db(dbName)
+}
+
+export { connectToDatabase, getDatabaseConnection }

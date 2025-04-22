@@ -1,6 +1,11 @@
 import { compare, hash, genSalt } from 'bcrypt'
 import jwt from 'jsonwebtoken'; const { sign } = jwt;
 import dotenv from 'dotenv'; dotenv.config(); const secretJWT = process.env.SECRET_JWT
+import { getDatabaseConnection } from "./db.js"; let db
+
+export async function setDBConnection() {
+    db = getDatabaseConnection()
+}
 
 export function sanitizeMessage(message) {
     return message
@@ -33,7 +38,7 @@ export async function verifyJWT(req, res, next){
     }
 
     try {
-        const decoded = UTILS.compareVerifyJWT(token)
+        const decoded = compareVerifyJWT(token)
         req.JWTdata = decoded
 
         const user_info = await db.collection('users_info').findOne({user_id: Number(decoded.user_id)})
@@ -50,7 +55,7 @@ export async function verifyJWT(req, res, next){
         }
 
     } catch (error) {
-        return res.status(403).json({ error: "Token non valido!" })
+        return res.status(403).json({ error: error })
     }
 
 }

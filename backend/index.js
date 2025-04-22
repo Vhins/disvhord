@@ -15,6 +15,7 @@ async function startServer(PORT){
 
     try{
         db = await connectToDatabase()
+        await UTILS.setDBConnection()
 
         io.listen(3332)
         const peerServer = PeerServer({ path: '/peerjs', port: 3331, secure: false, allow_discovery: true })
@@ -285,7 +286,6 @@ async function handleApi_checkUserTokenValidity(req, res){
     const privateToken = authHeader && authHeader.split(' ')[1]
 
     const user_info = await db.collection('users_info').findOne({user_id: Number(user_id)})
-    
     if (user_info === null){
         return res.status(404).json({ message: 'Utente non trovato' })
     }
