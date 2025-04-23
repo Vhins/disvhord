@@ -52,33 +52,15 @@ export class ChatService {
     }
 
     setThisChatID(chat_id: number | string) {
-        if (typeof chat_id === "number") {
+        console.log('chat_id', chat_id)
+        if (typeof chat_id === "number" && !isNaN(chat_id)) {
             this.chat_id = chat_id
             this.chat_user_id = this.initializeAppApiService.user_interface.chats.find(chat => chat.chat_id == this.chat_id)!.chat_user_id
             
-            if (this.initializeAppApiService.user_interface.friends.find(user => user.user_id === this.chat_user_id)) {
-                this.chat_user_isFriend.set(true)
-            } else {
-                this.chat_user_isFriend.set(false)
-            }
-
-            if (this.initializeAppApiService.user_interface.blocked.find(user => user === this.chat_user_id)) {
-                this.chat_user_isBlocked = true
-            } else {
-                this.chat_user_isBlocked = false
-            }
-            
-            if (this.initializeAppApiService.user_interface.friend_requests_sent.find(user => user === this.chat_user_id)) {
-                this.chat_user_friendRequestSend = true
-            } else {
-                this.chat_user_friendRequestSend = false
-            }
-            
-            if (this.initializeAppApiService.user_interface.notifications.friend_request.find(user => user.user_id === this.chat_user_id)) {
-                this.chat_user_friendRequestSendAcceptOrDecline = true
-            } else {
-                this.chat_user_friendRequestSendAcceptOrDecline = false
-            }
+            this.chat_user_isFriend.set(this.initializeAppApiService.user_interface.friends.some(user => user.user_id === this.chat_user_id))
+            this.chat_user_isBlocked = this.initializeAppApiService.user_interface.blocked.some(user => user === this.chat_user_id)
+            this.chat_user_friendRequestSend = this.initializeAppApiService.user_interface.friend_requests_sent.some(user => user === this.chat_user_id)
+            this.chat_user_friendRequestSendAcceptOrDecline = this.initializeAppApiService.user_interface.notifications.friend_request.some(user => user.user_id === this.chat_user_id)
         } else {
             console.debug('chat personale')
         }
