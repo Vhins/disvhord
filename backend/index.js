@@ -78,23 +78,26 @@ async function startServer(PORT){
                         message.attachments = data.attachments
                     }
 
-                    let op1 = await db.collection('chats').findOne({users_id: [data.sender, data.receiver]})
-                    let op2 = await db.collection('chats').findOne({users_id: [data.receiver, data.sender]})
+                    let op1 = await db.collection('chats').findOne({ users_id: [data.sender, data.receiver] })
+                    let op2 = await db.collection('chats').findOne({ users_id: [data.receiver, data.sender] })
 
                     if (Number(op1?.chat_id) !== Number(data.chat_id) && Number(op2?.chat_id) !== Number(data.chat_id)) {
                         console.debug('id chat non corrisponde ai due utenti')
                         return
                     }
                 
-                    const op = await db.collection('chats').updateOne(
-                        { chat_id: data.chat_id},
-                        { $push: { messages: message }}
-                    )
+                    const op = await db.collection('chats').updateOne({ chat_id: data.chat_id }, { $push: { messages: message }})
+
+                    if (!op) {
+                        throw new Error(op)
+                    }
 
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
                     io.to(senderSocketId).emit('personal_message_received', message)
-                    io.to(receiverSocketId).emit('personal_message_received', message)
+                    if (receiverSocketId) {
+                        io.to(receiverSocketId).emit('personal_message_received', message)
+                    }
                 }
                 
             })
