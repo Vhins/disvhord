@@ -1,4 +1,4 @@
-import { Injectable, Signal, signal } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 import { InitializeAppApiService } from "../../initialize-app-api.service";
 import { BehaviorSubject, single } from "rxjs";
 import { NotificationsService } from "../../notifications.service";

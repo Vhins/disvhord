@@ -2,6 +2,7 @@ import { Component, ElementRef, viewChild } from '@angular/core';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { Router } from '@angular/router';
 import { ChatService } from '../chat/chat.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-friend-list',
@@ -42,7 +43,7 @@ export class FriendListComponent {
             return
         }
 
-        fetch('http://localhost:3333/tryToSendFriendRequest', {
+        fetch(`http://${environment.SERVER_IP}/tryToSendFriendRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

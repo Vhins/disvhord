@@ -1,3 +1,4 @@
 export const environment = {
-    IP: "localhost:3333"
+    SERVER_IP: "localhost:3333",
+    WEBSOCKET_IP: "localhost:3332"
 }

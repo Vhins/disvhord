@@ -22,7 +22,6 @@ interface user_interface {
   providedIn: 'root'
 })
 export class InitializeAppApiService {
-    IP: string = "localhost:3333"  
 
     constructor(private authService: AuthService, private webSocketService: WebSocketService) {}
 
@@ -31,7 +30,7 @@ export class InitializeAppApiService {
 
 
     async get_basicUserInterfaceData(): Promise<boolean>{
-        const apiURL = `http://${environment.IP}/basicUserInterfaceData`
+        const apiURL = `http://${environment.SERVER_IP}/basicUserInterfaceData`
         const request = {
             method: 'POST',
             headers: {

@@ -1,5 +1,6 @@
 import { AfterContentChecked, Component, inject } from '@angular/core';
 import { ChatService } from '../chat/chat.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-side-bar-chat',
@@ -26,7 +27,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     }
 
     blockUser() {
-        fetch('http://localhost:3333/blockUser', {
+        fetch(`http://${environment.SERVER_IP}/blockUser`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     }
 
     removeBlockFromUser() {
-        fetch('http://localhost:3333/removeBlockFromUser', {
+        fetch(`http://${environment.SERVER_IP}/removeBlockFromUser`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     }
 
     removeFriend() {
-        fetch('http://localhost:3333/removeFriend', {
+        fetch(`http://${environment.SERVER_IP}/removeFriend`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -71,7 +72,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     }
 
     sendFriendRequest() {
-        fetch('http://localhost:3333/tryToSendFriendRequest', {
+        fetch(`http://${environment.SERVER_IP}/tryToSendFriendRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,7 +91,7 @@ export class SideBarChatComponent implements AfterContentChecked{
     }
 
     acceptFriendRequest() {
-        fetch('http://localhost:3333/acceptFriendRequest', {
+        fetch(`http://${environment.SERVER_IP}/acceptFriendRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ export class AuthService {
 
     
     public async tryCreateAccount(accountData: object): Promise<{return: boolean, code: number}> {
-        const apiURL = `http://${environment.IP}/userCreateAccount`
+        const apiURL = `http://${environment.SERVER_IP}/userCreateAccount`
         const request = {
             method: 'POST',
             headers: {
@@ -56,7 +56,7 @@ export class AuthService {
     }
 
     public async login(email: string, password: string): Promise<boolean>{
-        const apiURL = `http://${environment.IP}/userLogin`
+        const apiURL = `http://${environment.SERVER_IP}/userLogin`
         const request = {
             method: 'POST',
             headers: {
@@ -91,7 +91,7 @@ export class AuthService {
         
         if(privateToken != null && user_id != null){
             
-            const apiURL = new URL(`http://${environment.IP}/checkUserTokenValidity`)
+            const apiURL = new URL(`http://${environment.SERVER_IP}/checkUserTokenValidity`)
             const request: RequestInit = {
                 method: 'POST',
                 headers: {

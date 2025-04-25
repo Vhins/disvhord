@@ -12,7 +12,7 @@ export class ApiChatService {
         if (chat_id == null) throw new Error('[chat_id] was not found as an argument in [ApiChatService:get_ChatInfoMessages]')
 
         try {
-            const apiURL = `http://${environment.IP}/ChatInfoMessages`
+            const apiURL = `http://${environment.SERVER_IP}/ChatInfoMessages`
             const request = {
                 method: 'POST',
                 headers: {

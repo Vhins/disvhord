@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { RelativeTimePipe } from '../../relative-time.pipe';
 import { DatePipe } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-notifications',
@@ -23,7 +24,7 @@ export class NotificationsComponent {
     }
 
     acceptFriendRequest(friend_user_id: number) {
-        fetch('http://localhost:3333/acceptFriendRequest', {
+        fetch(`http://${environment.SERVER_IP}/acceptFriendRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ export class NotificationsComponent {
     }
 
     deleteFriendRequest(friend_user_id: number) {
-        fetch('http://localhost:3333/deleteFriendRequest', {
+        fetch(`http://${environment.SERVER_IP}/deleteFriendRequest`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
