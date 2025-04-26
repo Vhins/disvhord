@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../environments/environment';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebSocketService {
     private readonly SOCKET: Socket = io(environment.WEBSOCKET_IP)
+    private readonly ruoter: Router = inject(Router)
 
     start(): boolean {
         const privateToken = localStorage.getItem("privateToken") || null
@@ -19,18 +21,17 @@ export class WebSocketService {
 
     emit(eventName: string, data: any): void {
         const socketEvent = this.SOCKET.emit(eventName, data)
-        //todo: show error message  --  socketEvent.connected
+        if (socketEvent.connected === false) {
+            this.ruoter.navigate(['/'])
+        }
     }
 
     on(eventName: string): Observable<any> {
         return new Observable(observer => {
-            this.SOCKET.on(eventName, (data: any) => {
-                observer.next(data)
-            })
+            const handler = (data: any) => observer.next(data)
+            this.SOCKET.on(eventName, handler)
     
-            return () => {
-                this.SOCKET.off(eventName)
-            }
+            return () => this.SOCKET.off(eventName, handler)
         })
     }
 
