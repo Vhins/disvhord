@@ -135,4 +135,8 @@
     border-radius: 5px 5px 0px 5px; 
     border-bottom: 1px solid black; 
     padding: 0px 5px 0px 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #CE3FCC;
 }

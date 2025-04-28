@@ -21,7 +21,7 @@ async function startServer(PORT){
         const peerServer = PeerServer({ path: '/peerjs', port: 3331, secure: false, allow_discovery: true })
         app.listen(PORT, ()=>{ console.debug(`‎ \n Server backend avviato | Port: ${PORT} \n ---------------------------------------------------------`) })
 
-        const limiter = rateLimit({ windowMs: 1000 * 60, limit: 30, standardHeaders: 'draft-8', legacyHeaders: false })
+        const limiter = rateLimit({ windowMs: 1000 * 60, limit: 1000, standardHeaders: 'draft-8', legacyHeaders: false }) //* prod limit: 30
         app.use(limiter)
         
         app.use((req, res, next) => {        
