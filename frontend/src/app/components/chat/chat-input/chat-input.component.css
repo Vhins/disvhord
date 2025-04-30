@@ -8,7 +8,8 @@
     font-size: 24px;
     border: none;
     min-height: 60px;
-    overflow: hidden; 
+    overflow-y: scroll; 
+    overflow-x: hidden; 
     resize: none;
     box-sizing: border-box;
 }
@@ -27,6 +28,7 @@
     width: 50px;
     height: 50px;
     border-radius: 10px;
+    margin-bottom: 5px;
     background-image: linear-gradient(135deg, #4B4A4A 0%, #262525 100%);
     border: 0px;
     cursor: pointer;
@@ -52,12 +54,13 @@
 .input-box {
     width: 100%;
     min-height: 50px;
+    max-height: 90dvh;
     background-color: white;
     border-radius: 5px;
     padding: 5px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: end;
     position: relative;
 }
 
