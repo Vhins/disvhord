@@ -8,16 +8,19 @@
     font-size: 24px;
     border: none;
     min-height: 60px;
-    overflow-y: scroll; 
-    overflow-x: hidden; 
+    max-height: 90dvh;
     resize: none;
     box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .input2 {
     outline: none;
     line-height: 36px;
     padding: 12px 10px;
+    overflow-x: hidden;
+    overflow-y: auto; 
 }
 
 .input:focus {
@@ -52,7 +55,7 @@
 }
 
 .input-box {
-    width: 100%;
+    width: calc(100% - 2px);
     min-height: 50px;
     max-height: 90dvh;
     background-color: white;
@@ -62,6 +65,7 @@
     justify-content: space-between;
     align-items: end;
     position: relative;
+    gap: 2px;
 }
 
 .content {
