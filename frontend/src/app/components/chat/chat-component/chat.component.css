@@ -16,3 +16,7 @@
     flex-wrap: nowrap;
     gap: 20px;
 }
+
+a {
+    color: violet;
+}

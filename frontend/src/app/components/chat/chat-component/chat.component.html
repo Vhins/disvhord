@@ -3,7 +3,7 @@
 
 <div #scrollContainer class="messages-container">
     @for (message of messagesService.messages; track $index) {
-        <app-message [messageData]="message" (editingMessage)="editingMessage($event)" [islastMessage]="messagesService.firstRender ? $last : false"/>
+        <app-message class="message" [messageData]="message" (editingMessage)="editingMessage($event)" [islastMessage]="messagesService.firstRender ? $last : false"/>
     }
 </div>
 

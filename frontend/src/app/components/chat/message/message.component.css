@@ -29,8 +29,23 @@
     font-size: 18px;
     margin: auto 0 auto 0;
     font-weight: 400;
+    width: 100%;
     max-width: 800px;
     word-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+}
+
+.content a {
+    text-decoration: dotted;
+    color: rgb(115, 235, 17) !important;
+    text-overflow: break-word !important;
+}
+
+.prova {
+    text-decoration: dotted;
+    color: rgb(115, 235, 17);
+    text-overflow: break-word !important;
 }
 
 .message-stuff {
@@ -76,9 +91,9 @@
 }
 
 .message {
-    min-width: 130px;
-    max-width: 900px;
-    width: max-content;
+    min-width: calc(130px - 30px);
+    max-width: calc(900px - 30px);
+    width: calc(max-content - 30px);
     margin-right: 23px;
     min-height: 44px;
     height: fit-content;
@@ -92,7 +107,7 @@
 }
 
 .message-wrapper {
-    width: 100%;
+    width: calc(100% - 50px);
 }
 
 .message-wrapper:hover .message-actions-wrapper {

@@ -35,6 +35,13 @@
 .user_status {
     font-size: 18px;
     font-weight: 500;
+    text-overflow: clip;
+    white-space: nowrap
+}
+
+.user_mood {
+    white-space: nowrap;
+    text-overflow: clip;
 }
 
 .user {
@@ -93,7 +100,7 @@
 }
 
 .user_name_input {
-    width: 500px;
+    max-width: 500px;
     font-size: 1.5rem;
     font-weight: 500;
     overflow: hidden;
