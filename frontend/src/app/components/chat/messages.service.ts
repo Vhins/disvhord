@@ -112,7 +112,7 @@ export class MessagesService {
             .replace(/&gt;/g, '>')
             .replace(/&quot;/g, '"')
             .replace(/&#39;/g, "'")
-            .replace(/https?:\/\/[^\s<>()\[\]{}&]+(?=\s|[^\w-]|$|&nbsp;)/g, (url) => `<a class="prova" href="${url}" target="_blank">${url}</a>`)
+            .replace(/https?:\/\/[^\s<>()\[\]{}&]+(?=\s|[^\w-]|$|&nbsp;)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
             .replace(/on\w+="[^"]*"/g, '')
     }
 

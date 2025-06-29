@@ -31,22 +31,15 @@
     font-weight: 400;
     width: 100%;
     max-width: 800px;
-    word-wrap: break-word;
-    display: flex;
-    flex-direction: column;
+    word-break: break-word;
+    /* display: flex; */
+    /* flex-direction: column; */
 }
 
-.content a {
+/* .content a {
     text-decoration: dotted;
     color: rgb(115, 235, 17) !important;
-    text-overflow: break-word !important;
-}
-
-.prova {
-    text-decoration: dotted;
-    color: rgb(115, 235, 17);
-    text-overflow: break-word !important;
-}
+} */
 
 .message-stuff {
     display: flex;
@@ -93,7 +86,7 @@
 .message {
     min-width: calc(130px - 30px);
     max-width: calc(900px - 30px);
-    width: calc(max-content - 30px);
+    width: fit-content;
     margin-right: 23px;
     min-height: 44px;
     height: fit-content;
