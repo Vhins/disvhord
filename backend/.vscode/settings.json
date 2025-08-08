@@ -1,0 +1,32 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#72bd60",
+        "activityBar.background": "#72bd60",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#4b5fb4",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#15202b99",
+        "sash.hoverBorder": "#72bd60",
+        "statusBar.background": "#57a545",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#448136",
+        "statusBarItem.remoteBackground": "#57a545",
+        "statusBarItem.remoteForeground": "#15202b",
+        "titleBar.activeBackground": "#57a545",
+        "titleBar.activeForeground": "#15202b",
+        "titleBar.inactiveBackground": "#57a54599",
+        "titleBar.inactiveForeground": "#15202b99"
+    },
+    "peacock.color": "#57a545",
+    "autorun.build": true,
+    "auto-run-command.commands": [
+        {
+            "match": ".*",  
+            "cmd": "workbench.action.tasks.runTask",
+            "args": {
+            "task": "Start Backend"
+            }
+        }
+    ],
+}

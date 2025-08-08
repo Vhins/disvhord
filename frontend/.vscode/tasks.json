@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+        "label": "Start Frontend",
+        "type": "shell",
+        "command": "ng serve",
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": []
+    }
+]
+}
