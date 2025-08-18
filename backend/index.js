@@ -406,6 +406,20 @@ async function handleApi_ChatInfoMessages(req, res) {
         return res.status(404).json({ message: 'chat_id non fornito' })
     }
 
+    if (chat_id === "me") {
+        const user_interface = await db.collection('users_interface').findOne({ user_id: Number(JWTdata.user_id) })
+        let personal_chat_id = user_interface.personal_chat_id
+
+        const loadMoreMessages = -50 * loadMessage
+        const chat_info = await db.collection('chats').findOne({ chat_id: personal_chat_id }, { projection: { messages: { $slice: loadMoreMessages } } })
+        let user_chat_info = await db.collection('users_interface').findOne({ user_id: chat_info.users_id[0] })
+        res.status(200).json({ 
+            chatMessages: chat_info.messages, 
+            chatInfo: {user_id: user_chat_info.user_id, user_displayName: user_chat_info.user_displayName, user_logo: user_chat_info.user_logo}}
+        ) 
+        return
+    }
+ 
     const loadMoreMessages = -50 * loadMessage
     const chat_info = await db.collection('chats').findOne({ chat_id: chat_id }, { projection: { messages: { $slice: loadMoreMessages } } })
     let user_chat_info

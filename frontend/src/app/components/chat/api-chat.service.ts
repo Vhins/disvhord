@@ -8,9 +8,9 @@ import { api_ChatInfoMessages } from './chat.model';
 export class ApiChatService {
     chat_messages_length!: number
 
-    async get_ChatInfoMessages(chat_id: number, loadMessage: number): Promise<api_ChatInfoMessages | "max_loaded" > {
+    async get_ChatInfoMessages(chat_id: number | "me" , loadMessage: number): Promise<api_ChatInfoMessages | "max_loaded" > {
         if (chat_id == null) throw new Error('[chat_id] was not found as an argument in [ApiChatService:get_ChatInfoMessages]')
-
+            console.log(chat_id, loadMessage)
         try {
             const apiURL = `http://${environment.SERVER_IP}/ChatInfoMessages`
             const request = {

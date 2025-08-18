@@ -15,7 +15,7 @@ export class MessagesService {
     set messages (new_messages) { this._messages = new_messages}
 
     user_id: number = this.initializeAppApiService.user_interface.user_id
-    chat_id!: number
+    chat_id!: number | "me"
     chat_user_id!: number
 
     scrollDownChat$ = new BehaviorSubject<boolean>(false)
@@ -64,7 +64,7 @@ export class MessagesService {
 
     listenForChatChanges(): void {}
 
-    async getMessages(chat_id: number, loadMessage: number): Promise<boolean> {
+    async getMessages(chat_id: number | "me", loadMessage: number): Promise<boolean> {
         const responseData: api_ChatInfoMessages | "max_loaded" = await this.apiChatService.get_ChatInfoMessages(chat_id, loadMessage)
 
         if (responseData === "max_loaded") return false

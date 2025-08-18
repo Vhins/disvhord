@@ -40,3 +40,6 @@
 # System files
 **/.DS_Store
 **/Thumbs.db
+
+# DB Backup
+backup-mongodb.rar

@@ -8,7 +8,7 @@ import { NotificationsService } from "../../notifications.service";
 })
 export class ChatService {
     user_id: number //* personal userid
-    chat_id!: number
+    chat_id!: number | "me"
     chat_user_id!: number
     chat_user_isFriend = signal<boolean | null>(null)
     chat_user_isBlocked!: boolean
@@ -62,6 +62,7 @@ export class ChatService {
             this.chat_user_friendRequestSend = this.initializeAppApiService.user_interface.friend_requests_sent.some(user => user === this.chat_user_id)
             this.chat_user_friendRequestSendAcceptOrDecline = this.initializeAppApiService.user_interface.notifications.friend_request.some(user => user.user_id === this.chat_user_id)
         } else {
+            this.chat_id = "me"
             console.debug('chat personale')
         }
     }
