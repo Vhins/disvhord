@@ -43,3 +43,6 @@
 
 # DB Backup
 backup-mongodb.rar
+
+# Environment variables
+.env
