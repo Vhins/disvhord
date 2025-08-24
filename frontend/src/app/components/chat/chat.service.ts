@@ -8,7 +8,7 @@ import { NotificationsService } from "../../notifications.service";
 })
 export class ChatService {
     user_id: number //* personal userid
-    chat_id!: number | "me"
+    chat_id!: number
     chat_user_id!: number
     chat_user_isFriend = signal<boolean | null>(null)
     chat_user_isBlocked!: boolean
@@ -51,8 +51,7 @@ export class ChatService {
         }
     }
 
-    setThisChatID(chat_id: number | string) {
-        console.log('chat_id', chat_id)
+    setThisChatID(chat_id: number | string | null): void {
         if (typeof chat_id === "number" && !isNaN(chat_id)) {
             this.chat_id = chat_id
             this.chat_user_id = this.initializeAppApiService.user_interface.chats.find(chat => chat.chat_id == this.chat_id)!.chat_user_id
@@ -62,8 +61,8 @@ export class ChatService {
             this.chat_user_friendRequestSend = this.initializeAppApiService.user_interface.friend_requests_sent.some(user => user === this.chat_user_id)
             this.chat_user_friendRequestSendAcceptOrDecline = this.initializeAppApiService.user_interface.notifications.friend_request.some(user => user.user_id === this.chat_user_id)
         } else {
-            this.chat_id = "me"
-            console.debug('chat personale')
+            this.chat_id = this.initializeAppApiService.user_interface.personal_chat_id
+            this.chat_user_id = this.initializeAppApiService.user_interface.user_id
         }
     }
 

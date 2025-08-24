@@ -15,8 +15,9 @@ export class MessagesService {
     set messages (new_messages) { this._messages = new_messages}
 
     user_id: number = this.initializeAppApiService.user_interface.user_id
-    chat_id!: number | "me"
+    chat_id!: number
     chat_user_id!: number
+    isPersonalChat: boolean = false
 
     scrollDownChat$ = new BehaviorSubject<boolean>(false)
     firstRender: boolean = true
@@ -64,10 +65,12 @@ export class MessagesService {
 
     listenForChatChanges(): void {}
 
-    async getMessages(chat_id: number | "me", loadMessage: number): Promise<boolean> {
+    async getMessages(chat_id: number, loadMessage: number, isPersonalChat?: boolean): Promise<boolean> {
         const responseData: api_ChatInfoMessages | "max_loaded" = await this.apiChatService.get_ChatInfoMessages(chat_id, loadMessage)
-
+        
         if (responseData === "max_loaded") return false
+        
+        isPersonalChat ? this.isPersonalChat = true : this.isPersonalChat = false
 
         const messages: Messages[] = responseData.chatMessages
 
@@ -84,7 +87,8 @@ export class MessagesService {
 
     sendMessage(content: string) {
         if (!this.chatService.editingMessageMode()) {
-            const messageData: MessageData = { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id }
+            
+            const messageData: MessageData = { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id, "isPersonalChat": this.isPersonalChat }
             
             if (this.chatService.allegatedLink) { messageData.attachments = this.chatService.allegatedLink }
 
@@ -96,11 +100,11 @@ export class MessagesService {
     }
 
     deleteMessage(message_id: number) {
-        this.webSocketService.emit("delete_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id } as MessageData)
+        this.webSocketService.emit("delete_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id, "isPersonalChat": this.isPersonalChat } as MessageData)
     }
 
     editMessage(message_id: number, content: string) {
-        this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id, "content": content } as MessageData)
+        this.webSocketService.emit("edit_message", { "chat_id": this.chat_id, "message_id": message_id, "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "isPersonalChat": this.isPersonalChat } as MessageData)
         this.chatService.editingMessageMode.set(false)
     }
 

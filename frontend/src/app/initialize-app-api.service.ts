@@ -15,7 +15,8 @@ interface user_interface {
     servers_joined: Array<{server_id: number, name: string, logo: string}>,
     posts: Array<number>,
     notifications: {friend_request: Array<{user_id: number, user_handle: string, user_logo: string, timestamp: number}>},
-    friend_requests_sent: Array<Number>
+    friend_requests_sent: Array<Number>,
+    personal_chat_id: number
 }
 
 @Injectable({

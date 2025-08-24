@@ -95,7 +95,7 @@ async function startServer(PORT){
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
                     io.to(senderSocketId).emit('personal_message_received', message)
-                    if (receiverSocketId) {
+                    if (receiverSocketId && !data.isPersonalChat) {
                         io.to(receiverSocketId).emit('personal_message_received', message)
                     }
                 }
@@ -131,7 +131,9 @@ async function startServer(PORT){
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
                     io.to(senderSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": data.content})
-                    io.to(receiverSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": data.content})
+                    if (receiverSocketId && !data.isPersonalChat) {
+                        io.to(receiverSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": data.content})
+                    }
                 }
                 
             })
@@ -161,7 +163,9 @@ async function startServer(PORT){
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
                     io.to(senderSocketId).emit('personal_message_edited', {"message_id": data.message_id, "content": data.content})
-                    io.to(receiverSocketId).emit('personal_message_edited', {"message_id": data.message_id, "content": data.content})
+                    if (receiverSocketId && !data.isPersonalChat) {
+                        io.to(receiverSocketId).emit('personal_message_edited', {"message_id": data.message_id, "content": data.content})
+                    }
                 }
                 
             })
@@ -235,7 +239,8 @@ async function handleApi_userCreateAccount(req, res){
         "servers_owned": [],
         "posts": [],
         "notifications": {},
-        "friend_requests_sent": []
+        "friend_requests_sent": [],
+        "personal_chat_id": 8
     }
 
     const op = await db.collection('users_info').insertOne(user_info_doc)
@@ -351,7 +356,8 @@ async function handleApi_basicUserInterfaceData(req, res){
             chat_id: chat_info.chat_id,
             chat_user_id: user_chat_info.user_id,
             user_displayName: user_chat_info.user_displayName,
-            user_logo: user_chat_info.user_logo
+            user_logo: user_chat_info.user_logo,
+            personal_chat_id: user_chat_info.personal_chat_id   
         })
     }
     user_interfaceDB.chats = chats_info
@@ -401,7 +407,7 @@ async function handleApi_basicUserInterfaceData(req, res){
 async function handleApi_ChatInfoMessages(req, res) {
     const { chat_id, loadMessage } = req.body
     const JWTdata = req.JWTdata
-
+    
     if (chat_id === null || chat_id === undefined) {
         return res.status(404).json({ message: 'chat_id non fornito' })
     }

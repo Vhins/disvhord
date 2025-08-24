@@ -20,6 +20,7 @@ export interface MessageData {
     sender: number, 
     receiver: number, 
     content?: string, 
-    chat_id: number | "me", 
-    attachments?: string
+    chat_id: number, 
+    attachments?: string,
+    isPersonalChat: boolean
 }

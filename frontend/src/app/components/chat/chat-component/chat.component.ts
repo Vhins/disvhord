@@ -24,12 +24,13 @@ export class ChatComponent implements AfterViewInit {
         this.newChat = true
         this.activatedRoute.paramMap.subscribe(async param => {
             this.newChat = true
-            this.chatService.setThisChatID(Number(param.get('chat_id')))
-            if (typeof this.chatService.chat_id === "number") {
-                this.messagesService.getMessages(Number(param.get('chat_id')), 1)
+            const paramCHAT_ID = param.get('chat_id')
+            if (paramCHAT_ID !== "me") {
+                this.chatService.setThisChatID(Number(paramCHAT_ID))
             } else {
-                this.messagesService.getMessages("me", 1)
+                this.chatService.setThisChatID(paramCHAT_ID)
             }
+            this.messagesService.getMessages(this.chatService.chat_id, 1, paramCHAT_ID === "me")
             this.chatService.allegatingLink.set(false)
             this.chatService.allegatedLink = ""
             this.chatService.editingMessageMode.set(false)
