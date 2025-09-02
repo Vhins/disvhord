@@ -17,7 +17,6 @@ export class MessageComponent implements OnInit {
 
     message_option: 'none' | 'edit' | 'delete' = "none"
     editingMessage = output<number>()
-    messageJustDeleted = false
 
     constructor(public chatService: ChatService, public messagesService: MessagesService) {}
     
@@ -31,7 +30,6 @@ export class MessageComponent implements OnInit {
     }
     
     messageOption() {
-        if (this.messageJustDeleted) return
         
         if (this.messageData().sender != this.chatService.user_id || this.messageData().content === "[[Questo messaggio è stato eliminato dal creatore]]") {
             this.message_option = "none"
@@ -50,7 +48,6 @@ export class MessageComponent implements OnInit {
     }
     
     onDeleteMessage() {
-        this.messageJustDeleted = true
         this.message_option = "none"
         this.messagesService.deleteMessage(this.messageData().message_id)
     }

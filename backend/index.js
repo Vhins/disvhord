@@ -106,6 +106,8 @@ async function startServer(PORT){
 
                 if (users[data.message_id] !== null) {
 
+                    const messageDeletedTEXT = "[[Questo messaggio è stato eliminato dal creatore]]"
+
                     let op = await db.collection('chats').findOne( { chat_id: data.chat_id }, { projection: { messages: { $elemMatch: { message_id: data.message_id } } } })
                     if (op == null) {
                         return
@@ -118,11 +120,19 @@ async function startServer(PORT){
                     
                     const currentTimestamp = Date.now()
                     if (currentTimestamp - op.messages[0].timestamp > 10 * 60 * 1000) {
-                        data.content = "[[Questo messaggio è stato eliminato dal creatore]]"
-                        await db.collection('chats').updateOne( 
-                            { chat_id: data.chat_id, "messages.message_id": data.message_id }, 
-                            { $set: { "messages.$.content": data.content, "messages.$.attachments": null }} 
-                        )
+
+                        if (!data.isPersonalChat) {
+                            await db.collection('chats').updateOne( 
+                                { chat_id: data.chat_id, "messages.message_id": data.message_id }, 
+                                { $set: { "messages.$.content": messageDeletedTEXT, "messages.$.attachments": null }} 
+                            )
+                            
+                        } else {
+                            await db.collection('chats').updateOne( 
+                                { chat_id: data.chat_id }, { $pull: { messages: { message_id: data.message_id }} }
+                            )
+                        }
+
                     } else {
                         await db.collection('chats').updateOne( { chat_id: data.chat_id }, { $pull: { messages: { message_id: data.message_id } } })
                     }
@@ -130,9 +140,9 @@ async function startServer(PORT){
 
                     const senderSocketId = users[data.sender]
                     const receiverSocketId = users[data.receiver]
-                    io.to(senderSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": data.content})
+                    io.to(senderSocketId).emit('personal_message_deleted', !data.isPersonalChat ? {"message_id": data.message_id, "content": messageDeletedTEXT} : {"message_id": data.message_id})
                     if (receiverSocketId && !data.isPersonalChat) {
-                        io.to(receiverSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": data.content})
+                        io.to(receiverSocketId).emit('personal_message_deleted', {"message_id": data.message_id, "content": messageDeletedTEXT})
                     }
                 }
                 
