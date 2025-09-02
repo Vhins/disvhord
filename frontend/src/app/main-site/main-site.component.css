@@ -17,3 +17,51 @@ button {
     box-shadow: 4px -4px 10px 0px #ffffff41, -2px 2px 5px 0px #00000041;
     cursor: cell;
 }
+
+.roadmap-title {
+    margin-top: 165px;
+    font-size: 60px;
+}
+
+.roadmap-grid {
+    max-width: 1000px;
+    padding: 10px;
+    margin: 30px auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.roadmap-card {
+    background: #1e1e1e;
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    text-align: left;
+    transition: 0.3s;
+}
+.roadmap-card:hover {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.roadmap-card h3 {
+    margin-top: 0px;
+    margin-bottom: 15px;
+    font-size: 24px;
+    background: linear-gradient(90deg, #CE3FCC, #43C2DE);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.roadmap-card-2style h3 {
+    background: linear-gradient(90deg, #43C2DE, #CE3FCC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.roadmap-card ul {
+    padding-left: 20px;
+    line-height: 1.8;
+    margin: 0;
+}
