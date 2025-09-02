@@ -15,6 +15,7 @@ export class ChatService {
     chat_user_friendRequestSend!: boolean
     chat_user_friendRequestSendAcceptOrDecline!: boolean
     users_info: {[key: number]: {id: number, name: string, img: string}} = {}
+    isPersonalChat: boolean = false
 
     constructor(private initializeAppApiService: InitializeAppApiService, private notificationsService: NotificationsService) {
         this.user_id = this.initializeAppApiService.user_interface.user_id

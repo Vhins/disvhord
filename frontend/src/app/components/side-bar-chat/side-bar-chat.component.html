@@ -4,37 +4,40 @@
     <span class="user_name"> {{user_chat_name}} </span>
 </div>
 
-<button (click)="callThisChat()">
-    <span class="user_name"> Chiama </span>
-</button>
+@if (!chatService.isPersonalChat) {
 
-@if (chatService.chat_user_isFriend() && !chatService.chat_user_friendRequestSend && !chatService.chat_user_friendRequestSendAcceptOrDecline) {
-    <button (click)="removeFriend()">
-        <span class="user_name"> Rimuovi amicizia </span>
+    <button (click)="callThisChat()">
+        <span class="user_name"> Chiama </span>
     </button>
-}
-@if (!chatService.chat_user_isFriend() && !chatService.chat_user_friendRequestSend && !chatService.chat_user_friendRequestSendAcceptOrDecline){
-    <button (click)="sendFriendRequest()">
-        <span class="user_name"> Aggiungi agli amici </span>
-    </button>
-}
 
-@if (chatService.chat_user_friendRequestSend) {
-    <button (click)="removeFriendRequest()">
-        <span class="user_name"> Annulla richiesta d'amicizia </span>
-    </button>
-}
-@if (chatService.chat_user_friendRequestSendAcceptOrDecline) {
-    <button (click)="acceptFriendRequest()">
-        <span class="user_name"> Accetta l'amicizia </span>
-    </button>
-}
-@if (!chatService.chat_user_isBlocked) {
-    <button (click)="blockUser()">
-        <span class="user_name"> Blocca </span>
-    </button>
-} @else {
-    <button (click)="removeBlockFromUser()">
-        <span class="user_name"> Sblocca </span>
-    </button>
+    @if (chatService.chat_user_isFriend() && !chatService.chat_user_friendRequestSend && !chatService.chat_user_friendRequestSendAcceptOrDecline) {
+        <button (click)="removeFriend()">
+            <span class="user_name"> Rimuovi amicizia </span>
+        </button>
+    }
+    @if (!chatService.chat_user_isFriend() && !chatService.chat_user_friendRequestSend && !chatService.chat_user_friendRequestSendAcceptOrDecline){
+        <button (click)="sendFriendRequest()">
+            <span class="user_name"> Aggiungi agli amici </span>
+        </button>
+    }
+    
+    @if (chatService.chat_user_friendRequestSend) {
+        <button (click)="removeFriendRequest()">
+            <span class="user_name"> Annulla richiesta d'amicizia </span>
+        </button>
+    }
+    @if (chatService.chat_user_friendRequestSendAcceptOrDecline) {
+        <button (click)="acceptFriendRequest()">
+            <span class="user_name"> Accetta l'amicizia </span>
+        </button>
+    }
+    @if (!chatService.chat_user_isBlocked) {
+        <button (click)="blockUser()">
+            <span class="user_name"> Blocca </span>
+        </button>
+    } @else {
+        <button (click)="removeBlockFromUser()">
+            <span class="user_name"> Sblocca </span>
+        </button>
+    }
 }

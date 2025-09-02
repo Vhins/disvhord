@@ -70,7 +70,8 @@ export class MessagesService {
         
         if (responseData === "max_loaded") return false
         
-        isPersonalChat ? this.isPersonalChat = true : this.isPersonalChat = false
+        this.chatService.isPersonalChat = typeof isPersonalChat === 'boolean' ? isPersonalChat : false
+        this.isPersonalChat = typeof isPersonalChat === 'boolean' ? isPersonalChat : false
 
         const messages: Messages[] = responseData.chatMessages
 
