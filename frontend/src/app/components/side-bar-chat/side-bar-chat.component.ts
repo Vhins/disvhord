@@ -26,36 +26,6 @@ export class SideBarChatComponent implements AfterContentChecked{
         this.chatService.callThisChatNow()
     }
 
-    blockUser() {
-        fetch(`http://${environment.SERVER_IP}/blockUser`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
-            },
-            body: JSON.stringify({
-                'user_id': this.user_id
-            })
-        }).then( res => {
-            this.chatService.chat_user_isBlocked = true
-        })
-    }
-
-    removeBlockFromUser() {
-        fetch(`http://${environment.SERVER_IP}/removeBlockFromUser`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
-            },
-            body: JSON.stringify({
-                'user_id': this.user_id
-            })
-        }).then( res => {
-            this.chatService.chat_user_isBlocked = false
-        })
-    }
-
     removeFriend() {
         fetch(`http://${environment.SERVER_IP}/removeFriend`, {
             method: 'POST',
@@ -86,10 +56,6 @@ export class SideBarChatComponent implements AfterContentChecked{
         })
     }
 
-    removeFriendRequest() {
-        this.chatService.chat_user_friendRequestSend = false
-    }
-
     acceptFriendRequest() {
         fetch(`http://${environment.SERVER_IP}/acceptFriendRequest`, {
             method: 'POST',
@@ -102,4 +68,49 @@ export class SideBarChatComponent implements AfterContentChecked{
             })
         })
     }
+
+    removeFriendRequest() {
+        this.chatService.chat_user_friendRequestSend = false
+        fetch(`http://${environment.SERVER_IP}/deleteFriendRequest`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
+            },
+            body: JSON.stringify({
+                'friend_user_id': this.user_id
+            })
+        })
+    }
+
+    blockUser() {
+        fetch(`http://${environment.SERVER_IP}/blockUser`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
+            },
+            body: JSON.stringify({
+                'user_id': this.user_id
+            })
+        }).then( res => {
+            this.chatService.chat_user_isBlocked = true
+        })
+    }
+
+    removeBlockFromUser() {
+        fetch(`http://${environment.SERVER_IP}/removeBlockFromUser`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
+            },
+            body: JSON.stringify({
+                'user_id': this.user_id
+            })
+        }).then( res => {
+            this.chatService.chat_user_isBlocked = false
+        })
+    }
+    
 }

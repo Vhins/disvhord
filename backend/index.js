@@ -582,8 +582,10 @@ async function handleApi_deleteFriendRequest(req, res) {
     const { friend_user_id } = req.body
     const JWTdata = req.JWTdata
 
-    let success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
-    if (!success) {
+    let success = await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "notifications.friend_request": {user_id: JWTdata.user_id}} } )
+    let success2 = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friend_requests_sent": friend_user_id} } )
+
+    if (!success.acknowledged && !success2.acknowledged) {
         return res.sendStatus(404)
     }
     res.sendStatus(200)
