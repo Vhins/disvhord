@@ -82,7 +82,7 @@ export class MessagesService {
         this.messages = messages
         this.chat_id = chat_id
         this.chat_user_id = responseData.chatInfo.user_id
-        this.chatService.users_info[responseData.chatInfo.user_id] = {id: responseData.chatInfo.user_id , name: responseData.chatInfo.user_displayName, img: responseData.chatInfo.user_logo}
+        this.chatService.users_info[responseData.chatInfo.user_id] = {id: responseData.chatInfo.user_id , name: responseData.chatInfo.user_displayName, logo: responseData.chatInfo.user_logo}
         return true
     }
 

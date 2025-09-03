@@ -456,7 +456,7 @@ async function handleApi_ChatInfoMessages(req, res) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_requests -, socket.io
+async function handleApi_tryToSendFriendRequest(req, res) {
     const { friend_user_handle } = req.body
     const JWTdata = req.JWTdata
     
@@ -515,11 +515,15 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
         return res.status(500).json({ statusFriendRequest: 0 })
     }
 
+    const senderSocketId = users[JWTdata.user_id]
     const receiverSocketId = users[friend_user.user_id]
+    if (senderSocketId !== undefined) {
+        io.to(senderSocketId).emit('userInterface', {'type': "sent_pending_friend_request", 'user_id': friend_user.user_id})
+    }
     if (receiverSocketId !== undefined) {       
         const user_interface = await db.collection('users_interface').findOne({ user_id: Number(JWTdata.user_id) }) 
         io.to(receiverSocketId).emit('userInterface', {'type': "pending_friend_requests", 
-            'user_id': JWTdata.user_id, 'user_handle': user_interface.user_handle, 'user_logo': user_interface.user_logo, 'timestamp': timestamp 
+            'user_id': JWTdata.user_id, 'user_handle': user_interface.user_handle, 'logo': user_interface.user_logo, 'timestamp': timestamp
         })
     }
 
@@ -530,7 +534,7 @@ async function handleApi_tryToSendFriendRequest(req, res) {  //! pending_friend_
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requests -, socket.io
+async function handleApi_acceptFriendRequest(req, res) {
     const { friend_user_id } = req.body
     const JWTdata = req.JWTdata
 
@@ -567,11 +571,13 @@ async function handleApi_acceptFriendRequest(req, res) { //! pending_friend_requ
         io.to(receiverSocketId).emit('userInterface', {'type': "add_friend", 
             'user_id': JWTdata.user_id, 'user_displayName': my_user_interface.user_displayName, 'user_logo': my_user_interface.user_logo
         })
+        io.to(senderSocketId).emit('userInterface', {'type': "remove_pending_friend_requests", 'user_id': friend_user_id})
     }
     if (senderSocketId !== undefined) {
         io.to(senderSocketId).emit('userInterface', {'type': "add_friend", 
             'user_id': friend_user_id, 'user_displayName': friend_user_interface.user_displayName, 'user_logo': friend_user_interface.user_logo
         })
+        io.to(receiverSocketId).emit('userInterface', {'type': "removed_friend_requests", 'user_id': JWTdata.user_id})
     }
 
 
@@ -582,13 +588,42 @@ async function handleApi_deleteFriendRequest(req, res) {
     const { friend_user_id } = req.body
     const JWTdata = req.JWTdata
 
-    let success = await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "notifications.friend_request": {user_id: JWTdata.user_id}} } )
-    let success2 = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friend_requests_sent": friend_user_id} } )
+    let success
+    let success2
+    if (JWTdata.refusing == true) {
+        success2 = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friend_requests_sent": friend_user_id} } )
+        success = await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "notifications.friend_request": {user_id: JWTdata.user_id}} } )
+    } else {
+        success2 = await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "friend_requests_sent": JWTdata.user_id} } )
+        success = await db.collection('users_interface').updateOne( { user_id:  JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+    }
 
     if (!success.acknowledged && !success2.acknowledged) {
         return res.sendStatus(404)
     }
-    res.sendStatus(200)
+
+    const senderSocketId = users[JWTdata.user_id]
+    const receiverSocketId = users[friend_user_id]
+
+    if (JWTdata.refusing == true) {
+        if (receiverSocketId !== undefined) {        
+            io.to(receiverSocketId).emit('userInterface', {'type': "remove_pending_friend_requests", 'user_id': JWTdata.user_id})
+        }
+        if (senderSocketId !== undefined) {
+            io.to(senderSocketId).emit('userInterface', {'type': "removed_friend_requests", 'user_id': friend_user_id})
+            return res.sendStatus(200)
+        }
+    } else {
+        if (receiverSocketId !== undefined) {        
+            io.to(receiverSocketId).emit('userInterface', {'type': "removed_friend_requests", 'user_id': JWTdata.user_id})
+        }
+        if (senderSocketId !== undefined) {
+            io.to(senderSocketId).emit('userInterface', {'type': "remove_pending_friend_requests", 'user_id': friend_user_id})
+            return res.sendStatus(200)
+        }
+    }
+
+    res.sendStatus(500)
 }
 
 async function handleApi_removeFriend(req, res) {
@@ -604,9 +639,11 @@ async function handleApi_removeFriend(req, res) {
     const senderSocketId = users[JWTdata.user_id]
     const receiverSocketId = users[friend_user_handle]
     if (receiverSocketId !== undefined) {        
+        io.to(receiverSocketId).emit('userInterface', {'type': "remove_pending_friend_requests", 'user_id': JWTdata.user_id})
         io.to(receiverSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': JWTdata.user_id})
     }
     if (senderSocketId !== undefined) {
+        io.to(senderSocketId).emit('userInterface', {'type': "removed_friend_requests", 'user_id': friend_user_handle})
         io.to(senderSocketId).emit('userInterface', {'type': "removed_friend", 'user_id': friend_user_handle})
         return res.sendStatus(200)
     }

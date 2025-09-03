@@ -26,9 +26,12 @@
             <span class="user_name"> Annulla richiesta d'amicizia </span>
         </button>
     }
-    @if (chatService.chat_user_friendRequestSendAcceptOrDecline) {
+    @if (chatService.chat_user_friendRequestSendAcceptOrDecline && !chatService.chat_user_isFriend()) {
         <button (click)="acceptFriendRequest()">
             <span class="user_name"> Accetta l'amicizia </span>
+        </button>
+        <button (click)="refuseFriendRequest()">
+            <span class="user_name"> Rifiuta l'amicizia </span>
         </button>
     }
     @if (!chatService.chat_user_isBlocked) {

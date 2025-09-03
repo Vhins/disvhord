@@ -18,7 +18,7 @@ export class SideBarChatComponent implements AfterContentChecked{
 
     ngAfterContentChecked() {
         this.user_chat_name = this.chatService.users_info[this.chatService.chat_user_id]?.name
-        this.user_chat_logo = this.chatService.users_info[this.chatService.chat_user_id]?.img
+        this.user_chat_logo = this.chatService.users_info[this.chatService.chat_user_id]?.logo
         this.user_id = this.chatService.users_info[this.chatService.chat_user_id]?.id
     }
 
@@ -65,6 +65,19 @@ export class SideBarChatComponent implements AfterContentChecked{
             },
             body: JSON.stringify({
                 'friend_user_id': this.user_id
+            })
+        })
+    }
+
+    refuseFriendRequest() {
+        fetch(`http://${environment.SERVER_IP}/deleteFriendRequest`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
+            },
+            body: JSON.stringify({
+                'friend_user_id': this.user_id, 'refusing': true
             })
         })
     }

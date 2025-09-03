@@ -16,7 +16,8 @@ interface NotificationData {
   styleUrl: './notification.component.css'
 })
 export class NotificationComponent {
-    notificationData: NotificationData | null = null
+    // notificationData: NotificationData | null = null
+    notificationData: any | null = null
     _timeoutId: any = null
 
     notificationsService: NotificationsService = inject(NotificationsService)
@@ -26,10 +27,15 @@ export class NotificationComponent {
         this.notificationsService.showNotification$.subscribe( data => {
             if (!data) return
 
+            // this.notificationData = {
+            //     type: data.type,
+            //     image: this.chatService.users_info[data.sender].logo,
+            //     name: this.chatService.users_info[data.sender]?.name
+            // }
             this.notificationData = {
                 type: data.type,
-                image: this.chatService.users_info[data.sender].img,
-                name: this.chatService.users_info[data.sender]?.name
+                image: data.logo,
+                name: data.name
             }
 
             if (this._timeoutId) { clearTimeout(this._timeoutId) }

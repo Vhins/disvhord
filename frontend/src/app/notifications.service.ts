@@ -9,11 +9,13 @@ export type NotificationType = "call" | "message" | "friend_req" | "server_invit
   providedIn: 'root'
 })
 export class NotificationsService {
-    readonly showNotification$ = new BehaviorSubject<{type: NotificationType, sender: number} | null>(null)
+    readonly showNotification$ = new BehaviorSubject<{type: NotificationType, sender: number, logo?: string, name?: string} | null>(null)
     readonly incomingCall$ = new BehaviorSubject<any | null>(null)
     readonly FriendAdded$ = new BehaviorSubject<number | null>(null)
     readonly FriendRemoved$ = new BehaviorSubject<number | null>(null)
     readonly NewFriendRequest$ = new BehaviorSubject<number | null>(null)
+    readonly RemovedPendingFriendRequest$ = new BehaviorSubject<number | null>(null)
+    readonly RemovedFriendRequest$ = new BehaviorSubject<number | null>(null)
 
     private webSocketService = inject(WebSocketService)
     user_id = Number(localStorage.getItem("user_id"))
@@ -37,8 +39,14 @@ export class NotificationsService {
                     this.FriendRemoved$.next(data.user_id)
                     break
                 case 'pending_friend_requests':
-                    this.NewFriendRequest$.next(data.user_handle)
-                    this.showNotification$.next({type: "call", sender: data.sender})
+                    this.NewFriendRequest$.next(data.user_id)
+                    this.showNotification$.next({type: "call", sender: data})
+                    break
+                case 'remove_pending_friend_requests':
+                    this.RemovedPendingFriendRequest$.next(data.user_id)
+                    break
+                case 'removed_friend_requests':
+                    this.RemovedFriendRequest$.next(data.user_id)
                     break
             }
         })

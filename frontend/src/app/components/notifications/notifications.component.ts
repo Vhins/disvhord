@@ -3,6 +3,7 @@ import { InitializeAppApiService } from '../../initialize-app-api.service';
 import { RelativeTimePipe } from '../../relative-time.pipe';
 import { DatePipe } from '@angular/common';
 import { environment } from '../../../environments/environment';
+import { ChatService } from '../chat/chat.service';
 
 @Component({
   selector: 'app-notifications',
@@ -14,7 +15,7 @@ import { environment } from '../../../environments/environment';
 export class NotificationsComponent {
     friend_request: {user_id: number, user_handle: string, user_logo: string, timestamp: number}[]
     showTooltip = false 
-    constructor(public initializeAppService: InitializeAppApiService) {
+    constructor(public initializeAppService: InitializeAppApiService, public chatService: ChatService) {
         const friend_request = this.initializeAppService.user_interface.notifications.friend_request
         if (friend_request !== undefined) {
             this.friend_request = friend_request
@@ -51,7 +52,7 @@ export class NotificationsComponent {
                 'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
             },
             body: JSON.stringify({
-                'friend_user_id': friend_user_id
+                'friend_user_id': friend_user_id, 'refusing': true
             })
         }).then( () => {
             this.removeFriendRequestNotification(friend_user_id)
@@ -59,6 +60,7 @@ export class NotificationsComponent {
     }
 
     removeFriendRequestNotification(friend_user_id: number) {
+        this.chatService.chat_user_friendRequestSend = false
         const filtered = this.initializeAppService.user_interface.notifications.friend_request.filter(user => user.user_id !== friend_user_id)
         this.initializeAppService.user_interface.notifications.friend_request = filtered
         this.friend_request = filtered

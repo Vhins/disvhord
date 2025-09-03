@@ -14,7 +14,7 @@ export class ChatService {
     chat_user_isBlocked!: boolean
     chat_user_friendRequestSend!: boolean
     chat_user_friendRequestSendAcceptOrDecline!: boolean
-    users_info: {[key: number]: {id: number, name: string, img: string}} = {}
+    users_info: {[key: number]: {id: number, name: string, logo: string}} = {}
     isPersonalChat: boolean = false
 
     constructor(private initializeAppApiService: InitializeAppApiService, private notificationsService: NotificationsService) {
@@ -22,16 +22,35 @@ export class ChatService {
         this.setMyInfo()
 
         this.notificationsService.FriendAdded$.subscribe( data => {
-            if (!data) return
+            if (data === null || data === undefined) return
             else if (data === this.chat_user_id) {
                 this.chat_user_friendRequestSend = false
+                this.chat_user_friendRequestSendAcceptOrDecline = false
                 this.chat_user_isFriend.set(true)
             }
         })
         this.notificationsService.FriendRemoved$.subscribe( data => {
-            if (!data) return
+            if (data === null || data === undefined) return
             else if (data === this.chat_user_id) {
                 this.chat_user_isFriend.set(false)
+            }
+        })
+        this.notificationsService.NewFriendRequest$.subscribe( data => {
+            if (data === null || data === undefined) return
+            else if (data === this.chat_user_id) {
+                this.chat_user_friendRequestSendAcceptOrDecline = true
+            }
+        })
+        this.notificationsService.RemovedPendingFriendRequest$.subscribe( data => {
+            if (data === null || data === undefined) return
+            else if (data === this.chat_user_id) {
+                this.chat_user_friendRequestSendAcceptOrDecline = false
+            }
+        })
+        this.notificationsService.RemovedFriendRequest$.subscribe( data => {
+            if (data === null || data === undefined) return
+            else if (data === this.chat_user_id) {
+                this.chat_user_friendRequestSend = false
             }
         })
     }
@@ -48,7 +67,7 @@ export class ChatService {
         this.users_info[this.user_id] = {
             id: this.user_id, 
             name: this.initializeAppApiService.user_interface.user_displayName, 
-            img: this.initializeAppApiService.user_interface.user_logo
+            logo: this.initializeAppApiService.user_interface.user_logo
         }
     }
 
