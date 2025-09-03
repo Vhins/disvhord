@@ -36,9 +36,6 @@ export class NotificationsComponent {
             })
         }).then( res => {
             res.json().then( resjson => {
-                this.initializeAppService.user_interface.friends.push(
-                    {user_id: resjson.user_id, user_displayName: resjson.displayName, user_logo: resjson.user_logo}
-                )
                 this.removeFriendRequestNotification(friend_user_id)
             })
         })
