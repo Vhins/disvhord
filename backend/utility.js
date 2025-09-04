@@ -5,6 +5,10 @@ import { getDatabaseConnection } from "./db.js"; let db
 
 export async function setDBConnection() {
     db = getDatabaseConnection()
+    
+    const dbGeneral = await db.collection('general_info').findOne({unique: 'unique'})
+    lastCreatedID = dbGeneral.lastCreatedID + 1
+    setTimeout(() => updateLastCreatedID(), 1000)
 }
 
 export function sanitizeMessage(message) {
@@ -89,15 +93,11 @@ export async function comparePassword(password, password2) {
 
 let lastCreatedID = null
 
-export async function generateID(){
-    if(lastCreatedID != null){
-        lastCreatedID += 1
-        await db.collection('general_info').updateOne({unique: 'unique'}, {$set: {lastCreatedID: lastCreatedID}})
-        return lastCreatedID
-    }else{
-        const dbGeneral = await db.collection('general_info').findOne({unique: 'unique'})
-        lastCreatedID = dbGeneral.lastCreatedID + 1
-        await db.collection('general_info').updateOne({unique: 'unique'}, {$set: {lastCreatedID: lastCreatedID}})
-        return lastCreatedID
-    }
+export function generateID() { 
+    lastCreatedID++;
+    return lastCreatedID
+}
+
+async function updateLastCreatedID() {
+    await db.collection('general_info').updateOne({unique: 'unique'}, {$set: {lastCreatedID: lastCreatedID}})
 }

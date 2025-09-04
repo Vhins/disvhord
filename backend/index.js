@@ -66,7 +66,7 @@ async function startServer(PORT){
                     }
 
                     const message = {
-                        "message_id": await UTILS.generateID(),
+                        "message_id": UTILS.generateID(),
                         "content": data.content,
                         "attachments": null,
                         "sender": data.sender,
@@ -225,7 +225,7 @@ async function handleApi_userCreateAccount(req, res){
 
     let saltHashedPassword = await UTILS.generaSaltHashedPassword(user_password)
     
-    const new_user_id = await UTILS.generateID()
+    const new_user_id = UTILS.generateID()
     const new_token = UTILS.generaTokenJWT(new_user_id)
 
     const user_info_doc = {
@@ -250,7 +250,7 @@ async function handleApi_userCreateAccount(req, res){
         "posts": [],
         "notifications": {},
         "friend_requests_sent": [],
-        "personal_chat_id": 8
+        "personal_chat_id": UTILS.generateID()
     }
 
     const op = await db.collection('users_info').insertOne(user_info_doc)
