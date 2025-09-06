@@ -1,7 +1,7 @@
 import { Injectable, signal } from "@angular/core";
 import { InitializeAppApiService } from "../../initialize-app-api.service";
-import { BehaviorSubject, single } from "rxjs";
-import { NotificationsService } from "../../notifications.service";
+import { BehaviorSubject } from "rxjs";
+import { WebSocketService } from "../../web-socket.service";
 
 @Injectable({
     providedIn: 'root'
@@ -17,40 +17,31 @@ export class ChatService {
     users_info: {[key: number]: {id: number, name: string, logo: string}} = {}
     isPersonalChat: boolean = false
 
-    constructor(private initializeAppApiService: InitializeAppApiService, private notificationsService: NotificationsService) {
+    constructor(private initializeAppApiService: InitializeAppApiService, private webSocketService: WebSocketService) {
         this.user_id = this.initializeAppApiService.user_interface.user_id
         this.setMyInfo()
 
-        this.notificationsService.FriendAdded$.subscribe( data => {
-            if (data === null || data === undefined) return
-            else if (data === this.chat_user_id) {
+        this.webSocketService.on("userInterface").subscribe(data => {
+            if (data === null || data === undefined || data.user_id !== this.chat_user_id) return
+
+            switch(data.type) {
+            case 'add_friend':
                 this.chat_user_friendRequestSend = false
                 this.chat_user_friendRequestSendAcceptOrDecline = false
                 this.chat_user_isFriend.set(true)
-            }
-        })
-        this.notificationsService.FriendRemoved$.subscribe( data => {
-            if (data === null || data === undefined) return
-            else if (data === this.chat_user_id) {
+                break
+            case 'removed_friend':
                 this.chat_user_isFriend.set(false)
-            }
-        })
-        this.notificationsService.NewFriendRequest$.subscribe( data => {
-            if (data === null || data === undefined) return
-            else if (data === this.chat_user_id) {
+                break
+            case 'pending_friend_requests':
                 this.chat_user_friendRequestSendAcceptOrDecline = true
-            }
-        })
-        this.notificationsService.RemovedPendingFriendRequest$.subscribe( data => {
-            if (data === null || data === undefined) return
-            else if (data === this.chat_user_id) {
+                break
+            case 'remove_pending_friend_requests':
                 this.chat_user_friendRequestSendAcceptOrDecline = false
-            }
-        })
-        this.notificationsService.RemovedFriendRequest$.subscribe( data => {
-            if (data === null || data === undefined) return
-            else if (data === this.chat_user_id) {
+                break
+            case 'removed_friend_requests':
                 this.chat_user_friendRequestSend = false
+                break
             }
         })
     }
