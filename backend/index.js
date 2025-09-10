@@ -585,17 +585,17 @@ async function handleApi_acceptFriendRequest(req, res) {
 }
 
 async function handleApi_deleteFriendRequest(req, res) {
-    const { friend_user_id } = req.body
+    const { friend_user_id, refusing } = req.body
     const JWTdata = req.JWTdata
 
     let success
     let success2
-    if (JWTdata.refusing == true) {
-        success2 = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friend_requests_sent": friend_user_id} } )
-        success = await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "notifications.friend_request": {user_id: JWTdata.user_id}} } )
-    } else {
+    if (refusing == true) {
+        success = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id }} } )
         success2 = await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "friend_requests_sent": JWTdata.user_id} } )
-        success = await db.collection('users_interface').updateOne( { user_id:  JWTdata.user_id }, { $pull: { "notifications.friend_request": {user_id: friend_user_id}} } )
+    } else {
+        success = await db.collection('users_interface').updateOne( { user_id: friend_user_id }, { $pull: { "notifications.friend_request": {user_id: JWTdata.user_id }} } )
+        success2 = await db.collection('users_interface').updateOne( { user_id: JWTdata.user_id }, { $pull: { "friend_requests_sent": friend_user_id} } )
     }
 
     if (!success.acknowledged && !success2.acknowledged) {
@@ -605,20 +605,20 @@ async function handleApi_deleteFriendRequest(req, res) {
     const senderSocketId = users[JWTdata.user_id]
     const receiverSocketId = users[friend_user_id]
 
-    if (JWTdata.refusing == true) {
-        if (receiverSocketId !== undefined) {        
-            io.to(receiverSocketId).emit('userInterface', {'type': "remove_pending_friend_requests", 'user_id': JWTdata.user_id})
-        }
-        if (senderSocketId !== undefined) {
-            io.to(senderSocketId).emit('userInterface', {'type': "removed_friend_requests", 'user_id': friend_user_id})
-            return res.sendStatus(200)
-        }
-    } else {
+    if (refusing == true) {
         if (receiverSocketId !== undefined) {        
             io.to(receiverSocketId).emit('userInterface', {'type': "removed_friend_requests", 'user_id': JWTdata.user_id})
         }
         if (senderSocketId !== undefined) {
             io.to(senderSocketId).emit('userInterface', {'type': "remove_pending_friend_requests", 'user_id': friend_user_id})
+            return res.sendStatus(200)
+        }
+    } else {
+        if (receiverSocketId !== undefined) {        
+            io.to(receiverSocketId).emit('userInterface', {'type': "remove_pending_friend_requests", 'user_id': JWTdata.user_id})
+        }
+        if (senderSocketId !== undefined) {
+            io.to(senderSocketId).emit('userInterface', {'type': "removed_friend_requests", 'user_id': friend_user_id})
             return res.sendStatus(200)
         }
     }

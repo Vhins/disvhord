@@ -91,7 +91,7 @@ export class SideBarChatComponent implements AfterContentChecked{
                 'Authorization': `Bearer ${localStorage.getItem('privateToken')}`
             },
             body: JSON.stringify({
-                'friend_user_id': this.user_id
+                'friend_user_id': this.user_id, 'refusing': false
             })
         })
     }
