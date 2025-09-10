@@ -6,7 +6,8 @@ export interface Messages {
     timestamp: number, 
     attachments: string | null,
     name: string,
-    logo: string
+    logo: string,
+    chat_id?: number
 }
 
 export interface api_ChatInfoMessages {

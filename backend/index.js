@@ -73,7 +73,8 @@ async function startServer(PORT){
                         "receiver": data.receiver,
                         "timestamp": new Date().getTime(),
                         "name": data.name,
-                        "logo": data.logo
+                        "logo": data.logo,
+                        "chat_id": data.chat_id
                     }
 
                     if (data.attachments) {
@@ -81,13 +82,14 @@ async function startServer(PORT){
                     }
 
                     let op1 = await db.collection('chats').findOne({ users_id: [data.sender, data.receiver] })
-                    let op2 = await db.collection('chats').findOne({ users_id: [data.receiver, data.sender] })
-
-                    if (Number(op1?.chat_id) !== Number(data.chat_id) && Number(op2?.chat_id) !== Number(data.chat_id)) {
-                        console.debug('id chat non corrisponde ai due utenti')
-                        return
+                    if (Number(op1?.chat_id) !== Number(data.chat_id)) {
+                        let op2 = await db.collection('chats').findOne({ users_id: [data.receiver, data.sender] })
+                        if (Number(op2?.chat_id) !== Number(data.chat_id)) {
+                            console.debug('id chat non corrisponde ai due utenti')
+                            return
+                        }
                     }
-                
+
                     const op = await db.collection('chats').updateOne({ chat_id: data.chat_id }, { $push: { messages: message }})
 
                     if (!op) {

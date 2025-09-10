@@ -30,9 +30,12 @@ export class MessagesService {
     
     listenForNewMessages(): void {
         this.webSocketService.on("personal_message_received").subscribe((data: Messages) => {
-            if (this.messages === null) return
+            if (this.messages === null) return //?
+            if (data.chat_id !== this.chat_id) return
+            
             data.content = this.convertMessageToBrowserFormat(data.content)
             this.messages.push(data)
+
             if (data.sender === this.user_id) {
                 this.scrollDownChat$.next(true)
             } else {
