@@ -137,7 +137,7 @@ export class PeerService {
         console.debug('rimossa chiamata da utente!', user_id)
     }
 
-    startCall(chat_user_id: number) {        
+    startCall(chat_user_id: number, user_name: string, user_logo: string): boolean {        
         if (!this.peer) return false
 
         if (this.currentCall) {
@@ -155,7 +155,7 @@ export class PeerService {
             call.answer(this.localStream!)
         })
 
-        this.webSocketService.emit('start_personal_call', {receiver: chat_user_id, sender: this.initalizeAppService.user_interface.user_id, call_id: this.peer.id})
+        this.webSocketService.emit('start_personal_call', {receiver: chat_user_id, sender: this.initalizeAppService.user_interface.user_id, call_id: this.peer.id, name: user_name, logo: user_logo})
         this.webSocketService.on('personal_call_not_started')
 
         return true

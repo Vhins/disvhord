@@ -4,7 +4,9 @@ export interface Messages {
     receiver: number, 
     message_id: number, 
     timestamp: number, 
-    attachments: string | null
+    attachments: string | null,
+    name: string,
+    logo: string
 }
 
 export interface api_ChatInfoMessages {
@@ -22,5 +24,7 @@ export interface MessageData {
     content?: string, 
     chat_id: number, 
     attachments?: string,
-    isPersonalChat: boolean
+    isPersonalChat: boolean,
+    name?: string,
+    logo?: string
 }

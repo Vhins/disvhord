@@ -6,9 +6,11 @@
 
 @if (!chatService.isPersonalChat) {
 
-    <button (click)="callThisChat()">
-        <span class="user_name"> Chiama </span>
-    </button>
+    @if (chatService.chat_user_isFriend()) {
+        <button (click)="callThisChat()">
+            <span class="user_name"> Chiama </span>
+        </button>
+    }
 
     @if (chatService.chat_user_isFriend() && !chatService.chat_user_friendRequestSend && !chatService.chat_user_friendRequestSendAcceptOrDecline) {
         <button (click)="removeFriend()">

@@ -71,7 +71,9 @@ async function startServer(PORT){
                         "attachments": null,
                         "sender": data.sender,
                         "receiver": data.receiver,
-                        "timestamp": new Date().getTime()
+                        "timestamp": new Date().getTime(),
+                        "name": data.name,
+                        "logo": data.logo
                     }
 
                     if (data.attachments) {
@@ -504,7 +506,7 @@ async function handleApi_tryToSendFriendRequest(req, res) {
 
     const sendRequest = await db.collection('users_interface').updateOne(
         { user_id: friend_user.user_id }, 
-        {  $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: timestamp, user_handle: 'prova', user_logo: ''} } } 
+        { $push: {"notifications.friend_request": { user_id: JWTdata.user_id, timestamp: timestamp} } } 
     )
     const recognizeRequest = await db.collection('users_interface').updateOne(
         { user_id: JWTdata.user_id }, 

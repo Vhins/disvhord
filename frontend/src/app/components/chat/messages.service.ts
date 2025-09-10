@@ -89,7 +89,10 @@ export class MessagesService {
     sendMessage(content: string) {
         if (!this.chatService.editingMessageMode()) {
             
-            const messageData: MessageData = { "sender": this.user_id, "receiver": this.chat_user_id, "content": content, "chat_id": this.chat_id, "isPersonalChat": this.isPersonalChat }
+            const messageData: MessageData = { 
+                "sender": this.user_id, "receiver": this.chat_user_id, "content": content, 
+                "chat_id": this.chat_id, "isPersonalChat": this.isPersonalChat, 
+                "name": this.initializeAppApiService.user_interface.user_displayName, "logo": this.initializeAppApiService.user_interface.user_logo }
             
             if (this.chatService.allegatedLink) { messageData.attachments = this.chatService.allegatedLink }
 

@@ -143,7 +143,8 @@ export class ChatComponent implements AfterViewInit {
         const status2 = this.peerService.connectToPeerServer()
         if (!status2) { console.debug('status2', status2); return }
 
-        const status3 = this.peerService.startCall(this.chatService.chat_user_id)
+        const chat_user_id = this.chatService.chat_user_id
+        const status3 = this.peerService.startCall(chat_user_id, this.chatService.users_info[chat_user_id].name, this.chatService.users_info[chat_user_id].logo)
         if (!status3) { console.debug('status3', status3); return }
     }
 

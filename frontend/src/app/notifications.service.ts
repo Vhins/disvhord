@@ -9,7 +9,7 @@ export type NotificationType = "call" | "message" | "friend_req" | "server_invit
   providedIn: 'root'
 })
 export class NotificationsService {
-    readonly showNotification$ = new BehaviorSubject<{type: NotificationType, sender: number, logo?: string, name?: string} | null>(null)
+    readonly showNotification$ = new BehaviorSubject<{type: NotificationType, sender?: number, image?: string, name?: string} | null>(null)
     readonly incomingCall$ = new BehaviorSubject<any | null>(null)
 
     private webSocketService = inject(WebSocketService)
@@ -18,17 +18,17 @@ export class NotificationsService {
     listenForNotifications() {
         this.webSocketService.on("personal_message_received").subscribe((data: Messages) => {
             if (data.sender !== this.user_id) {
-                this.showNotification$.next({type: "message", sender: data.sender})
+                this.showNotification$.next({type: "message", sender: data.sender, name: data.name, image: data.logo})
             }
         })
         this.webSocketService.on("personal_call_started").subscribe(data => {
             this.incomingCall$.next(data)
-            this.showNotification$.next({type: "call", sender: data.sender})
+            this.showNotification$.next({type: "call", sender: data.sender, name: data.name, image: data.logo})
         })
         this.webSocketService.on("userInterface").subscribe(data => {
             switch(data.type) {
             case 'pending_friend_requests':
-                this.showNotification$.next({type: "call", sender: data})
+                this.showNotification$.next({type: "friend_req", name: data.user_handle, image: data.logo})
                 break
             }
         })
