@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { NotificationsService, NotificationType } from '../../notifications.service';
 import { ChatService } from '../chat/chat.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { InitializeAppApiService } from '../../initialize-app-api.service';
 
 interface NotificationData {
     type: NotificationType
@@ -24,6 +25,7 @@ export class NotificationComponent {
     notificationsService: NotificationsService = inject(NotificationsService)
     chatService: ChatService = inject(ChatService)
     router: Router = inject(Router)
+    initializeAppApiService: InitializeAppApiService = inject(InitializeAppApiService)
 
     ngOnInit() {
         this.notificationsService.showNotification$.subscribe( data => {
@@ -53,7 +55,9 @@ export class NotificationComponent {
         console.log(fullPath)
         
         if (type === 'message' && sender !== undefined || type === 'call' && sender !== undefined) {
-            if (fullPath.startsWith('/app/home/chat')) return false
+            const chatID = this.initializeAppApiService.user_interface.chats.find( chat => chat.chat_user_id === sender )?.chat_id
+            if (fullPath.startsWith('/app/home/chat') && fullPath.endsWith(`/${chatID}`)) return false
+
             return true
         }
 
