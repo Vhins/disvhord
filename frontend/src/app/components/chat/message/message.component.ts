@@ -57,4 +57,8 @@ export class MessageComponent implements OnInit {
         if (!link) return
         window.open(link, '_blank')
     }
+
+    openUserProfile() {
+        this.chatService.openingUserProfile.set(true)
+    }
 }

@@ -1,6 +1,8 @@
 
 @if (this.aCallHasStarted) { <app-call [chat_user_id]="chatService.chat_user_id"/> }
 
+@if (chatService.openingUserProfile()) { <app-user-profile-popup/> }
+
 <div #scrollContainer class="messages-container">
     @for (message of messagesService.messages; track $index) {
         <app-message class="message" [messageData]="message" (editingMessage)="editingMessage($event)" [islastMessage]="messagesService.firstRender ? $last : false"/>

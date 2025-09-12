@@ -7,11 +7,12 @@ import { AddLinkPopupComponent } from "../add-link-popup/add-link-popup.componen
 import { ChatInputComponent } from "../chat-input/chat-input.component";
 import { MessagesService } from '../messages.service';
 import { PeerService } from '../../../peer.service';
+import { UserProfilePopupComponent } from "../../user-profile-popup/user-profile-popup.component";
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CallComponent, MessageComponent, AddLinkPopupComponent, ChatInputComponent],
+  imports: [CallComponent, MessageComponent, AddLinkPopupComponent, ChatInputComponent, UserProfilePopupComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })

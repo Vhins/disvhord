@@ -17,7 +17,7 @@ export class DataResolver {
         return this.startServices(RESULT) // RANDOM_DELAY
     }
 
-    private startServices(result: boolean, radommDelay: number = 20): Promise<boolean> {
+    private startServices(result: boolean, randomDelay: number = 20): Promise<boolean> {
         return new Promise<boolean>(resolve => {
             setTimeout(() => {
 
@@ -33,7 +33,7 @@ export class DataResolver {
                     resolve(false)
                 }
                 
-            }, radommDelay)
+            }, randomDelay)
         })
     }
 }

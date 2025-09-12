@@ -95,6 +95,14 @@ export class ChatService {
         this._allegatedLink = newLink
     }
 
+    openingUserProfile = signal<boolean>(false)
+
+    private _openedUserProfile: boolean = false
+    get openedUserProfile() { return this._openedUserProfile }
+    set openedUserProfile(bool: boolean) {
+        this._openedUserProfile = bool
+    }
+
     linkType(url: string | null | undefined): 'image' | 'video' | 'audio' | 'link' {
         if (!!url && ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.bmp'].some(ext => url.endsWith(ext))) {
             return 'image'
