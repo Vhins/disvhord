@@ -1,22 +1,22 @@
 
-<div class="allegatingFiles">
-    <h1 class="label"> Inserisci un link valido 
-        <button class="exitUI" (click)="onExit()"> X </button>
-    </h1>
-    <form (submit)="onConfirmAllegateFile()">
-        <input class="input-box-ui" [(ngModel)]="inputlinkValue" name="inputlinkValue" type="text">
-    </form>
-    <div class="description">
-        <p> Formati supportati: </p>
-        <ul>
-          <li> link: semplice link </li>
-          <li> immagini: png, jpg, jpeg, webp, avif, bmp, gif </li>
-          <li> audio: mp3, ogg, wav, aac, flac </li>
-          <li> video: mp4, webm, mov, mkv </li>
-        </ul>
-        <br>
-        <p> Formati non supportati verranno mostrati come link. </p>
-        <p> Formati supportati ma non funzionanti, non verranno caricati. </p>
-        <p> Puoi allegare solo 1 link per messaggio. </p>
-      </div>
+<div (click)="onExit()" class="wrapper">
+    <div class="allegatingFiles" (click)="$event.stopPropagation()">
+        <h1 class="label"> Inserisci un link valido </h1>
+        <form (submit)="onConfirmAllegateFile()">
+            <input class="input-box-ui" [(ngModel)]="inputlinkValue" name="inputlinkValue" type="text">
+        </form>
+        <div class="description">
+            <p> Formati supportati: </p>
+            <ul>
+              <li> link: semplice link </li>
+              <li> immagini: png, jpg, jpeg, webp, avif, bmp, gif </li>
+              <li> audio: mp3, ogg, wav, aac, flac </li>
+              <li> video: mp4, webm, mov, mkv </li>
+            </ul>
+            <br>
+            <p> Formati non supportati verranno mostrati come link. </p>
+            <p> Formati supportati ma non funzionanti, non verranno caricati. </p>
+            <p> Puoi allegare solo 1 link per messaggio. </p>
+          </div>
+    </div>
 </div>
