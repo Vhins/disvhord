@@ -34,6 +34,7 @@ export class MessagesService {
             if (data.chat_id !== this.chat_id) return
             
             data.content = this.convertMessageToBrowserFormat(data.content)
+            data.attachments = data.attachments ? this.convertAttachmentLinkToBrowserFormat(data.attachments) : data.attachments
             this.messages.push(data)
 
             if (data.sender === this.user_id) {
@@ -80,8 +81,8 @@ export class MessagesService {
 
         messages.map(message => {
             message.content = this.convertMessageToBrowserFormat(message.content)
+            message.attachments = message.attachments ? this.convertAttachmentLinkToBrowserFormat(message.attachments) : message.attachments
         })
-
         this.messages = messages
         this.chat_id = chat_id
         this.chat_user_id = responseData.chatInfo.user_id
@@ -123,8 +124,12 @@ export class MessagesService {
             .replace(/&gt;/g, '>')
             .replace(/&quot;/g, '"')
             .replace(/&#39;/g, "'")
-            .replace(/https?:\/\/[^\s<>()\[\]{}&]+(?=\s|[^\w-]|$|&nbsp;)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
-            .replace(/on\w+="[^"]*"/g, '')
+            .replace(/https?:\/\/[^\s<>()\[\]{}]+(?=\s|[^\w-]|$|&nbsp;)/g, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+            .replace(/on\w+="[^"]*"/g, '');
+    }
+    convertAttachmentLinkToBrowserFormat(content: string): string {
+        return content
+            .replace(/&amp;/g, '&')
     }
 
 }

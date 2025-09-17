@@ -54,11 +54,7 @@
     font-size: 22px;
     line-height: 22px;
     font-weight: 500;
-    cursor: pointer;
-}
-.userdisplayname:hover {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
+    cursor: default;
 }
 
 .timestamp {

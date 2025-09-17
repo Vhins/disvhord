@@ -20,7 +20,7 @@ export class AddLinkPopupComponent {
         ')' + // Fine gruppo per hostname
         '(\\:\\d+)?' + // Porta (opzionale)
         '(\\/[-a-z\\d%_.~+]*)*' + // Percorso (opzionale)
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // Query string (opzionale)
+        '(\\?[-a-z\\d%_.~+&;=]*)?' + // Query string (opzionale, ora include & e =)
         '(\\#[-a-z\\d_]*)?' + // Fragment locator (opzionale)
         '$', // Fine della stringa
         'i' // Flag case-insensitive

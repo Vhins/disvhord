@@ -2,11 +2,11 @@
 <div (mouseenter)="messageOption()" class="message-wrapper">
 
     <div class="message">
-        <img class="message-user_logo" [src]="chatService.users_info[messageData().sender].logo" alt="User logo">
+        <img class="message-user_logo" (click)="openUserProfile()" [src]="chatService.users_info[messageData().sender].logo" alt="User logo">
 
         <div class="message-stuff">
             <div class="message-stufff">
-                <div class="userdisplayname userselection" (click)="openUserProfile()"> {{chatService.users_info[messageData().sender].name}} </div>
+                <div class="userdisplayname userselection"> {{chatService.users_info[messageData().sender].name}} </div>
                 <div class="timestamp userselection"> {{messageData().timestamp | date: 'dd/MM/yyyy HH:mm'}} </div>
             </div>
             <div class="content userselection" [innerHTML]="messageData().content"> </div>
