@@ -8,15 +8,19 @@
         <div class="description">
             <p> Formati supportati: </p>
             <ul>
-              <li> link: semplice link </li>
+              <li> link: dominio, ip, localhost </li>
               <li> immagini: png, jpg, jpeg, webp, avif, bmp, gif </li>
               <li> audio: mp3, ogg, wav, aac, flac </li>
               <li> video: mp4, webm, mov, mkv </li>
             </ul>
             <br>
             <p> Formati non supportati verranno mostrati come link. </p>
-            <p> Formati supportati ma non funzionanti, non verranno caricati. </p>
-            <p> Puoi allegare solo 1 link per messaggio. </p>
+            @if (!invalidMediaLink) {
+                <p> Formati supportati non funzionanti, non verranno caricati. </p>
+            } @else {
+                <p class="error"> Formato non valido o il link non punta ad un file di quel tipo. </p>
+            }
+            <p> Puoi allegare solo un link per messaggio. </p>
           </div>
     </div>
 </div>

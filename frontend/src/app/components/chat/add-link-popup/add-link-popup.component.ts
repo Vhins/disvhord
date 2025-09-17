@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../chat.service';
 
@@ -12,22 +12,32 @@ import { ChatService } from '../chat.service';
 export class AddLinkPopupComponent {
     inputlinkValue: string = ""
     linkRegExp: RegExp = new RegExp(
-        '^(https?:\\/\\/)?'+ // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        '(\\#[-a-z\\d_]*)?$','i' // fragment locator
+        '^(https?:\\/\\/)?' + // Protocollo (opzionale)
+        '(' + // Inizio gruppo per hostname
+        '(([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // Dominio
+        'localhost|' + // localhost
+        '((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)' + // Indirizzo IP
+        ')' + // Fine gruppo per hostname
+        '(\\:\\d+)?' + // Porta (opzionale)
+        '(\\/[-a-z\\d%_.~+]*)*' + // Percorso (opzionale)
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // Query string (opzionale)
+        '(\\#[-a-z\\d_]*)?' + // Fragment locator (opzionale)
+        '$', // Fine della stringa
+        'i' // Flag case-insensitive
     )
-
-    constructor(private chatService: ChatService) {}
+    invalidMediaLink: boolean = false
+    
+    chatService: ChatService = inject(ChatService)
 
     async onConfirmAllegateFile() {
         if (!this.linkRegExp.test(this.inputlinkValue)) return
 
         const linkType = this.chatService.linkType(this.inputlinkValue)
         if (linkType !== "link"){
-            if (!await this.checkMediaValidity(this.inputlinkValue, linkType)) return
+            if (!await this.checkMediaValidity(this.inputlinkValue, linkType)){ 
+                this.invalidMediaLink = true
+                return
+            }
         }
 
         this.chatService.allegatingLink.set(false)
