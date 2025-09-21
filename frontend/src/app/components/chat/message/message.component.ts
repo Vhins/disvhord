@@ -58,7 +58,8 @@ export class MessageComponent implements OnInit {
         window.open(link, '_blank')
     }
 
-    openUserProfile() {
+    openUserProfile(user_id: number) {
         this.chatService.openingUserProfile.set(true)
+        this.chatService.openedUserProfile = user_id
     }
 }

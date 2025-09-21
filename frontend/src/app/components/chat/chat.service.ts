@@ -97,10 +97,10 @@ export class ChatService {
 
     openingUserProfile = signal<boolean>(false)
 
-    private _openedUserProfile: boolean = false
+    private _openedUserProfile: number | null = null
     get openedUserProfile() { return this._openedUserProfile }
-    set openedUserProfile(bool: boolean) {
-        this._openedUserProfile = bool
+    set openedUserProfile(user_id: number | null) {
+        this._openedUserProfile = user_id
     }
 
     linkType(url: string | null | undefined): 'image' | 'video' | 'audio' | 'link' {

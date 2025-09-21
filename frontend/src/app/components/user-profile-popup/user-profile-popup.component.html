@@ -1,6 +1,7 @@
 
 <div class="wrapper" (click)="close()">
     <div class="popup" (click)="$event.stopPropagation()">
-
+        <img class="user_logo" [src]="user_chat_logo">
+        <span class="user_name"> {{user_chat_name}} </span>
     </div>
 </div>

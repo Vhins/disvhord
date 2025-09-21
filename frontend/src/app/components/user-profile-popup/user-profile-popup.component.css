@@ -21,4 +21,20 @@
     width: 550px;
     height: 600px;
     border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.user_logo {
+    width: 150px;
+    height: 150px;
+    border-radius: 100%;
+}
+
+.user_name {
+    font-size: 30px;
+    font-weight: 600;
 }
