@@ -38,3 +38,8 @@
     font-size: 30px;
     font-weight: 600;
 }
+
+.user_bio {
+    width: 80%;
+    text-align: center;
+}
